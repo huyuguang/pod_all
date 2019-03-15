@@ -1,6 +1,7 @@
 #include "mkl_tree.h"
 
 #include <cryptopp/sha.h>
+#include <cassert>
 #include "tick.h"
 
 namespace mkl {
@@ -34,7 +35,7 @@ void TwoToOne(h256_t const& a, h256_t const& b, h256_t* r) {
 
 // return mkl root
 h256_t CalcPath(GetItem get_item, uint64_t item_count, uint64_t leaf,
-                std::vector<h256_t>* path) {
+                Path* path) {
   auto get_item_or_empty = [&get_item, item_count](uint64_t i) {
     if (i < item_count) return get_item(i);
     return kEmptyH256;
@@ -139,7 +140,7 @@ h256_t CalcRoot(GetItem get_item, uint64_t item_count) {
 }
 
 bool VerifyPath(uint64_t pos, h256_t value, uint64_t count, h256_t const& root,
-                std::vector<h256_t> const& path) {
+                Path const& path) {
   // Tick tick(__FUNCTION__);
   auto depth = Log2UB(count);
   assert(path.size() == depth);
@@ -159,7 +160,7 @@ bool VerifyPath(uint64_t pos, h256_t value, uint64_t count, h256_t const& root,
 }
 
 bool VerifyRangePath(GetItem get_item, Range const& range, uint64_t item_count,
-                     h256_t const& root, std::vector<h256_t> const& path) {
+                     h256_t const& root, Path const& path) {
   assert(range.start < item_count);
   if (range.start >= item_count) return false;
   assert(range.count && range.count <= item_count);
@@ -241,7 +242,7 @@ std::vector<Range> SplitRange(Range const& range) {
   return ret;
 }
 
-std::vector<h256_t> BuildTree(uint64_t item_count, GetItem const& get_item) {
+Tree BuildTree(uint64_t item_count, GetItem const& get_item) {
   std::vector<h256_t> digests;
   if (item_count == 1) {
     digests.push_back(get_item(0));
@@ -283,8 +284,8 @@ size_t GetTreeSize(uint64_t item_count) {
   return Pow2UB(item_count) - 1;
 }
 
-std::vector<h256_t> GetRangePath(uint64_t item_count, GetItem const& get_item,
-                  std::vector<h256_t> const& tree, Range const& range) {
+Path GetRangePath(uint64_t item_count, GetItem const& get_item,
+                  Tree const& tree, Range const& range) {
   std::vector<h256_t> path;
   if (tree.size() != GetTreeSize(item_count))
     throw std::runtime_error("invaild parameters");

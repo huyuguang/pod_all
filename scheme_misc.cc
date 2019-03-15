@@ -1,10 +1,55 @@
-#include "task_misc.h"
+#include "scheme_misc.h"
 
-#include "public.h"
-#include "mkl_tree.h"
-#include "misc.h"
+#include "chain.h"
 #include "ecc_pub.h"
+#include "misc.h"
+#include "mkl_tree.h"
 #include "multiexp.h"
+#include "public.h"
+
+namespace scheme_misc {
+std::istream& operator>>(std::istream& in, Mode& t) {
+  std::string token;
+  in >> token;
+  if (token == "plain") {
+    t = Mode::kPlain;
+  } else if (token == "table") {
+    t = Mode::kTable;
+  } else {
+    in.setstate(std::ios_base::failbit);
+  }
+  return in;
+}
+
+std::ostream& operator<<(std::ostream& os, Mode const& t) {
+  if (t == Mode::kPlain) {
+    os << "plain";
+  } else if (t == Mode::kTable) {
+    os << "table";
+  } else {
+    os.setstate(std::ios_base::failbit);
+  }
+  return os;
+}
+
+bool GetBulletinMode(std::string const& file, Mode& mode) {
+  try {
+    pt::ptree tree;
+    pt::read_json(file, tree);
+    auto str = tree.get<std::string>("mode");
+    if (str == "table") {
+      mode = Mode::kTable;
+    } else if (str == "plain") {
+      mode = Mode::kPlain;
+    } else {
+      return false;
+    }
+    return true;
+  } catch (std::exception&) {
+    assert(false);
+    return false;
+  }
+}
 
 void LoadMij(uint8_t const* data_start, uint8_t const* data_end, uint64_t i,
              uint64_t j, uint64_t s, Fr& mij) {
@@ -60,8 +105,34 @@ bool SaveMkl(std::string const& output, std::vector<h256_t> const& mkl_tree) {
   }
 }
 
+bool LoadMkl(std::string const& input, uint64_t n,
+             std::vector<h256_t>& mkl_tree) {
+  try {
+    io::mapped_file_params params;
+    params.path = input;
+    params.flags = io::mapped_file_base::readonly;
+    io::mapped_file_source view(params);
+    auto tree_size = mkl::GetTreeSize(n);
+    if (view.size() != tree_size * 32) {
+      assert(false);
+      return false;
+    }
+    mkl_tree.resize(tree_size);
+    auto start = (uint8_t*)view.data();
+    for (size_t i = 0; i < tree_size; ++i) {
+      h256_t& h = mkl_tree[i];
+      memcpy(h.data(), start + i * h.size(), h.size());
+    }
+
+    return true;
+  } catch (std::exception&) {
+    assert(false);
+    return false;
+  }
+}
+
 std::vector<G1> CalcSigma(std::vector<Fr> const& m, uint64_t n, uint64_t s) {
-  assert(m.size() == n*s);
+  assert(m.size() == n * s);
 
   auto const& ecc_pub = GetEccPub();
 
@@ -102,6 +173,26 @@ bool SaveSigma(std::string const& output, std::vector<G1> const& sigma) {
   }
 }
 
+bool LoadSigma(std::string const& input, uint64_t n, std::vector<G1>& sigmas) {
+  try {
+    io::mapped_file_params params;
+    params.path = input;
+    params.flags = io::mapped_file_base::readonly;
+    io::mapped_file_source view(params);
+    if (view.size() != n * 32) return false;
+
+    sigmas.resize(n);
+    auto start = (uint8_t*)view.data();
+    for (size_t i = 0; i < n; ++i) {
+      sigmas[i] = BinToG1(start + i * 32);
+    }
+    return true;
+  } catch (std::exception&) {
+    assert(false);
+    return false;
+  }
+}
+
 bool SaveMatrix(std::string const& output, std::vector<Fr> const& m) {
   try {
     io::mapped_file_params params;
@@ -120,19 +211,34 @@ bool SaveMatrix(std::string const& output, std::vector<Fr> const& m) {
   }
 }
 
-bool GetFileSha256(std::string const& file, h256_t& h) {
+bool LoadMatrix(std::string const& input, uint64_t ns, std::vector<Fr>& m) {
   try {
     io::mapped_file_params params;
-    params.path = file;
+    params.path = input;
     params.flags = io::mapped_file_base::readonly;
     io::mapped_file_source view(params);
+    if (view.size() != 32 * ns) return false;
 
-    CryptoPP::SHA256 hash;
-    hash.Update((uint8_t const*)view.data(), view.size());
-    hash.Final(h.data());
+    auto start = (uint8_t*)view.data();
+    m.resize(ns);
+    for (uint64_t i = 0; i < m.size(); ++i) {
+      if (!BinToFr32(start + i * 32, &m[i])) {
+        assert(false);
+        return false;
+      }
+    }
     return true;
   } catch (std::exception&) {
-    assert(false);
     return false;
   }
 }
+
+std::vector<h256_t> BuildSigmaMklTree(std::vector<G1> const& sigmas) {
+  auto get_sigma = [&sigmas](uint64_t i) -> h256_t {
+    return G1ToBin(sigmas[i]);
+  };
+  return mkl::BuildTree(sigmas.size(), get_sigma);
+}
+
+}  // namespace scheme_misc
+

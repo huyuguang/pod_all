@@ -104,10 +104,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="bulletin.cc" />
-    <ClCompile Include="key_meta.cc" />
+    <ClCompile Include="bulletin_plain.cc" />
+    <ClCompile Include="bulletin_table.cc" />
     <ClCompile Include="pod_publish\main.cc" />
-    <ClCompile Include="table_task.cc" />
+    <ClCompile Include="pod_publish\publish.cc" />
     <ClCompile Include="csv\csv_reader.cc" />
     <ClCompile Include="csv\csv_reader_iterator.cc" />
     <ClCompile Include="csv\csv_row.cc" />
@@ -116,13 +116,15 @@
     <ClCompile Include="ecc.cc" />
     <ClCompile Include="fp.cc" />
     <ClCompile Include="mkl_tree.cc" />
-    <ClCompile Include="plain_task.cc" />
-    <ClCompile Include="task_misc.cc" />
+    <ClCompile Include="scheme_misc.cc" />
+    <ClCompile Include="scheme_plain.cc" />
+    <ClCompile Include="scheme_table.cc" />
+    <ClCompile Include="vrf_meta.cc" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="bulletin.h" />
-    <ClInclude Include="key_meta.h" />
-    <ClInclude Include="table_task.h" />
+    <ClInclude Include="bulletin_plain.h" />
+    <ClInclude Include="bulletin_table.h" />
+    <ClInclude Include="pod_publish\publish.h" />
     <ClInclude Include="basic_types.h" />
     <ClInclude Include="bp.h" />
     <ClInclude Include="chain.h" />
@@ -193,11 +195,13 @@
     <ClInclude Include="msvc_hack.h" />
     <ClInclude Include="multiexp.h" />
     <ClInclude Include="public.h" />
-    <ClInclude Include="plain_task.h" />
+    <ClInclude Include="scheme_plain.h" />
+    <ClInclude Include="scheme_table.h" />
     <ClInclude Include="schnorr.h" />
-    <ClInclude Include="task_misc.h" />
+    <ClInclude Include="scheme_misc.h" />
     <ClInclude Include="tick.h" />
     <ClInclude Include="vrf.h" />
+    <ClInclude Include="vrf_meta.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="pod_publish\Makefile" />

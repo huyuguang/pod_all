@@ -54,22 +54,28 @@
     <ClCompile Include="csv\data_type.cc">
       <Filter>cvs</Filter>
     </ClCompile>
-    <ClCompile Include="task_misc.cc">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="plain_task.cc">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="table_task.cc">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="bulletin.cc">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="key_meta.cc">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="pod_publish\main.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="scheme_misc.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="pod_publish\publish.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="bulletin_plain.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="bulletin_table.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="scheme_plain.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="scheme_table.cc">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="vrf_meta.cc">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -287,25 +293,31 @@
     <ClInclude Include="csv\memory.h">
       <Filter>cvs</Filter>
     </ClInclude>
-    <ClInclude Include="task_misc.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="plain_task.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="table_task.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="vrf.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ecc_pub.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="bulletin.h">
+    <ClInclude Include="scheme_misc.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="key_meta.h">
+    <ClInclude Include="pod_publish\publish.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="bulletin_plain.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="bulletin_table.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="scheme_plain.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="scheme_table.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="vrf_meta.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

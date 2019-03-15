@@ -113,7 +113,57 @@ bool Verify(Pk<N> const& pk, uint8_t const* x, Fsk const& fsk,
   return ret;
 }
 
+template <size_t N = 32>
+void ProveWithR(Sk<N> const& sk, uint8_t const* x, Fr const& r,
+                Psk<N>& psk_exp_r) {
+  Tick tick(__FUNCTION__);
+  auto& ecc_pub = GetEccPub();
+  std::array<Fr, N> a;
+  a[0] = sk[0] + x[0];
+  for (size_t i = 1; i < N; ++i) {
+    a[i] = a[i - 1] * (sk[i] + x[i]);
+  }
+  for (auto& i : a) {
+    i = FrInv(i);
+  }
+  for (size_t i = 0; i < N; ++i) {
+    psk_exp_r[i] = ecc_pub.PowerG1(a[i] * r);
+  }
+}
+
+template <size_t N = 32>
+bool VerifyWithR(Pk<N> const& pk, uint8_t const* x, Psk<N> const& psk_exp_r,
+                 G1 const& g1_exp_r) {
+  Tick tick(__FUNCTION__);
+  auto& ecc_pub = GetEccPub();
+
+  bool ret =
+      PairingMatch(g1_exp_r, psk_exp_r[0], ecc_pub.PowerG2(x[0]) + pk[0]);
+  if (!ret) {
+    assert(false);
+    return false;
+  }
+
+  for (size_t i = 1; i < N; ++i) {
+    ret = PairingMatch(psk_exp_r[i - 1], psk_exp_r[i],
+                       ecc_pub.PowerG2(x[i]) + pk[i]);
+    if (!ret) {
+      assert(false);
+      return false;
+    }
+  }
+
+  return true;
+}
+
+inline void GetFskFromPskExpR(G1 const& psk_exp_r, Fr const& r, Fsk& fsk) {
+  Fr inv_r = FrInv(r);
+  G1 psk = psk_exp_r * inv_r;
+  mcl::bn256::pairing(fsk, psk, detail::GetU());
+}
+
 inline bool Test() {
+  auto& ecc_pub = GetEccPub();
   Pk<> pk;
   Sk<> sk;
   Generate<>(pk, sk);
@@ -125,11 +175,27 @@ inline bool Test() {
   Fsk fsk = Vrf<>(sk, x.data());
 
   Psk<> psk;
-  Prove(sk, x.data(), psk);
+  Prove<>(sk, x.data(), psk);
 
   bool ret = Verify<>(pk, x.data(), fsk, psk);
   assert(ret);
+  if (!ret) return false;
 
-  return ret;
+  Fr r = FrRand();
+  Psk<> psk_exp_r;
+  ProveWithR<>(sk, x.data(), r, psk_exp_r);
+
+  
+  G1 g1_exp_r = ecc_pub.PowerG1(r);
+  ret = VerifyWithR<>(pk, x.data(), psk_exp_r, g1_exp_r);
+  assert(ret);
+  if (!ret) return false;
+
+  Fsk fsk2;
+  GetFskFromPskExpR(psk_exp_r.back(), r, fsk2);
+
+  assert(fsk2 == fsk);
+  if (fsk2 != fsk) return false;
+  return true;
 }
 }  // namespace vrf

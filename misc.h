@@ -131,4 +131,46 @@ inline bool Str2UInt(std::string s, uint64_t* v) {
   }
 }
 
+inline bool IsSameFile(std::string const& file1, std::string const& file2) {
+  try {
+    io::mapped_file_params params1;
+    params1.path = file1;
+    params1.flags = io::mapped_file_base::readonly;
+    io::mapped_file_source view1(params1);
+
+    io::mapped_file_params params2;
+    params2.path = file2;
+    params2.flags = io::mapped_file_base::readonly;
+    io::mapped_file_source view2(params2);
+
+    if (view1.size() != view2.size()) return false;
+
+    return memcmp(view1.data(), view2.data(), view1.size()) == 0;
+  } catch (std::exception&) {
+    return false;
+  }
+}
+
+inline bool GetFileSha256(std::string const& file, h256_t& h) {
+  try {
+    io::mapped_file_params params;
+    params.path = file;
+    params.flags = io::mapped_file_base::readonly;
+    io::mapped_file_source view(params);
+
+    CryptoPP::SHA256 hash;
+    hash.Update((uint8_t const*)view.data(), view.size());
+    hash.Final(h.data());
+    return true;
+  } catch (std::exception&) {
+    assert(false);
+    return false;
+  }
+}
+
+inline void HexStrToH256(std::string const& str, h256_t& h) {
+  if (str.size() != 32 * 2) throw std::invalid_argument("");
+  StrToHex(str.c_str(), str.size(), h.data());
+}
+
 }  // namespace misc

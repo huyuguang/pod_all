@@ -47,17 +47,24 @@ bool LoadTable(std::string const& file, table::Type table_type,
   return LoadCsvTable(file, col_names, table);
 }
 
-void AddRubbishTail(table::Table& table,std::vector<uint64_t> key_index) {
-  // make sure the rubbish do not has same value
+void PadRubbishRow(table::Table& table) {
+  table::Record record(table[0].size());
+  for(auto& i:record)   {
+    i = "PAD";
+  }
+  table.emplace_back(std::move(record));
 }
 }  // namespace
 
 bool PublishTable(std::string publish_file, std::string output_path,
                   scheme_misc::table::Type table_type,
-                  std::vector<uint64_t> vrf_colnums_index) {
+                  std::vector<uint64_t> vrf_colnums_index,
+                  std::vector<bool> unique_key) {
   using namespace scheme_misc;
   using namespace scheme_misc::table;
   using namespace misc;
+
+  assert(unique_key.size() == vrf_colnums_index.size());
 
   auto& ecc_pub = GetEccPub();
   boost::system::error_code err;
@@ -111,13 +118,21 @@ bool PublishTable(std::string publish_file, std::string output_path,
   for (uint64_t i = 0; i < vrf_colnums_index.size(); ++i) {
     vrf_meta.keys[i].column_index = vrf_colnums_index[i];
     vrf_meta.keys[i].j = i;
+    vrf_meta.keys[i].unique = unique_key[i];
   }
 
-  UniqueRecords(table, vrf_colnums_index);
+  std::vector<uint64_t> unique_index;
+  for (uint64_t i = 0; i < vrf_colnums_index.size(); ++i) {
+    if (unique_key[i]) unique_index.push_back(vrf_colnums_index[i]);
+  }
+  UniqueRecords(table, unique_index);
 
-  Bulletin bulletin;
-  bulletin.n = table.size();
+  PadRubbishRow(table);
+
   auto max_record_size = GetMaxRecordSize(table);
+  
+  Bulletin bulletin;
+  bulletin.n = table.size();  
   auto record_fr_num = (max_record_size + 30) / 31;
   bulletin.s = vrf_colnums_index.size() + 1 + record_fr_num;
   auto max_s = ecc_pub.u1().size();
@@ -127,8 +142,7 @@ bool PublishTable(std::string publish_file, std::string output_path,
   }
 
   std::vector<Fr> m(bulletin.n * bulletin.s);
-  DataToM(table, vrf_colnums_index, bulletin.s, vrf_sk, m);
-
+  DataToM(table, vrf_colnums_index, bulletin.s, vrf_sk, m);  
   if (!SaveMatrix(matrix_file, m)) {
     assert(false);
     return false;
@@ -172,6 +186,16 @@ bool PublishTable(std::string publish_file, std::string output_path,
     for (size_t i = 0; i < bulletin.n; ++i) {
       km[i] = m[i * bulletin.s + j];
     }
+
+    // NOTE: After UniqueRecords(), all of the keys are difference. But there
+    // still has very small probability that the km is not unique (two
+    // difference key have same digest).
+    // Here just simply not supporting such data.
+    if (vrf_meta.keys[j].unique && !IsElementUnique(km)) {
+      assert(false);
+      return false;
+    }
+
     // save key_m_files
     if (!SaveMatrix(key_m_files[j], km)) {
       assert(false);

@@ -39,4 +39,6 @@ std::vector<G1> CalcSigma(std::vector<Fr> const& m, uint64_t n, uint64_t s);
 std::vector<h256_t> BuildSigmaMklTree(std::vector<G1> const& sigmas);
 
 bool GetBulletinMode(std::string const& file, Mode& mode);
+
+bool IsElementUnique(std::vector<Fr> const v);
 }  // namespace scheme_misc

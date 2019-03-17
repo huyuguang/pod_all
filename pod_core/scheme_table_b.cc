@@ -47,6 +47,11 @@ void B::LoadAndVerifyData() {
       throw std::runtime_error("invalid key m file");
     }
 
+    if (vrf_meta_.keys[j].unique && !IsElementUnique(km)) {
+      assert(false);
+      throw std::runtime_error("km not unique");
+    }
+
     auto get_item = [&km](uint64_t i) -> h256_t {
       if (i < km.size()) {
         h256_t h;

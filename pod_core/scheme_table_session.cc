@@ -6,7 +6,8 @@
 
 namespace scheme_misc::table {
 
-Session::Session(APtr a) : a_(a) {
+Session::Session(APtr a, h256_t const& self_id, h256_t const& peer_id)
+    : a_(a), self_id_(self_id), peer_id_(peer_id) {
   auto const& ecc_pub = GetEccPub();
   r_ = FrRand();
   g_exp_r_ = ecc_pub.PowerG1(r_);
@@ -25,7 +26,7 @@ bool Session::OnQueryReq(QueryReq const& req, QueryRsp& rsp) {
 
   vrf::ProveWithR(a_->vrf_sk(), digest.data(), r_, rsp.psk_exp_r);
 
-#ifdef _DEBUG  
+#ifdef _DEBUG
   vrf::Fsk fsk2 = vrf::Vrf(a_->vrf_sk(), digest.data());
   vrf::VerifyWithR(a_->vrf_pk(), digest.data(), rsp.psk_exp_r, rsp.g_exp_r);
   vrf::Fsk fsk1;
@@ -35,9 +36,9 @@ bool Session::OnQueryReq(QueryReq const& req, QueryRsp& rsp) {
   return true;
 }
 
-bool Session::OnQueryReceipt(QueryReceipt const& receipt, Fr& r) {
+bool Session::OnQueryReceipt(QueryReceipt const& receipt, QuerySecret& secret) {
   if (receipt.g_exp_r != g_exp_r_) return false;
-  r = r_;
+  secret.r = r_;
   return true;
 }
 }  // namespace scheme_misc::table

@@ -20,4 +20,8 @@ struct QueryRsp {
 struct QueryReceipt {
   G1 g_exp_r;
 };
+
+struct QuerySecret {
+  Fr r;
+};
 }  // namespace scheme_misc::table

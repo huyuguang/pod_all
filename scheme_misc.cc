@@ -240,5 +240,17 @@ std::vector<h256_t> BuildSigmaMklTree(std::vector<G1> const& sigmas) {
   return mkl::BuildTree(sigmas.size(), get_sigma);
 }
 
+bool IsElementUnique(std::vector<Fr> const v) {
+  std::vector<Fr const*> pv(v.size());
+  for (size_t i = 0; i < v.size(); ++i) pv[i] = &v[i];
+
+  auto compare = [](Fr const* a, Fr const* b) {
+    return a->getMpz() < b->getMpz();
+  };
+
+  std::sort(pv.begin(), pv.end(), compare);
+
+  return std::adjacent_find(pv.begin(), pv.end(), compare) == pv.end();
+}
 }  // namespace scheme_misc
 

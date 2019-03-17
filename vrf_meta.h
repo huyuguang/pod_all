@@ -15,6 +15,7 @@ struct VrfKeyMeta {
   uint64_t j;
   h256_t mj_mkl_root;
   h256_t bp_digest;
+  bool unique;
   bool operator==(VrfKeyMeta const& v) const;
   bool operator!=(VrfKeyMeta const& v) const;
 };

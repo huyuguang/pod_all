@@ -1,15 +1,19 @@
 #include "scheme_table_client.h"
 #include "public.h"
+#include "scheme_table.h"
 #include "scheme_table_b.h"
 #include "scheme_table_protocol.h"
 #include "vrf.h"
-#include "scheme_table.h"
 
 namespace scheme_misc::table {
 
-Client::Client(BPtr b, std::string const& key_name,
-               std::string const& key_value)
-    : b_(b), key_name_(key_name), key_value_(key_value) {
+Client::Client(BPtr b, h256_t const& self_id, h256_t const& peer_id,
+               std::string const& key_name, std::string const& key_value)
+    : b_(b),
+      self_id_(self_id),
+      peer_id_(peer_id),
+      key_name_(key_name),
+      key_value_(key_value) {
   vrf_key_ = GetKeyMetaByName(b_->vrf_meta(), key_name);
   if (!vrf_key_) throw std::runtime_error("invalid key_name");
 
@@ -29,15 +33,16 @@ bool Client::OnQueryRsp(QueryRsp const& rsp, QueryReceipt& receipt) {
   return true;
 }
 
-bool Client::OnR(Fr const& r, int64_t& position) {
+bool Client::OnSecretReveal(QuerySecret const& query_secret,
+                            std::vector<uint64_t>& positions) {
   auto const& ecc_pub = GetEccPub();
-  if (ecc_pub.PowerG1(r) != g_exp_r_) {
+  if (ecc_pub.PowerG1(query_secret.r) != g_exp_r_) {
     assert(false);
     return false;
   }
 
-  vrf::GetFskFromPskExpR(last_psk_exp_r_, r, fsk_);
-  
+  vrf::GetFskFromPskExpR(last_psk_exp_r_, query_secret.r, fsk_);
+
   uint8_t fsk_bin[12 * 32];
   fsk_.serialize(fsk_bin, sizeof(fsk_bin), mcl::IoMode::IoSerialize);
 
@@ -50,11 +55,11 @@ bool Client::OnR(Fr const& r, int64_t& position) {
   auto const& key_m = b_->key_m();
   auto const& km = key_m[vrf_key_->j];
 
-  auto it = std::find(km.begin(), km.end(), fr_fsk);
-  if (it == km.end()) {
-    position = -1;
-  } else {
-    position = std::distance(km.begin(), it);
+  for (uint64_t i = 0; i < km.size(); ++i) {
+    if (fr_fsk == km[i]) {
+      positions.push_back(i);
+      if (vrf_key_->unique) break;
+    }
   }
 
   return true;

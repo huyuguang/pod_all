@@ -13,15 +13,19 @@ typedef std::shared_ptr<A> APtr;
 struct QueryReq;
 struct QueryRsp;
 struct QueryReceipt;
+struct QuerySecret;
 
 class Session {
  public:
-  Session(APtr a);
+  // The self_id and peer_id are useless now, just for later convenience.
+  Session(APtr a, h256_t const& self_id, h256_t const& peer_id);
   bool OnQueryReq(QueryReq const& req, QueryRsp& rsp);
-  bool OnQueryReceipt(QueryReceipt const& receipt, Fr& r);
+  bool OnQueryReceipt(QueryReceipt const& receipt, QuerySecret& secret);
 
  private:
   APtr a_;
+  h256_t self_id_;
+  h256_t peer_id_;
 
  private:
   Fr r_;

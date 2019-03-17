@@ -55,6 +55,7 @@ bool SaveVrfMeta(std::string const& output, VrfMeta const& data) {
     pt::ptree vrf_keys_node;
     for (auto const& i : data.keys) {
       pt::ptree vrf_key_node;
+      vrf_key_node.put("unique", i.unique);
       vrf_key_node.put("j", i.j);
       vrf_key_node.put("column_index", i.column_index);
       vrf_key_node.put("mj_mkl_root", misc::HexToStr(i.mj_mkl_root));
@@ -97,6 +98,7 @@ bool LoadVrfMeta(std::string const& input, h256_t const& digest,
 
     for (pt::ptree::value_type& pt_key : tree.get_child("keys")) {
       VrfKeyMeta vrf_key;
+      vrf_key.unique = pt_key.second.get<bool>("unique");
       vrf_key.j = pt_key.second.get<uint32_t>("j");
       vrf_key.column_index = pt_key.second.get<uint32_t>("column_index");
       str = pt_key.second.get<std::string>("mj_mkl_root");

@@ -21,6 +21,7 @@ int main(int argc, char** argv) {
   std::string output_path;
   Type table_type;
   std::vector<uint64_t> vrf_colnum_index;
+  std::vector<bool> unique_key;
   uint64_t column_num;
   std::string ecc_pub_file;
 
@@ -49,8 +50,12 @@ int main(int argc, char** argv) {
         "plain mode (default 1024)")(
         "vrf_colnum_index,k",
         po::value<std::vector<uint64_t>>(&vrf_colnum_index)->multitoken(),
-        "Provide the publish file vrf key column index"
-        "positions in table mode (for example: -v 0 1 3)");
+        "Provide the publish file vrf key column index "
+        "positions in table mode (for example: -v 0 1 3)")(
+        "unique_key,u",
+        po::value<std::vector<bool>>(&unique_key)->multitoken(),
+        "Provide the flag if publish must unique the key"
+        " in table mode (for example: -u 1 0 1)");
 
     boost::program_options::variables_map vmap;
 
@@ -111,6 +116,7 @@ int main(int argc, char** argv) {
         std::cout << options << std::endl;
         return -1;
       }
+      unique_key.resize(vrf_colnum_index.size());
     }
   } catch (std::exception& e) {
     std::cout << "Unknown parameters.\n"
@@ -135,7 +141,8 @@ int main(int argc, char** argv) {
     case Mode::kTable: {
       bool ret =
           PublishTable(std::move(publish_file), std::move(output_path),
-                       std::move(table_type), std::move(vrf_colnum_index));
+                       std::move(table_type), std::move(vrf_colnum_index),
+            std::move(unique_key));
       return ret ? 0 : -1;
     }
     default:

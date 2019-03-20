@@ -1,7 +1,8 @@
 #include "scheme_plain.h"
-#include "public.h"
 #include "ecc.h"
+#include "public.h"
 #include "scheme_misc.h"
+#include "mkl_tree.h"
 
 namespace scheme_misc::plain {
 
@@ -28,7 +29,7 @@ bool DataToM(std::string const& pathname, uint64_t size, uint64_t n,
     for (uint64_t i = 0; i < n; ++i) {
       m[i * s] = FrRand();  // pad random fr
       for (uint64_t j = 1; j < s; ++j) {
-        LoadMij(start, end, i, j, s, m[i * s + j]);
+        LoadMij(start, end, i, j - 1, column_num, m[i * s + j]);
       }
     }
     return true;
@@ -79,4 +80,32 @@ bool MToFile(std::string const& file, uint64_t size, uint64_t s, uint64_t start,
   return true;
 }
 
-}  // namespace scheme_misc
+void BuildK(std::vector<Fr> const& v, std::vector<G1>& k, uint64_t s) {
+  Tick _tick_(__FUNCTION__);
+
+  assert(v.size() % s == 0);
+
+  auto const& ecc_pub = GetEccPub();
+  uint64_t n = v.size() / s;
+  k.resize(v.size());
+
+#pragma omp parallel for
+  for (int64_t i = 0; i < (int64_t)n; ++i) {
+    for (int64_t j = 0; j < (int64_t)s; ++j) {
+      auto offset = i * s + j;
+      k[offset] = ecc_pub.PowerU1(j, v[offset]);
+      k[offset].normalize(); // since we will serialize k (mkl root) later
+    }
+  }
+}
+
+h256_t CalcRootOfK(std::vector<G1> const& k) {
+  Tick _tick_(__FUNCTION__);
+  auto get_k = [&k](uint64_t i) -> h256_t {
+    assert(i < k.size());
+    return G1ToBin(k[i]);
+  };
+  return mkl::CalcRoot(std::move(get_k), k.size());
+}
+
+}  // namespace scheme_misc::plain

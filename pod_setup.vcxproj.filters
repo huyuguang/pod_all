@@ -1,14 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Source Files">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
-    </Filter>
-    <Filter Include="Header Files">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hh;hpp;hxx;hm;inl;inc;ipp;xsd</Extensions>
-    </Filter>
     <Filter Include="Resource Files">
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
@@ -25,25 +17,25 @@
     <Filter Include="libmcl\include\mcl">
       <UniqueIdentifier>{05e30be5-3541-4681-9b73-59b2fc219638}</UniqueIdentifier>
     </Filter>
+    <Filter Include="local">
+      <UniqueIdentifier>{43a7decb-7a5b-4528-8f15-b0b07b4881b4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="public">
+      <UniqueIdentifier>{2c055482-74d3-4b83-be0b-bc8908b2d8f7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="ecc.cc">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="fp.cc">
       <Filter>libmcl</Filter>
     </ClCompile>
+    <ClCompile Include="ecc.cc">
+      <Filter>public</Filter>
+    </ClCompile>
     <ClCompile Include="pod_setup\main.cc">
-      <Filter>Source Files</Filter>
+      <Filter>local</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="tick.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ecc.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="mcl\include\mcl\aggregate_sig.hpp">
       <Filter>libmcl\include\mcl</Filter>
     </ClInclude>
@@ -200,11 +192,17 @@
     <ClInclude Include="mcl\include\cybozu\xorshift.hpp">
       <Filter>libmcl\include\cybozu</Filter>
     </ClInclude>
-    <ClInclude Include="msvc_hack.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="ecc.h">
+      <Filter>public</Filter>
     </ClInclude>
     <ClInclude Include="ecc_pub.h">
-      <Filter>Header Files</Filter>
+      <Filter>public</Filter>
+    </ClInclude>
+    <ClInclude Include="msvc_hack.h">
+      <Filter>public</Filter>
+    </ClInclude>
+    <ClInclude Include="tick.h">
+      <Filter>public</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

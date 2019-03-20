@@ -7,21 +7,21 @@
 #include "vrf.h"
 
 namespace scheme_misc::table {
-struct QueryReq {
+struct VrfQueryRequest {
   std::string key_name;
   std::string key_value;
 };
 
-struct QueryRsp {
+struct VrfQueryResponse {
   vrf::Psk<> psk_exp_r;
   G1 g_exp_r;
 };
 
-struct QueryReceipt {
+struct VrfQueryReceipt {
   G1 g_exp_r;
 };
 
-struct QuerySecret {
+struct VrfQuerySecret {
   Fr r;
 };
 }  // namespace scheme_misc::table

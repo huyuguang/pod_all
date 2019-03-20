@@ -112,6 +112,9 @@
     <ClCompile Include="pod_core\main.cc" />
     <ClCompile Include="pod_core\scheme_plain_a.cc" />
     <ClCompile Include="pod_core\scheme_plain_b.cc" />
+    <ClCompile Include="pod_core\scheme_plain_client.cc" />
+    <ClCompile Include="pod_core\scheme_plain_notary.cc" />
+    <ClCompile Include="pod_core\scheme_plain_session.cc" />
     <ClCompile Include="pod_core\scheme_plain_test.cc" />
     <ClCompile Include="pod_core\scheme_table_a.cc" />
     <ClCompile Include="pod_core\scheme_table_b.cc" />
@@ -190,6 +193,10 @@
     <ClInclude Include="multiexp.h" />
     <ClInclude Include="pod_core\scheme_plain_a.h" />
     <ClInclude Include="pod_core\scheme_plain_b.h" />
+    <ClInclude Include="pod_core\scheme_plain_client.h" />
+    <ClInclude Include="pod_core\scheme_plain_notary.h" />
+    <ClInclude Include="pod_core\scheme_plain_protocol.h" />
+    <ClInclude Include="pod_core\scheme_plain_session.h" />
     <ClInclude Include="pod_core\scheme_plain_test.h" />
     <ClInclude Include="pod_core\scheme_table_a.h" />
     <ClInclude Include="pod_core\scheme_table_b.h" />
@@ -197,7 +204,6 @@
     <ClInclude Include="pod_core\scheme_table_protocol.h" />
     <ClInclude Include="pod_core\scheme_table_session.h" />
     <ClInclude Include="pod_core\scheme_table_test.h" />
-    <ClInclude Include="pod_data.h" />
     <ClInclude Include="public.h" />
     <ClInclude Include="scheme_plain.h" />
     <ClInclude Include="scheme_misc.h" />

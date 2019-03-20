@@ -3,6 +3,7 @@
 #include <cryptopp/sha.h>
 #include <cassert>
 #include "tick.h"
+#include "public.h"
 
 namespace mkl {
 h256_t kEmptyH256 = h256_t();
@@ -94,6 +95,28 @@ h256_t CalcPath(GetItem get_item, uint64_t item_count, uint64_t leaf,
   }
 
   return s[0].item;
+}
+
+bool CalcRoot(std::string const& file, h256_t* root) {
+  try {
+    io::mapped_file_params params;
+    params.path = file;
+    params.flags = io::mapped_file_base::readonly;
+    io::mapped_file_source view(params);
+    auto start = (uint8_t*)view.data();
+    if (!view.size() || view.size() % 32) return false;
+    uint64_t n = view.size() / 32;
+    auto get_item = [start, n](uint64_t i) -> h256_t {
+      assert(i < n);
+      h256_t h;
+      memcpy(h.data(), start + i * 32, 32);
+      return h;
+    };
+    *root = mkl::CalcRoot(get_item, n);
+    return true;
+  } catch (std::exception&) {
+    return false;
+  }
 }
 
 h256_t CalcRoot(GetItem get_item, uint64_t item_count) {

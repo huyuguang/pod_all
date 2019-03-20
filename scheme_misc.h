@@ -7,6 +7,7 @@
 #include "bp.h"
 #include "ecc.h"
 #include "vrf.h"
+#include "mpz.h"
 
 namespace scheme_misc {
 
@@ -28,7 +29,8 @@ bool LoadMkl(std::string const& input, uint64_t n,
 
 bool SaveSigma(std::string const& output, std::vector<G1> const& sigma);
 
-bool LoadSigma(std::string const& input, uint64_t n, std::vector<G1>& sigmas);
+bool LoadSigma(std::string const& input, uint64_t n, h256_t const* root,
+               std::vector<G1>& sigmas);
 
 bool SaveMatrix(std::string const& output, std::vector<Fr> const& m);
 
@@ -41,4 +43,7 @@ std::vector<h256_t> BuildSigmaMklTree(std::vector<G1> const& sigmas);
 bool GetBulletinMode(std::string const& file, Mode& mode);
 
 bool IsElementUnique(std::vector<Fr> const v);
+
+void H2(mpz_class const& seed, uint64_t count, std::vector<Fr>& v);
+
 }  // namespace scheme_misc

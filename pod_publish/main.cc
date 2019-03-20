@@ -24,7 +24,7 @@ int main(int argc, char** argv) {
   std::vector<bool> unique_key;
   uint64_t column_num;
   std::string ecc_pub_file;
-
+  
   try {
     po::options_description options("command line options");
     options.add_options()("help,h", "Use -h or --help to list all arguments")(
@@ -132,20 +132,28 @@ int main(int argc, char** argv) {
     return -1;
   }
 
+  bool ret;
   switch (task_mode) {
     case Mode::kPlain: {
-      bool ret = PublishPlain(std::move(publish_file), std::move(output_path),
+      ret = PublishPlain(std::move(publish_file), std::move(output_path),
                               column_num);
-      return ret ? 0 : -1;
+      break;
     }
     case Mode::kTable: {
-      bool ret =
+      ret =
           PublishTable(std::move(publish_file), std::move(output_path),
                        std::move(table_type), std::move(vrf_colnum_index),
             std::move(unique_key));
-      return ret ? 0 : -1;
+      break;
     }
     default:
       throw std::runtime_error("never reach");
   }
+
+  if (ret) {
+    std::cout << "publish success." << std::endl;
+  } else {
+    std::cout << "publish failed." << std::endl;
+  }
+  return ret ? 0 : -1;
 }

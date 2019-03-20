@@ -31,6 +31,8 @@ h256_t CalcPath(GetItem get_item, uint64_t item_count, uint64_t leaf,
 
 h256_t CalcRoot(GetItem get_item, uint64_t item_count);
 
+bool CalcRoot(std::string const& file, h256_t* root);
+
 bool VerifyPath(uint64_t pos, h256_t value, uint64_t count, h256_t const& root,
                 Path const& path);
 

@@ -43,13 +43,16 @@ bool LoadCsvTable(std::string const& file, std::vector<std::string>& col_names,
 
 bool LoadTable(std::string const& file, table::Type table_type,
                std::vector<std::string>& col_names, table::Table& table) {
-  if (table_type != table::Type::kCsv) return false;  // not support yet
+  if (table_type != table::Type::kCsv) {
+    // TBD: support more db file types
+    return false;
+  }
   return LoadCsvTable(file, col_names, table);
 }
 
 void PadRubbishRow(table::Table& table) {
   table::Record record(table[0].size());
-  for(auto& i:record)   {
+  for (auto& i : record) {
     i = "PAD";
   }
   table.emplace_back(std::move(record));
@@ -82,7 +85,7 @@ bool PublishTable(std::string publish_file, std::string output_path,
   }
 
   std::string bulletin_file = output_path + "/bulletin";
-  std::string data_file = private_path + "/data";
+  std::string original_file = private_path + "/original";
   std::string matrix_file = private_path + "/matrix";
   std::string sigma_file = public_path + "/sigma";
   std::string sigma_mkl_tree_file = public_path + "/sigma_mkl_tree";
@@ -97,7 +100,7 @@ bool PublishTable(std::string publish_file, std::string output_path,
     key_m_files[i] = public_path + "/key_m_" + str_i;
   }
 
-  if (!CopyData(publish_file, data_file)) {
+  if (!CopyData(publish_file, original_file)) {
     assert(false);
     return false;
   }
@@ -109,7 +112,7 @@ bool PublishTable(std::string publish_file, std::string output_path,
 
   Table table;
   VrfMeta vrf_meta;
-  if (!LoadTable(data_file, table_type, vrf_meta.column_names, table)) {
+  if (!LoadTable(original_file, table_type, vrf_meta.column_names, table)) {
     assert(false);
     return false;
   }
@@ -130,9 +133,9 @@ bool PublishTable(std::string publish_file, std::string output_path,
   PadRubbishRow(table);
 
   auto max_record_size = GetMaxRecordSize(table);
-  
+
   Bulletin bulletin;
-  bulletin.n = table.size();  
+  bulletin.n = table.size();
   auto record_fr_num = (max_record_size + 30) / 31;
   bulletin.s = vrf_colnums_index.size() + 1 + record_fr_num;
   auto max_s = ecc_pub.u1().size();
@@ -142,7 +145,7 @@ bool PublishTable(std::string publish_file, std::string output_path,
   }
 
   std::vector<Fr> m(bulletin.n * bulletin.s);
-  DataToM(table, vrf_colnums_index, bulletin.s, vrf_sk, m);  
+  DataToM(table, vrf_colnums_index, bulletin.s, vrf_sk, m);
   if (!SaveMatrix(matrix_file, m)) {
     assert(false);
     return false;
@@ -218,8 +221,19 @@ bool PublishTable(std::string publish_file, std::string output_path,
   for (size_t i = 0; i < vrf_colnums_index.size(); ++i) {
     auto& key = vrf_meta.keys[i];
     bp::P1Proof bp_p1_proof;
-    BuildKeyBp(bulletin.n, bulletin.s, m, sigmas, bulletin.sigma_mkl_root,
+    BuildKeyBp(bulletin.n, bulletin.s, m, bulletin.sigma_mkl_root,
                key.column_index, key.mj_mkl_root, bp_p1_proof);
+
+#ifdef _DEBUG
+    std::vector<Fr> dummy_km(bulletin.n);
+    for (uint64_t col = 0; col < bulletin.n; ++col) {
+      dummy_km[col] = m[col * bulletin.s + key.column_index];
+    }
+    assert(VerifyKeyBp(bulletin.n, bulletin.s, dummy_km, sigmas,
+                       key.column_index, bulletin.sigma_mkl_root,
+                       key.mj_mkl_root, bp_p1_proof));
+#endif
+
     if (!SaveBpP1Proof(key_bp_files[i], bp_p1_proof)) {
       assert(false);
       return false;
@@ -245,6 +259,7 @@ bool PublishTable(std::string publish_file, std::string output_path,
     return false;
   }
 
+  std::cout << "n: " << bulletin.n << ", s: " << bulletin.s << "\n";
   return true;
 }
 
@@ -261,26 +276,39 @@ bool PublishPlain(std::string publish_file, std::string output_path,
               << std::endl;
     return false;
   }
+  boost::system::error_code err;
+  std::string public_path = output_path + "/public";
+  if (!fs::is_directory(public_path, err) &&
+      !fs::create_directories(public_path, err)) {
+    assert(false);
+    return false;
+  }
+  std::string private_path = output_path + "/private";
+  if (!fs::is_directory(private_path, err) &&
+      !fs::create_directories(private_path, err)) {
+    assert(false);
+    return false;
+  }
 
   Bulletin bulletin;
   bulletin.size = fs::file_size(publish_file);
   if (!bulletin.size) return false;
   bulletin.s = column_num + 1;
-  uint64_t n = GetDataBlockCount(bulletin.size, column_num);
+  bulletin.n = GetDataBlockCount(bulletin.size, column_num);
 
-  std::string data_file = output_path + "/data";
-  std::string matrix_file = output_path + "/matrix";
   std::string bulletin_file = output_path + "/bulletin";
-  std::string sigma_file = output_path + "/sigma";
-  std::string sigma_mkl_file = output_path + "/sigma_mkl";
+  std::string original_file = private_path + "/original";
+  std::string matrix_file = private_path + "/matrix";
+  std::string sigma_file = public_path + "/sigma";
+  std::string sigma_mkl_file = public_path + "/sigma_mkl_tree";
 
-  if (!CopyData(publish_file, data_file)) {
+  if (!CopyData(publish_file, original_file)) {
     assert(false);
     return false;
   }
 
   std::vector<Fr> m;
-  if (!DataToM(data_file, bulletin.size, n, column_num, m)) {
+  if (!DataToM(original_file, bulletin.size, bulletin.n, column_num, m)) {
     assert(false);
     return false;
   }
@@ -290,7 +318,7 @@ bool PublishPlain(std::string publish_file, std::string output_path,
     return false;
   }
 
-  std::vector<G1> sigmas = CalcSigma(m, n, bulletin.s);
+  std::vector<G1> sigmas = CalcSigma(m, bulletin.n, bulletin.s);
 
   if (!SaveSigma(sigma_file, sigmas)) {
     assert(false);
@@ -312,17 +340,21 @@ bool PublishPlain(std::string publish_file, std::string output_path,
   }
 
 #ifdef _DEBUG
-  std::string debug_data_file = data_file + ".debug";
-  if (!MToFile(debug_data_file, bulletin.size, bulletin.s, 0, n, m)) {
+  std::string debug_data_file = original_file + ".debug";
+  if (!MToFile(debug_data_file, bulletin.size, bulletin.s, 0, bulletin.n, m)) {
     assert(false);
     return false;
   }
 
-  if (!IsSameFile(debug_data_file, data_file)) {
+  if (!IsSameFile(debug_data_file, original_file)) {
     assert(false);
     return false;
   }
   fs::remove(debug_data_file);
 #endif
+
+  std::cout << "file size: " << bulletin.size << "\n";
+  std::cout << "n: " << bulletin.n << ", s: " << bulletin.s << "\n";
+
   return true;
 }

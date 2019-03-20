@@ -111,8 +111,11 @@ int main(int argc, char** argv) {
   }
   
   if (mode == Mode::kPlain) {
-    return scheme_misc::plain::Test(publish_path, start, count)? 0: -1;
+    auto output_file = output_path + "/decrypted_data";
+    return scheme_misc::plain::Test(publish_path, output_file, start, count)
+               ? 0
+               : -1;
   } else {
-    return scheme_misc::table::Test(publish_path, key_name, key_value)? 0:-1;
+    return scheme_misc::table::Test(publish_path, key_name, key_value) ? 0 : -1;
   }
 }

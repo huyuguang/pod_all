@@ -5,7 +5,6 @@
 #include <vector>
 
 #include "basic_types.h"
-#include "vrf_meta.h"
 
 namespace scheme_misc {
 namespace table {

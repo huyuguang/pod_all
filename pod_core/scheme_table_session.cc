@@ -1,7 +1,6 @@
 #include "scheme_table_session.h"
 #include "public.h"
 #include "scheme_table_a.h"
-#include "scheme_table_protocol.h"
 #include "vrf.h"
 
 namespace scheme_misc::table {
@@ -13,30 +12,33 @@ Session::Session(APtr a, h256_t const& self_id, h256_t const& peer_id)
   g_exp_r_ = ecc_pub.PowerG1(r_);
 }
 
-bool Session::OnQueryReq(QueryReq const& req, QueryRsp& rsp) {
-  auto key_meta = a_->GetKeyMetaByName(req.key_name);
+bool Session::OnQueryRequest(VrfQueryRequest const& request,
+                             VrfQueryResponse& response) {
+  auto key_meta = a_->GetKeyMetaByName(request.key_name);
   if (!key_meta) return false;
 
-  rsp.g_exp_r = g_exp_r_;
+  response.g_exp_r = g_exp_r_;
 
   h256_t digest;
   CryptoPP::SHA256 hash;
-  hash.Update((uint8_t*)req.key_value.data(), req.key_value.size());
+  hash.Update((uint8_t*)request.key_value.data(), request.key_value.size());
   hash.Final(digest.data());
 
-  vrf::ProveWithR(a_->vrf_sk(), digest.data(), r_, rsp.psk_exp_r);
+  vrf::ProveWithR(a_->vrf_sk(), digest.data(), r_, response.psk_exp_r);
 
 #ifdef _DEBUG
   vrf::Fsk fsk2 = vrf::Vrf(a_->vrf_sk(), digest.data());
-  vrf::VerifyWithR(a_->vrf_pk(), digest.data(), rsp.psk_exp_r, rsp.g_exp_r);
+  vrf::VerifyWithR(a_->vrf_pk(), digest.data(), response.psk_exp_r,
+                   response.g_exp_r);
   vrf::Fsk fsk1;
-  vrf::GetFskFromPskExpR(rsp.psk_exp_r.back(), r_, fsk1);
+  vrf::GetFskFromPskExpR(response.psk_exp_r.back(), r_, fsk1);
   assert(fsk1 == fsk2);
 #endif
   return true;
 }
 
-bool Session::OnQueryReceipt(QueryReceipt const& receipt, QuerySecret& secret) {
+bool Session::OnQueryReceipt(VrfQueryReceipt const& receipt,
+                             VrfQuerySecret& secret) {
   if (receipt.g_exp_r != g_exp_r_) return false;
   secret.r = r_;
   return true;

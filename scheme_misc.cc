@@ -173,16 +173,30 @@ bool SaveSigma(std::string const& output, std::vector<G1> const& sigma) {
   }
 }
 
-bool LoadSigma(std::string const& input, uint64_t n, std::vector<G1>& sigmas) {
+bool LoadSigma(std::string const& input, uint64_t n, h256_t const* root,
+               std::vector<G1>& sigmas) {
   try {
     io::mapped_file_params params;
     params.path = input;
     params.flags = io::mapped_file_base::readonly;
     io::mapped_file_source view(params);
     if (view.size() != n * 32) return false;
-
-    sigmas.resize(n);
     auto start = (uint8_t*)view.data();
+
+    if (root) {
+      auto get_sigma = [start, n](uint64_t i) -> h256_t {
+        assert(i < n);
+        h256_t h;
+        memcpy(h.data(), start + i * 32, 32);
+        return h;
+      };
+      if (*root != mkl::CalcRoot(std::move(get_sigma), n)) {
+        assert(false);
+        return false;
+      }      
+    }
+
+    sigmas.resize(n);    
     for (size_t i = 0; i < n; ++i) {
       sigmas[i] = BinToG1(start + i * 32);
     }
@@ -252,5 +266,17 @@ bool IsElementUnique(std::vector<Fr> const v) {
 
   return std::adjacent_find(pv.begin(), pv.end(), compare) == pv.end();
 }
+
+void H2(mpz_class const& seed, uint64_t count, std::vector<Fr>& v) {
+  Tick _tick_(__FUNCTION__);
+
+  v.resize(count);
+
+#pragma omp parallel for
+  for (int64_t i = 0; i < (int64_t)count; ++i) {
+    v[i] = Chain(seed, i);
+  }
+}
+
 }  // namespace scheme_misc
 

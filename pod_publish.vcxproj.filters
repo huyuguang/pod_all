@@ -1,14 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Source Files">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
-    </Filter>
-    <Filter Include="Header Files">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hh;hpp;hxx;hm;inl;inc;ipp;xsd</Extensions>
-    </Filter>
     <Filter Include="Resource Files">
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
@@ -28,16 +20,16 @@
     <Filter Include="cvs">
       <UniqueIdentifier>{080400ac-d071-4da1-9d26-2509057d8146}</UniqueIdentifier>
     </Filter>
+    <Filter Include="public">
+      <UniqueIdentifier>{b9a32451-30eb-47f4-b38d-7d820cf8c050}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="local">
+      <UniqueIdentifier>{b3253629-e6ae-4192-aaff-5fad9d8a027e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="ecc.cc">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="fp.cc">
       <Filter>libmcl</Filter>
-    </ClCompile>
-    <ClCompile Include="mkl_tree.cc">
-      <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="csv\csv_reader.cc">
       <Filter>cvs</Filter>
@@ -54,47 +46,38 @@
     <ClCompile Include="csv\data_type.cc">
       <Filter>cvs</Filter>
     </ClCompile>
-    <ClCompile Include="pod_publish\main.cc">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="scheme_misc.cc">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="pod_publish\publish.cc">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="bulletin_plain.cc">
-      <Filter>Source Files</Filter>
+      <Filter>public</Filter>
     </ClCompile>
     <ClCompile Include="bulletin_table.cc">
-      <Filter>Source Files</Filter>
+      <Filter>public</Filter>
     </ClCompile>
-    <ClCompile Include="scheme_plain.cc">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="ecc.cc">
+      <Filter>public</Filter>
     </ClCompile>
-    <ClCompile Include="scheme_table.cc">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="mkl_tree.cc">
+      <Filter>public</Filter>
+    </ClCompile>
+    <ClCompile Include="scheme_misc.cc">
+      <Filter>public</Filter>
     </ClCompile>
     <ClCompile Include="vrf_meta.cc">
-      <Filter>Source Files</Filter>
+      <Filter>public</Filter>
+    </ClCompile>
+    <ClCompile Include="pod_publish\main.cc">
+      <Filter>local</Filter>
+    </ClCompile>
+    <ClCompile Include="pod_publish\publish.cc">
+      <Filter>local</Filter>
+    </ClCompile>
+    <ClCompile Include="scheme_plain.cc">
+      <Filter>local</Filter>
+    </ClCompile>
+    <ClCompile Include="scheme_table.cc">
+      <Filter>local</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="tick.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ecc.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="mkl_tree.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="bp.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="schnorr.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="mcl\include\mcl\aggregate_sig.hpp">
       <Filter>libmcl\include\mcl</Filter>
     </ClInclude>
@@ -251,33 +234,6 @@
     <ClInclude Include="mcl\include\cybozu\xorshift.hpp">
       <Filter>libmcl\include\cybozu</Filter>
     </ClInclude>
-    <ClInclude Include="msvc_hack.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="multiexp.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="mpz.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="chain.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="public.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="misc.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="pod_data.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="basic_types.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="csv.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="csv\data_type.h">
       <Filter>cvs</Filter>
     </ClInclude>
@@ -293,32 +249,71 @@
     <ClInclude Include="csv\memory.h">
       <Filter>cvs</Filter>
     </ClInclude>
-    <ClInclude Include="vrf.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="basic_types.h">
+      <Filter>public</Filter>
     </ClInclude>
-    <ClInclude Include="ecc_pub.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="scheme_misc.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="pod_publish\publish.h">
-      <Filter>Header Files</Filter>
+    <ClInclude Include="bp.h">
+      <Filter>public</Filter>
     </ClInclude>
     <ClInclude Include="bulletin_plain.h">
-      <Filter>Header Files</Filter>
+      <Filter>public</Filter>
     </ClInclude>
     <ClInclude Include="bulletin_table.h">
-      <Filter>Header Files</Filter>
+      <Filter>public</Filter>
+    </ClInclude>
+    <ClInclude Include="chain.h">
+      <Filter>public</Filter>
+    </ClInclude>
+    <ClInclude Include="csv.h">
+      <Filter>public</Filter>
+    </ClInclude>
+    <ClInclude Include="ecc.h">
+      <Filter>public</Filter>
+    </ClInclude>
+    <ClInclude Include="ecc_pub.h">
+      <Filter>public</Filter>
+    </ClInclude>
+    <ClInclude Include="misc.h">
+      <Filter>public</Filter>
+    </ClInclude>
+    <ClInclude Include="mkl_tree.h">
+      <Filter>public</Filter>
+    </ClInclude>
+    <ClInclude Include="mpz.h">
+      <Filter>public</Filter>
+    </ClInclude>
+    <ClInclude Include="msvc_hack.h">
+      <Filter>public</Filter>
+    </ClInclude>
+    <ClInclude Include="multiexp.h">
+      <Filter>public</Filter>
+    </ClInclude>
+    <ClInclude Include="public.h">
+      <Filter>public</Filter>
+    </ClInclude>
+    <ClInclude Include="scheme_misc.h">
+      <Filter>public</Filter>
     </ClInclude>
     <ClInclude Include="scheme_plain.h">
-      <Filter>Header Files</Filter>
+      <Filter>public</Filter>
     </ClInclude>
     <ClInclude Include="scheme_table.h">
-      <Filter>Header Files</Filter>
+      <Filter>public</Filter>
+    </ClInclude>
+    <ClInclude Include="schnorr.h">
+      <Filter>public</Filter>
+    </ClInclude>
+    <ClInclude Include="tick.h">
+      <Filter>public</Filter>
+    </ClInclude>
+    <ClInclude Include="vrf.h">
+      <Filter>public</Filter>
     </ClInclude>
     <ClInclude Include="vrf_meta.h">
-      <Filter>Header Files</Filter>
+      <Filter>public</Filter>
+    </ClInclude>
+    <ClInclude Include="pod_publish\publish.h">
+      <Filter>local</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

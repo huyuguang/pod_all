@@ -5,27 +5,23 @@
 #include <vector>
 
 #include "ecc.h"
+#include "scheme_table_protocol.h"
 
 namespace scheme_misc::table {
 class A;
 typedef std::shared_ptr<A> APtr;
 
-struct QueryReq;
-struct QueryRsp;
-struct QueryReceipt;
-struct QuerySecret;
-
 class Session {
  public:
   // The self_id and peer_id are useless now, just for later convenience.
   Session(APtr a, h256_t const& self_id, h256_t const& peer_id);
-  bool OnQueryReq(QueryReq const& req, QueryRsp& rsp);
-  bool OnQueryReceipt(QueryReceipt const& receipt, QuerySecret& secret);
+  bool OnQueryRequest(VrfQueryRequest const& req, VrfQueryResponse& rsp);
+  bool OnQueryReceipt(VrfQueryReceipt const& receipt, VrfQuerySecret& secret);
 
  private:
   APtr a_;
-  h256_t self_id_;
-  h256_t peer_id_;
+  h256_t const self_id_;
+  h256_t const peer_id_;
 
  private:
   Fr r_;

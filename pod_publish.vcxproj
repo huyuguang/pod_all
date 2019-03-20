@@ -134,7 +134,6 @@
     <ClInclude Include="csv\csv_writer.h" />
     <ClInclude Include="csv\data_type.h" />
     <ClInclude Include="csv\memory.h" />
-    <ClInclude Include="pod_data.h" />
     <ClInclude Include="ecc.h" />
     <ClInclude Include="ecc_pub.h" />
     <ClInclude Include="mcl\include\cybozu\array.hpp" />

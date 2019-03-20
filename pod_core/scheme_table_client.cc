@@ -2,8 +2,6 @@
 #include "public.h"
 #include "scheme_table.h"
 #include "scheme_table_b.h"
-#include "scheme_table_protocol.h"
-#include "vrf.h"
 
 namespace scheme_misc::table {
 
@@ -22,18 +20,19 @@ Client::Client(BPtr b, h256_t const& self_id, h256_t const& peer_id,
   hash.Final(key_digest_.data());
 }
 
-bool Client::OnQueryRsp(QueryRsp const& rsp, QueryReceipt& receipt) {
-  if (!vrf::VerifyWithR(b_->vrf_pk(), key_digest_.data(), rsp.psk_exp_r,
-                        rsp.g_exp_r))
+bool Client::OnQueryResponse(VrfQueryResponse const& response,
+                             VrfQueryReceipt& receipt) {
+  if (!vrf::VerifyWithR(b_->vrf_pk(), key_digest_.data(), response.psk_exp_r,
+                        response.g_exp_r))
     return false;
 
-  g_exp_r_ = rsp.g_exp_r;
-  last_psk_exp_r_ = rsp.psk_exp_r.back();
-  receipt.g_exp_r = rsp.g_exp_r;
+  g_exp_r_ = response.g_exp_r;
+  last_psk_exp_r_ = response.psk_exp_r.back();
+  receipt.g_exp_r = response.g_exp_r;
   return true;
 }
 
-bool Client::OnSecretReveal(QuerySecret const& query_secret,
+bool Client::OnQuerySecret(VrfQuerySecret const& query_secret,
                             std::vector<uint64_t>& positions) {
   auto const& ecc_pub = GetEccPub();
   if (ecc_pub.PowerG1(query_secret.r) != g_exp_r_) {

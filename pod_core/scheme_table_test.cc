@@ -15,56 +15,49 @@ const h256_t kDummySessionId = h256_t { 1 };
 const h256_t kDummyClientId = h256_t { 2 };
 }
 
-bool QueryOne(APtr a, BPtr b, std::string const& key_name,
-              std::string const& key_value, std::vector<uint64_t>& positions) {
+bool QueryInternal(APtr a, BPtr b, std::string const& key_name,
+                   std::string const& key_value) {
+  
   Session session(a, kDummySessionId, kDummyClientId);
   Client client(b, kDummyClientId, kDummySessionId, key_name, key_value);
 
-  QueryReq query_req;
+  VrfQueryRequest query_req;
   query_req.key_name = key_name;
   query_req.key_value = key_value;
-  QueryRsp query_rsp;
-  if (!session.OnQueryReq(query_req, query_rsp)) {
+  VrfQueryResponse query_rsp;
+  if (!session.OnQueryRequest(query_req, query_rsp)) {
     assert(false);
     return false;
   }
 
-  QueryReceipt query_receipt;
-  if (!client.OnQueryRsp(query_rsp, query_receipt)) {
+  VrfQueryReceipt query_receipt;
+  if (!client.OnQueryResponse(query_rsp, query_receipt)) {
     assert(false);
     return false;
   }
 
-  QuerySecret query_secret;
+  VrfQuerySecret query_secret;
   if (!session.OnQueryReceipt(query_receipt, query_secret)) {
     assert(false);
     return false;
   }
 
-  if (!client.OnSecretReveal(query_secret, positions)) {
+  std::vector<uint64_t> positions;
+  if (!client.OnQuerySecret(query_secret, positions)) {
     assert(false);
     return false;
-  }
-  return true;
-}
+  }  
 
-bool QueryInternal(APtr a, BPtr b, std::string const& key_name,
-                   std::string const& key_value) {
-  std::vector<uint64_t> positions;
-  if (!QueryOne(a, b, key_name, key_value, positions)) {
-    std::cerr << "Query failed\n";
-    return false;
+  if (positions.empty()) {
+    std::cout << "Query " << key_name << " = " << key_value << ": not exist\n";
   } else {
-    if (positions.empty()) {
-      std::cout << "Query " << key_name << " = " << key_value << ": not exist\n";
-    } else {
-      std::cout << "Query " << key_name << " = " << key_value << ", Positions: ";
-      for (auto i : positions) {
-        std::cout << i << ";";
-      }
-      std::cout << "\n";
+    std::cout << "Query " << key_name << " = " << key_value << ", Positions: ";
+    for (auto i : positions) {
+      std::cout << i << ";";
     }
+    std::cout << "\n";
   }
+
   return true;
 }
 
@@ -77,12 +70,12 @@ bool Query(APtr a, BPtr b, std::string const& key_name,
   if (unique) {
     for (uint64_t i = 0;; ++i) {
       std::string key_value_with_suffix = key_value + "_" + std::to_string(i);
-      QueryInternal(a, b, key_name, key_value_with_suffix);
+      if (!QueryInternal(a, b, key_name, key_value_with_suffix)) return false;
     }
+    return true;
   } else {
-    QueryInternal(a, b, key_name, key_value);
+    return QueryInternal(a, b, key_name, key_value);
   }
-  return true;
 }
 
 bool Test(std::string const& publish_path, std::string const& key_name,

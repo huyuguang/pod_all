@@ -2,7 +2,7 @@
 
 #include <stdint.h>
 #include <string>
-#include <map>
+#include <memory>
 
 #include "basic_types.h"
 #include "bp.h"
@@ -10,6 +10,7 @@
 #include "mkl_tree.h"
 #include "scheme_misc.h"
 #include "vrf.h"
+#include "vrf_meta.h"
 
 namespace scheme_misc::table {
 
@@ -26,9 +27,6 @@ class A {
   VrfKeyMeta const* GetKeyMetaByName(std::string const& name);
 
  private:
-  
-
- private:
   std::string const publish_path_;
   scheme_misc::table::Bulletin bulletin_;
   vrf::Pk<> vrf_pk_;
@@ -39,8 +37,6 @@ class A {
   mkl::Tree sigma_mkl_tree_;
   std::vector<Fr> m_;  // secret
   std::vector<std::vector<Fr>> key_m_;
-
- private:
 
 };
 

@@ -1,10 +1,12 @@
 #include "vrf_meta.h"
 
+#include "bulletin_table.h"
 #include "chain.h"
 #include "ecc_pub.h"
 #include "misc.h"
 #include "mkl_tree.h"
 #include "public.h"
+#include "scheme_misc.h"
 
 namespace scheme_misc {
 namespace table {
@@ -72,17 +74,19 @@ bool SaveVrfMeta(std::string const& output, VrfMeta const& data) {
   }
 }
 
-bool LoadVrfMeta(std::string const& input, h256_t const& digest,
+bool LoadVrfMeta(std::string const& input, h256_t const* digest,
                  VrfMeta& data) {
-  h256_t digest2;
-  if (!misc::GetFileSha256(input, digest2)) {
-    assert(false);
-    return false;
-  }
+  if (digest) {
+    h256_t check_digest;
+    if (!misc::GetFileSha256(input, check_digest)) {
+      assert(false);
+      return false;
+    }
 
-  if (digest2 != digest) {
-    assert(false);
-    return false;
+    if (check_digest != *digest) {
+      assert(false);
+      return false;
+    }
   }
 
   try {
@@ -133,15 +137,17 @@ bool SaveVrfPk(std::string const& output, vrf::Pk<> const& pk) {
   }
 }
 
-bool LoadVrfPk(std::string const& file, h256_t const& digest, vrf::Pk<>& pk) {
-  h256_t digest2;
-  if (!misc::GetFileSha256(file, digest2)) {
-    assert(false);
-    return false;
-  }
-  if (digest != digest2) {
-    assert(false);
-    return false;
+bool LoadVrfPk(std::string const& file, h256_t const* digest, vrf::Pk<>& pk) {
+  if (digest) {
+    h256_t check_digest;
+    if (!misc::GetFileSha256(file, check_digest)) {
+      assert(false);
+      return false;
+    }
+    if (*digest != check_digest) {
+      assert(false);
+      return false;
+    }
   }
 
   const uint64_t kG2BufSize = 64;
@@ -264,10 +270,8 @@ bool LoadBpP1Proof(std::string const& file, h256_t const& digest,
 }
 
 void BuildKeyBp(uint64_t n, uint64_t s, std::vector<Fr> const& m,
-                std::vector<G1> const& sigmas, h256_t const& sigma_mkl_root,
-                uint64_t key_pos, h256_t keycol_mkl_root,
-                bp::P1Proof& p1_proof) {
-  assert(sigmas.size() == n);
+                h256_t const& sigma_mkl_root, uint64_t key_pos,
+                h256_t keycol_mkl_root, bp::P1Proof& p1_proof) {
   assert(m.size() == n * s);
 
   auto& ecc_pub = GetEccPub();
@@ -314,13 +318,6 @@ void BuildKeyBp(uint64_t n, uint64_t s, std::vector<Fr> const& m,
   };
 
   p1_proof = bp::P1Prove(get_g, get_f, bp_count);
-
-#ifdef _DEBUG
-  std::vector<Fr> km(n);
-  for (uint64_t i = 0; i < n; ++i) km[i] = m[i * s + key_pos];
-  assert(VerifyKeyBp, n, s, km, sigmas, key_pos, sigma_mkl_root,
-         keycol_mkl_root, p1_proof);
-#endif
 }
 
 bool VerifyKeyBp(uint64_t n, uint64_t s, std::vector<Fr> const& km,
@@ -366,6 +363,46 @@ bool VerifyKeyBp(uint64_t n, uint64_t s, std::vector<Fr> const& km,
   };
 
   return P1Verify(p1_proof, get_g, bp_count);
+}
+
+bool VerifyKeyBp(std::string const& file, Bulletin const& bulletin,
+                 VrfMeta const& vrf_meta, uint64_t j, std::vector<Fr> const& km,
+                 std::vector<G1> const& sigmas) {
+  auto const& key = vrf_meta.keys[j];
+  bp::P1Proof proof;
+  if (!LoadBpP1Proof(file, key.bp_digest, proof)) {
+    assert(false);
+    return false;
+  }
+
+  return VerifyKeyBp(bulletin.n, bulletin.s, km, sigmas, j,
+                     bulletin.sigma_mkl_root, key.mj_mkl_root, proof);
+}
+
+bool LoadKeyM(std::string const& input, uint64_t n, bool unique,
+              h256_t const* root, std::vector<Fr>& km) {
+  if (!LoadMatrix(input, n, km)) {
+    assert(false);
+    return false;
+  }
+
+  if (unique && !IsElementUnique(km)) {
+    assert(false);
+    return false;
+  }
+
+  if (root) {
+    h256_t check_root;
+    if (!mkl::CalcRoot(input, &check_root)) {
+      assert(false);
+      return false;
+    }
+    if (*root != check_root) {
+      assert(false);
+      return false;
+    }
+  }
+  return true;
 }
 }  // namespace table
 }  // namespace scheme_misc

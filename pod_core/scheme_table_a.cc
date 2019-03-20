@@ -26,7 +26,7 @@ A::A(std::string const& publish_path) : publish_path_(publish_path) {
   }
 
   // vrf meta
-  if (!LoadVrfMeta(key_meta_file, bulletin_.vrf_meta_digest, vrf_meta_)) {
+  if (!LoadVrfMeta(key_meta_file, nullptr, vrf_meta_)) {
     assert(false);
     throw std::runtime_error("invalid vrf meta file");
   }
@@ -60,13 +60,13 @@ A::A(std::string const& publish_path) : publish_path_(publish_path) {
   }
 
   // vrf pk
-  if (!LoadVrfPk(vrf_pk_file, vrf_meta_.pk_digest, vrf_pk_)) {
+  if (!LoadVrfPk(vrf_pk_file, nullptr, vrf_pk_)) {
     assert(false);
     throw std::runtime_error("invalid vrf pk file");
   }
 
   // sigma
-  if (!LoadSigma(sigma_file, bulletin_.n, sigmas_)) {
+  if (!LoadSigma(sigma_file, bulletin_.n, nullptr, sigmas_)) {
     assert(false);
     throw std::runtime_error("invalid sigma file");
   }

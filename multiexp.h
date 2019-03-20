@@ -108,6 +108,14 @@ inline G1 MultiExpBdlo12(std::vector<G1> const& g, std::vector<Fr> const& f) {
   return MultiExpBdlo12(g.data(), f.data(), g.size());
 }
 
+inline G1 MultiExpBdlo12(std::vector<G1 const*> const& g,
+                         std::vector<Fr const*> const& f) {
+  assert(g.size() == f.size());
+  auto get_g = [g](size_t i) -> G1 const& { return *g[i]; };
+  auto get_f = [f](size_t i) -> Fr const& { return *f[i]; };
+  return MultiExpBdlo12Inner<G1>(get_g, get_f, g.size());
+}
+
 inline G2 MultiExpBdlo12(G2 const* pg, Fr const* pf, size_t n) {
   auto get_g = [pg](size_t i) -> G2 const& { return pg[i]; };
   auto get_f = [pf](size_t i) -> Fr const& { return pf[i]; };
@@ -117,75 +125,4 @@ inline G2 MultiExpBdlo12(G2 const* pg, Fr const* pf, size_t n) {
 inline G2 MultiExpBdlo12(std::vector<G2> const& g, std::vector<Fr> const& f) {
   assert(g.size() == f.size());
   return MultiExpBdlo12(g.data(), f.data(), g.size());
-}
-
-
-inline G1 MultiExpBdlo12Inner2(std::vector<G1> const& g, std::vector<Fr> const& f) {
-  assert(g.size() == f.size());
-  G1 zero = G1Zero();
-
-  auto n = g.size();
-  if (n == 0) return zero;
-  if (n == 1) return g[0] * f[0];
-
-  auto local_log2 = [](size_t n) {
-    // returns ceil(log2(n)), so ((size_t)1)<<log2(n) is the smallest power of
-    // 2, that is not less than n.
-    size_t r = ((n & (n - 1)) == 0 ? 0 : 1);  // add 1 if n is not power of 2
-    while (n > 1) {
-      n >>= 1;
-      r++;
-    }
-    return r;
-  };
-
-  size_t log2_length = local_log2(n);
-  size_t c = log2_length - (log2_length / 3 - 2);
-  std::vector<mpz_class> bn_exponents(n);
-  size_t num_bits = 0;
-
-  for (size_t i = 0; i < n; i++) {
-    bn_exponents[i] = f[i].getMpz();
-    auto bits = mpz_sizeinbase(bn_exponents[i].get_mpz_t(), 2);
-    num_bits = std::max(num_bits, bits);
-  }
-
-  size_t num_groups = (num_bits + c - 1) / c;
-
-  std::cout << "num_groups: " << num_groups << ", c: " << c << std::endl;
-
-  G1 result = zero;
-
-  for (size_t k = num_groups - 1; (ssize_t)k >= 0; k--) {
-    for (size_t i = 0; i < c; i++) {
-      G1::dbl(result, result);
-    }
-
-    std::vector<G1> buckets((size_t)1 << c);
-    for (auto& i : buckets) i.clear();
-
-    for (size_t i = 0; i < n; i++) {
-      size_t id = 0;
-      for (size_t j = 0; j < c; j++) {
-        if (mpz_tstbit(bn_exponents[i].get_mpz_t(), k * c + j)) {
-          id |= (size_t)1 << j;
-        }
-      }
-
-      if (id == 0) {
-        continue;
-      }
-
-      buckets[id] += g[i];
-    }
-
-    G1 running_sum = zero;
-
-    for (size_t i = ((size_t)1 << c) - 1; i > 0; i--) {
-      running_sum += buckets[i];
-      result += running_sum;
-    }
-  }
-
-  return result;
 }

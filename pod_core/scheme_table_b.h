@@ -9,6 +9,7 @@
 #include "mkl_tree.h"
 #include "scheme_misc.h"
 #include "vrf.h"
+#include "vrf_meta.h"
 
 namespace scheme_misc::table {
 
@@ -16,14 +17,15 @@ class B {
  public:
   B(Bulletin const& bulletin, std::string const& public_path);
   B(std::string const& bulletin_file, std::string const& public_path);
-  Bulletin const& bulletin() const {return bulletin_;}
+  Bulletin const& bulletin() const { return bulletin_; }
   vrf::Pk<> const& vrf_pk() const { return vrf_pk_; }
   VrfMeta const& vrf_meta() const { return vrf_meta_; }
   std::vector<G1> sigmas() const { return sigmas_; }
   std::vector<std::vector<Fr>> const& key_m() const { return key_m_; }
 
  private:
-  void LoadAndVerifyData();
+  void LoadData();
+  bool NeedVerify();
 
  private:
   Bulletin bulletin_;
@@ -31,7 +33,6 @@ class B {
 
  private:
   VrfMeta vrf_meta_;
-  std::vector<bp::P1Proof> vrf_key_bp_proofs_;
   vrf::Pk<> vrf_pk_;
   std::vector<G1> sigmas_;
   std::vector<std::vector<Fr>> key_m_;

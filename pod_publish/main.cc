@@ -24,7 +24,8 @@ int main(int argc, char** argv) {
   std::vector<bool> unique_key;
   uint64_t column_num;
   std::string ecc_pub_file;
-  
+  uint32_t omp_thread_num;
+
   try {
     po::options_description options("command line options");
     options.add_options()("help,h", "Use -h or --help to list all arguments")(
@@ -52,10 +53,13 @@ int main(int argc, char** argv) {
         po::value<std::vector<uint64_t>>(&vrf_colnum_index)->multitoken(),
         "Provide the publish file vrf key column index "
         "positions in table mode (for example: -v 0 1 3)")(
-        "unique_key,u",
-        po::value<std::vector<bool>>(&unique_key)->multitoken(),
+        "unique_key,u", po::value<std::vector<bool>>(&unique_key)->multitoken(),
         "Provide the flag if publish must unique the key"
-        " in table mode (for example: -u 1 0 1)");
+        " in table mode (for example: -u 1 0 1)")(
+        "omp_thread_num,t",
+        po::value<uint32_t>(&omp_thread_num)->default_value(0),
+        "Provide the number of the openmp thread, 1: disable openmp, 0: "
+        "default.");
 
     boost::program_options::variables_map vmap;
 
@@ -125,6 +129,11 @@ int main(int argc, char** argv) {
     return -1;
   }
 
+  if (omp_thread_num) {
+    std::cout << "set openmp threadnum: " << omp_thread_num << "\n";
+    omp_set_num_threads(omp_thread_num);
+  }
+
   InitEcc();
 
   if (!InitEccPub(ecc_pub_file)) {
@@ -136,14 +145,13 @@ int main(int argc, char** argv) {
   switch (task_mode) {
     case Mode::kPlain: {
       ret = PublishPlain(std::move(publish_file), std::move(output_path),
-                              column_num);
+                         column_num);
       break;
     }
     case Mode::kTable: {
-      ret =
-          PublishTable(std::move(publish_file), std::move(output_path),
-                       std::move(table_type), std::move(vrf_colnum_index),
-            std::move(unique_key));
+      ret = PublishTable(std::move(publish_file), std::move(output_path),
+                         std::move(table_type), std::move(vrf_colnum_index),
+                         std::move(unique_key));
       break;
     }
     default:

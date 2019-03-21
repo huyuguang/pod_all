@@ -1,5 +1,5 @@
-#include "public.h"
 #include "ecc_pub.h"
+#include "public.h"
 
 namespace {
 bool operator==(G1WM const& a, G1WM const& b) {
@@ -62,16 +62,21 @@ int main(int argc, char** argv) {
   std::string output_file;
   uint64_t u1_size;
   uint64_t u2_size;
+  uint32_t omp_thread_num;
+
   try {
     po::options_description options("command line options");
     options.add_options()("help,h", "Use -h or --help to list all arguments")(
-        "output,o",
-        po::value<std::string>(&output_file)->default_value(""),
+        "output,o", po::value<std::string>(&output_file)->default_value(""),
         "Provide the output ecc pub file")(
         "u1_size,a", po::value<uint64_t>(&u1_size)->default_value(1026),
         "Provide the max number of u1")(
         "u2_size,b", po::value<uint64_t>(&u2_size)->default_value(2),
-        "Provide the max number of u2");
+        "Provide the max number of u2")(
+        "omp_thread_num,t",
+        po::value<uint32_t>(&omp_thread_num)->default_value(0),
+        "Provide the number of the openmp thread, 1: disable openmp, 0: "
+        "default.");
 
     boost::program_options::variables_map vmap;
 
@@ -104,6 +109,11 @@ int main(int argc, char** argv) {
               << e.what() << "\n"
               << "-h or --help to list all arguments.\n";
     return -1;
+  }
+
+  if (omp_thread_num) {
+    std::cout << "set openmp threadnum: " << omp_thread_num << "\n";
+    omp_set_num_threads(omp_thread_num);
   }
 
   InitEcc();

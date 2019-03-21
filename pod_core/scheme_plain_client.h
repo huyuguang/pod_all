@@ -15,18 +15,22 @@ class Client {
   // The self_id and peer_id are useless now, just for later convenience.
   Client(BPtr b, h256_t const& self_id, h256_t const& peer_id, uint64_t start,
          uint64_t count);
-  bool OnRangeResponse(RangeResponse const& response,
+  bool OnRangeResponse(RangeResponse response,
                        RangeChallenge& challenge);
-  bool OnRangeReply(RangeReply const& reply, RangeReceipt& receipt);
+  bool OnRangeReply(RangeReply reply, RangeReceipt& receipt);
   bool OnRangeSecret(RangeSecret const& secret, RangeClaim& claim);
   bool SaveDecrypted(std::string const& file);
 
  private:
+  bool CheckEncryptedM(std::vector<Fr> const& m);
   bool CheckK(std::vector<Fr> const& v, RangeClaim& claim);
+  bool CheckKDirect(std::vector<Fr> const& v, RangeClaim& claim);
+  bool CheckKMultiExp(std::vector<Fr> const& v, RangeClaim& claim);
   void DecryptM(std::vector<Fr> const& v);
-  uint64_t FindMismatchI(uint64_t offset_i, uint64_t mismatch_j,
+  uint64_t FindMismatchI(uint64_t mismatch_j,
                          std::vector<G1 const*> const& k_col,
                          std::vector<Fr const*> const& v_col);
+  void BuildClaim(uint64_t i, uint64_t j, RangeClaim& claim);
 
  private:
   BPtr b_;

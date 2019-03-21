@@ -1,12 +1,10 @@
 #include "ecc_pub.h"
 #include "public.h"
-#include "scheme_table_test.h"
-#include "scheme_plain_test.h"
 #include "scheme_misc.h"
+#include "scheme_plain_test.h"
+#include "scheme_table_test.h"
 
-namespace {
-
-}  // namespace
+namespace {}  // namespace
 
 int main(int argc, char** argv) {
   setlocale(LC_ALL, "");
@@ -20,6 +18,7 @@ int main(int argc, char** argv) {
   uint64_t count;
   std::string key_name;
   std::string key_value;
+  uint32_t omp_thread_num;
 
   try {
     po::options_description options("command line options");
@@ -27,8 +26,7 @@ int main(int argc, char** argv) {
         "ecc_pub_file,e",
         po::value<std::string>(&ecc_pub_file)->default_value(""),
         "Provide the ecc pub file")(
-        "mode,m",
-        po::value<Mode>(&mode)->default_value(Mode::kPlain),
+        "mode,m", po::value<Mode>(&mode)->default_value(Mode::kPlain),
         "Provide pod mode (plain, table)")(
         "publish_path,p",
         po::value<std::string>(&publish_path)->default_value(""),
@@ -36,18 +34,18 @@ int main(int argc, char** argv) {
         "output_path,o",
         po::value<std::string>(&output_path)->default_value(""),
         "Provide the output path")(
-        "start,s",
-        po::value<uint64_t>(&start)->default_value(0),
+        "start,s", po::value<uint64_t>(&start)->default_value(0),
         "Provide the start block position(plain mode)")(
-        "count,c",
-        po::value<uint64_t>(&count)->default_value(1),
+        "count,c", po::value<uint64_t>(&count)->default_value(1),
         "Provide the retrieve block count(plain mode)")(
-        "key_name,k",
-        po::value<std::string>(&key_name)->default_value(""),
+        "key_name,k", po::value<std::string>(&key_name)->default_value(""),
         "Provide the query key name(table mode)")(
-        "key_value,v",
-        po::value<std::string>(&key_value)->default_value(""),
-        "Provide the query key value(table mode)");
+        "key_value,v", po::value<std::string>(&key_value)->default_value(""),
+        "Provide the query key value(table mode)")(
+        "omp_thread_num,t",
+        po::value<uint32_t>(&omp_thread_num)->default_value(0),
+        "Provide the number of the openmp thread, 1: disable openmp, 0: "
+        "default.");
 
     boost::program_options::variables_map vmap;
 
@@ -103,13 +101,20 @@ int main(int argc, char** argv) {
     return -1;
   }
 
+  if (omp_thread_num) {
+    std::cout << "omp_set_num_threads: " << omp_thread_num << "\n";
+    omp_set_num_threads(omp_thread_num);    
+  }
+
+  std::cout << "omp_get_max_threads: " << omp_get_max_threads() << "\n";
+
   InitEcc();
 
   if (!InitEccPub(ecc_pub_file)) {
     std::cerr << "Open ecc pub file " << ecc_pub_file << " failed" << std::endl;
     return -1;
   }
-  
+
   if (mode == Mode::kPlain) {
     auto output_file = output_path + "/decrypted_data";
     return scheme_misc::plain::Test(publish_path, output_file, start, count)

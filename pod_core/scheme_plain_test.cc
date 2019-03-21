@@ -17,9 +17,12 @@ const h256_t kDummyClientId = h256_t{2};
 }  // namespace
 
 bool Range(std::string const& output_file, APtr a, BPtr b, uint64_t start,
-           uint64_t count) {
+           uint64_t count, bool evil) {
+  Tick _tick_(__FUNCTION__);
+
   Session session(a, kDummySessionId, kDummyClientId);
   Client client(b, kDummyClientId, kDummySessionId, start, count);
+  if (evil) session.TestSetEvil();
 
   RangeRequest request;
   request.start = start;
@@ -31,7 +34,7 @@ bool Range(std::string const& output_file, APtr a, BPtr b, uint64_t start,
   }
 
   RangeChallenge challenge;
-  if (!client.OnRangeResponse(response, challenge)) {
+  if (!client.OnRangeResponse(std::move(response), challenge)) {
     assert(false);
     return false;
   }
@@ -43,7 +46,7 @@ bool Range(std::string const& output_file, APtr a, BPtr b, uint64_t start,
   }
 
   RangeReceipt receipt;
-  if (!client.OnRangeReply(reply, receipt)) {
+  if (!client.OnRangeReply(std::move(reply), receipt)) {
     assert(false);
     return false;
   }
@@ -54,28 +57,30 @@ bool Range(std::string const& output_file, APtr a, BPtr b, uint64_t start,
     return false;
   }
 
-  RangeClaim claim;
-  if (!client.OnRangeSecret(secret, claim)) {
-    assert(false);
-    return false;
+  if (!evil) {
+    RangeClaim claim;
+    if (!client.OnRangeSecret(secret, claim)) {
+      assert(false);
+      return false;
+    }
+
+    if (!client.SaveDecrypted(output_file)) {
+      assert(false);
+      return false;
+    }
+  } else {
+    RangeClaim claim;
+    if (client.OnRangeSecret(secret, claim)) {
+      assert(false);
+      return false;
+    }
+    std::cout << "claim: " << claim.i << "," << claim.j << "\n";
+    if (!VerifyRangeClaim(count, a->bulletin().s, receipt, secret, claim)) {
+      assert(false);
+      return false;
+    }
   }
 
-  if (!client.SaveDecrypted(output_file)) {
-    assert(false);
-    return false;
-  }
-
-  // test claim
-  --secret.seed0;
-  if (client.OnRangeSecret(secret, claim)) {
-    assert(false);
-    return false;
-  }
-
-  if (!VerifyRangeClaim(count, a->bulletin().s, receipt, secret, claim)) {
-    assert(false);
-    return false;
-  }
   return true;
 }
 
@@ -87,7 +92,7 @@ bool Test(std::string const& publish_path, std::string const& output_path,
     std::string bulletin_file = publish_path + "/bulletin";
     std::string public_path = publish_path + "/public";
     auto b = std::make_shared<B>(bulletin_file, public_path);
-    return Range(output_path, a, b, start, count);
+    return Range(output_path, a, b, start, count, true);
   } catch (std::exception& e) {
     std::cerr << __FUNCTION__ << "\t" << e.what() << "\n";
     return false;

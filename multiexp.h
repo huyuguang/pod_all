@@ -111,9 +111,17 @@ inline G1 MultiExpBdlo12(std::vector<G1> const& g, std::vector<Fr> const& f) {
 inline G1 MultiExpBdlo12(std::vector<G1 const*> const& g,
                          std::vector<Fr const*> const& f) {
   assert(g.size() == f.size());
-  auto get_g = [g](size_t i) -> G1 const& { return *g[i]; };
-  auto get_f = [f](size_t i) -> Fr const& { return *f[i]; };
+  auto get_g = [&g](size_t i) -> G1 const& { return *g[i]; };
+  auto get_f = [&f](size_t i) -> Fr const& { return *f[i]; };
   return MultiExpBdlo12Inner<G1>(get_g, get_f, g.size());
+}
+
+inline G1 MultiExpBdlo12(std::vector<G1 const*> const& g,
+                         std::vector<Fr> const& f, uint64_t offset,
+                         uint64_t count) {
+  auto get_g = [&g, offset](size_t i) -> G1 const& { return *g[i + offset]; };
+  auto get_f = [&f, offset](size_t i) -> Fr const& { return f[i + offset]; };
+  return MultiExpBdlo12Inner<G1>(get_g, get_f, count);
 }
 
 inline G2 MultiExpBdlo12(G2 const* pg, Fr const* pf, size_t n) {

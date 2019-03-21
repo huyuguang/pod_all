@@ -19,8 +19,10 @@ class Session {
   bool OnRangeChallenge(RangeChallenge const& challenge, RangeReply& reply);
   bool OnRangeReceipt(RangeReceipt const& receipt, RangeSecret& secret);
 
- private:
+ public:
+  void TestSetEvil() {evil_ = true;}
 
+ private:
  private:
   APtr a_;
   h256_t const self_id_;
@@ -37,6 +39,9 @@ class Session {
   std::vector<Fr> v_;  // size() is count * s_
   std::vector<Fr> w_;  // size() is count
   h256_t k_mkl_root_;
+
+ private:
+  bool evil_ = false;
 };
 
 typedef std::unique_ptr<Session> SessionUPtr;

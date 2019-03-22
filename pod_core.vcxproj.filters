@@ -61,12 +61,6 @@
     <ClCompile Include="pod_core\scheme_plain_b.cc">
       <Filter>local</Filter>
     </ClCompile>
-    <ClCompile Include="pod_core\scheme_plain_client.cc">
-      <Filter>local</Filter>
-    </ClCompile>
-    <ClCompile Include="pod_core\scheme_plain_session.cc">
-      <Filter>local</Filter>
-    </ClCompile>
     <ClCompile Include="pod_core\scheme_plain_test.cc">
       <Filter>local</Filter>
     </ClCompile>
@@ -76,16 +70,28 @@
     <ClCompile Include="pod_core\scheme_table_b.cc">
       <Filter>local</Filter>
     </ClCompile>
-    <ClCompile Include="pod_core\scheme_table_client.cc">
-      <Filter>local</Filter>
-    </ClCompile>
-    <ClCompile Include="pod_core\scheme_table_session.cc">
-      <Filter>local</Filter>
-    </ClCompile>
     <ClCompile Include="pod_core\scheme_table_test.cc">
       <Filter>local</Filter>
     </ClCompile>
     <ClCompile Include="pod_core\scheme_plain_notary.cc">
+      <Filter>local</Filter>
+    </ClCompile>
+    <ClCompile Include="pod_core\scheme_plain_range_client.cc">
+      <Filter>local</Filter>
+    </ClCompile>
+    <ClCompile Include="pod_core\scheme_plain_range_session.cc">
+      <Filter>local</Filter>
+    </ClCompile>
+    <ClCompile Include="pod_core\scheme_table_vrfq_client.cc">
+      <Filter>local</Filter>
+    </ClCompile>
+    <ClCompile Include="pod_core\scheme_table_vrfq_session.cc">
+      <Filter>local</Filter>
+    </ClCompile>
+    <ClCompile Include="pod_core\scheme_table_otvrfq_client.cc">
+      <Filter>local</Filter>
+    </ClCompile>
+    <ClCompile Include="pod_core\scheme_table_otvrfq_session.cc">
       <Filter>local</Filter>
     </ClCompile>
   </ItemGroup>
@@ -312,12 +318,6 @@
     <ClInclude Include="pod_core\scheme_plain_b.h">
       <Filter>local</Filter>
     </ClInclude>
-    <ClInclude Include="pod_core\scheme_plain_client.h">
-      <Filter>local</Filter>
-    </ClInclude>
-    <ClInclude Include="pod_core\scheme_plain_session.h">
-      <Filter>local</Filter>
-    </ClInclude>
     <ClInclude Include="pod_core\scheme_plain_test.h">
       <Filter>local</Filter>
     </ClInclude>
@@ -327,13 +327,7 @@
     <ClInclude Include="pod_core\scheme_table_b.h">
       <Filter>local</Filter>
     </ClInclude>
-    <ClInclude Include="pod_core\scheme_table_client.h">
-      <Filter>local</Filter>
-    </ClInclude>
     <ClInclude Include="pod_core\scheme_table_protocol.h">
-      <Filter>local</Filter>
-    </ClInclude>
-    <ClInclude Include="pod_core\scheme_table_session.h">
       <Filter>local</Filter>
     </ClInclude>
     <ClInclude Include="pod_core\scheme_table_test.h">
@@ -343,6 +337,24 @@
       <Filter>local</Filter>
     </ClInclude>
     <ClInclude Include="pod_core\scheme_plain_notary.h">
+      <Filter>local</Filter>
+    </ClInclude>
+    <ClInclude Include="pod_core\scheme_plain_range_client.h">
+      <Filter>local</Filter>
+    </ClInclude>
+    <ClInclude Include="pod_core\scheme_plain_range_session.h">
+      <Filter>local</Filter>
+    </ClInclude>
+    <ClInclude Include="pod_core\scheme_table_vrfq_client.h">
+      <Filter>local</Filter>
+    </ClInclude>
+    <ClInclude Include="pod_core\scheme_table_vrfq_session.h">
+      <Filter>local</Filter>
+    </ClInclude>
+    <ClInclude Include="pod_core\scheme_table_otvrfq_client.h">
+      <Filter>local</Filter>
+    </ClInclude>
+    <ClInclude Include="pod_core\scheme_table_otvrfq_session.h">
       <Filter>local</Filter>
     </ClInclude>
   </ItemGroup>

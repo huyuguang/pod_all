@@ -89,9 +89,7 @@ void BuildK(std::vector<Fr> const& v, std::vector<G1>& k, uint64_t s) {
   uint64_t n = v.size() / s;
   k.resize(v.size());
 
-  #ifdef MULTICORE
 #pragma omp parallel for
-#endif
   for (int64_t i = 0; i < (int64_t)n; ++i) {
     for (int64_t j = 0; j < (int64_t)s; ++j) {
       auto offset = i * s + j;

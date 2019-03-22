@@ -5,18 +5,19 @@
 #include <vector>
 
 #include "ecc.h"
+#include "scheme_table_a.h"
 #include "scheme_table_protocol.h"
 
-namespace scheme_misc::table {
-class A;
-typedef std::shared_ptr<A> APtr;
+namespace scheme_misc::table::vrfq {
 
 class Session {
  public:
   // The self_id and peer_id are useless now, just for later convenience.
   Session(APtr a, h256_t const& self_id, h256_t const& peer_id);
-  bool OnQueryRequest(VrfQueryRequest const& req, VrfQueryResponse& rsp);
-  bool OnQueryReceipt(VrfQueryReceipt const& receipt, VrfQuerySecret& secret);
+
+ public:
+  bool OnRequest(Request const& request, Response& response);
+  bool OnReceipt(Receipt const& receipt, Secret& secret);
 
  private:
   APtr a_;
@@ -30,4 +31,4 @@ class Session {
 
 typedef std::unique_ptr<Session> SessionUPtr;
 
-}  // namespace scheme_misc::table
+}  // namespace scheme_misc::table::vrfq

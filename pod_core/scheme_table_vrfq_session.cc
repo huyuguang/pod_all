@@ -1,9 +1,9 @@
-#include "scheme_table_session.h"
+#include "scheme_table_vrfq_session.h"
 #include "public.h"
 #include "scheme_table_a.h"
 #include "vrf.h"
 
-namespace scheme_misc::table {
+namespace scheme_misc::table::vrfq {
 
 Session::Session(APtr a, h256_t const& self_id, h256_t const& peer_id)
     : a_(a), self_id_(self_id), peer_id_(peer_id) {
@@ -12,8 +12,7 @@ Session::Session(APtr a, h256_t const& self_id, h256_t const& peer_id)
   g_exp_r_ = ecc_pub.PowerG1(r_);
 }
 
-bool Session::OnQueryRequest(VrfQueryRequest const& request,
-                             VrfQueryResponse& response) {
+bool Session::OnRequest(Request const& request, Response& response) {
   auto key_meta = a_->GetKeyMetaByName(request.key_name);
   if (!key_meta) return false;
 
@@ -37,10 +36,9 @@ bool Session::OnQueryRequest(VrfQueryRequest const& request,
   return true;
 }
 
-bool Session::OnQueryReceipt(VrfQueryReceipt const& receipt,
-                             VrfQuerySecret& secret) {
+bool Session::OnReceipt(Receipt const& receipt, Secret& secret) {
   if (receipt.g_exp_r != g_exp_r_) return false;
   secret.r = r_;
   return true;
 }
-}  // namespace scheme_misc::table
+}  // namespace scheme_misc::table::vrfq

@@ -39,6 +39,8 @@ Fp FpRand();
 
 void FpRand(Fp* r, size_t n);
 
+Fp2 Fp2Rand();
+
 Fr FrRand();
 
 void FrRand(Fr* r, size_t n);
@@ -48,6 +50,8 @@ Fr FrInv(Fr r);
 G1 G1Rand();
 
 void G1Rand(G1* r, size_t n);
+
+G2 G2Rand();
 
 Fr FrZero();
 

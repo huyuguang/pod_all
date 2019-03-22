@@ -5,22 +5,22 @@
 #include <vector>
 
 #include "ecc.h"
+#include "scheme_plain_a.h"
 #include "scheme_plain_protocol.h"
 
 namespace scheme_misc::plain {
-class A;
-typedef std::shared_ptr<A> APtr;
 
+namespace range {
 class Session {
  public:
   // The self_id and peer_id are useless now, just for later convenience.
   Session(APtr a, h256_t const& self_id, h256_t const& peer_id);
-  bool OnRangeRequest(RangeRequest const& request, RangeResponse& response);
-  bool OnRangeChallenge(RangeChallenge const& challenge, RangeReply& reply);
-  bool OnRangeReceipt(RangeReceipt const& receipt, RangeSecret& secret);
+  bool OnRequest(Request const& request, Response& response);
+  bool OnChallenge(Challenge const& challenge, Reply& reply);
+  bool OnReceipt(Receipt const& receipt, Secret& secret);
 
  public:
-  void TestSetEvil() {evil_ = true;}
+  void TestSetEvil() { evil_ = true; }
 
  private:
  private:
@@ -31,8 +31,8 @@ class Session {
   uint64_t const s_;
 
  private:
-  RangeRequest request_;
-  RangeChallenge challenge_;
+  Request request_;
+  Challenge challenge_;
 
  private:
   mpz_class seed0_;
@@ -44,6 +44,6 @@ class Session {
   bool evil_ = false;
 };
 
-typedef std::unique_ptr<Session> SessionUPtr;
+}  // namespace range
 
 }  // namespace scheme_misc::plain

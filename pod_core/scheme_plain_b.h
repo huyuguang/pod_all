@@ -29,4 +29,6 @@ class B {
   std::vector<G1> sigmas_;
 };
 
+typedef std::shared_ptr<B> BPtr;
+
 }  // namespace scheme_misc::plain

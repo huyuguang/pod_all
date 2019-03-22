@@ -47,6 +47,10 @@ void FpRand(Fp* r, size_t n) {
   }
 }
 
+Fp2 Fp2Rand() {
+  return Fp2(FpRand(), FpRand());
+}
+
 Fr FrRand() {
   Fr r;
   r.setByCSPRNG();
@@ -85,6 +89,16 @@ void G1Rand(G1* r, size_t n) {
       if (b) break;
     }
   }
+}
+
+G2 G2Rand() {
+  G2 out;
+  bool b;
+  for (;;) {
+    mcl::bn256::mapToG2(&b, out, Fp2Rand());
+    if (b) break;
+  }
+  return out;
 }
 
 Fr FrZero() { return Fr(0); }

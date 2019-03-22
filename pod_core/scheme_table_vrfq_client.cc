@@ -1,9 +1,9 @@
-#include "scheme_table_client.h"
+#include "scheme_table_vrfq_client.h"
 #include "public.h"
 #include "scheme_table.h"
 #include "scheme_table_b.h"
 
-namespace scheme_misc::table {
+namespace scheme_misc::table::vrfq {
 
 Client::Client(BPtr b, h256_t const& self_id, h256_t const& peer_id,
                std::string const& key_name, std::string const& key_value)
@@ -20,8 +20,12 @@ Client::Client(BPtr b, h256_t const& self_id, h256_t const& peer_id,
   hash.Final(key_digest_.data());
 }
 
-bool Client::OnQueryResponse(VrfQueryResponse const& response,
-                             VrfQueryReceipt& receipt) {
+void Client::GetRequest(Request& request) {
+  request.key_name = key_name_;
+  request.key_value = key_value_;
+}
+
+bool Client::OnResponse(Response const& response, Receipt& receipt) {
   if (!vrf::VerifyWithR(b_->vrf_pk(), key_digest_.data(), response.psk_exp_r,
                         response.g_exp_r))
     return false;
@@ -32,8 +36,8 @@ bool Client::OnQueryResponse(VrfQueryResponse const& response,
   return true;
 }
 
-bool Client::OnQuerySecret(VrfQuerySecret const& query_secret,
-                            std::vector<uint64_t>& positions) {
+bool Client::OnSecret(Secret const& query_secret,
+                      std::vector<uint64_t>& positions) {
   auto const& ecc_pub = GetEccPub();
   if (ecc_pub.PowerG1(query_secret.r) != g_exp_r_) {
     assert(false);
@@ -63,4 +67,4 @@ bool Client::OnQuerySecret(VrfQuerySecret const& query_secret,
 
   return true;
 }
-}  // namespace scheme_misc::table
+}  // namespace scheme_misc::table::vrfq

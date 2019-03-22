@@ -1,4 +1,4 @@
-#include "scheme_plain_client.h"
+#include "scheme_plain_range_client.h"
 #include "misc.h"
 #include "public.h"
 #include "scheme_misc.h"
@@ -7,21 +7,7 @@
 #include "scheme_plain_protocol.h"
 #include "vrf.h"
 
-namespace scheme_misc::plain {
-
-namespace {
-
-void BuildK(std::vector<Fr> const& v, std::vector<G1>& k) {
-  k.resize(v.size());
-  auto const& ecc_pub = GetEccPub();
-
-#pragma omp parallel for
-  for (int64_t i = 0; i < (int64_t)v.size(); ++i) {
-    k[i] = ecc_pub.PowerG1(v[i]);
-  }
-}
-
-}  // namespace
+namespace scheme_misc::plain::range {
 
 Client::Client(BPtr b, h256_t const& self_id, h256_t const& peer_id,
                uint64_t start, uint64_t count)
@@ -35,8 +21,7 @@ Client::Client(BPtr b, h256_t const& self_id, h256_t const& peer_id,
   seed2_ = misc::RandMpz32();
 }
 
-bool Client::OnRangeResponse(RangeResponse response,
-                             RangeChallenge& challenge) {
+bool Client::OnResponse(Response response, Challenge& challenge) {
   Tick _tick_(__FUNCTION__);
 
   if (response.k.size() != count_ * s_) {
@@ -50,14 +35,14 @@ bool Client::OnRangeResponse(RangeResponse response,
   return true;
 }
 
-bool Client::OnRangeReply(RangeReply reply, RangeReceipt& receipt) {
+bool Client::OnReply(Reply reply, Receipt& receipt) {
   Tick _tick_(__FUNCTION__);
 
   if (reply.m.size() != count_ * s_) {
     assert(false);
     return false;
   }
-  
+
   H2(seed2_, count_, w_);
 
   if (!CheckEncryptedM(reply.m)) {
@@ -106,7 +91,7 @@ bool Client::CheckEncryptedM(std::vector<Fr> const& encrypted_m) {
   return true;
 }
 
-bool Client::OnRangeSecret(RangeSecret const& secret, RangeClaim& claim) {
+bool Client::OnSecret(Secret const& secret, Claim& claim) {
   Tick _tick_(__FUNCTION__);
 
   // compute v
@@ -120,7 +105,7 @@ bool Client::OnRangeSecret(RangeSecret const& secret, RangeClaim& claim) {
   return true;
 }
 
-bool Client::CheckK(std::vector<Fr> const& v, RangeClaim& claim) {
+bool Client::CheckK(std::vector<Fr> const& v, Claim& claim) {
   if (v.size() > (1024 * 1024) && omp_get_max_threads() < 3) {
     return CheckKMultiExp(v, claim);
   } else {
@@ -128,7 +113,7 @@ bool Client::CheckK(std::vector<Fr> const& v, RangeClaim& claim) {
   }
 }
 
-bool Client::CheckKDirect(std::vector<Fr> const& v, RangeClaim& claim) {
+bool Client::CheckKDirect(std::vector<Fr> const& v, Claim& claim) {
   Tick _tick_(__FUNCTION__);
 
   // compute k
@@ -147,7 +132,7 @@ bool Client::CheckKDirect(std::vector<Fr> const& v, RangeClaim& claim) {
   return true;
 }
 
-bool Client::CheckKMultiExp(std::vector<Fr> const& v, RangeClaim& claim) {
+bool Client::CheckKMultiExp(std::vector<Fr> const& v, Claim& claim) {
   Tick _tick_(__FUNCTION__);
 
   auto const& ecc_pub = GetEccPub();
@@ -189,7 +174,7 @@ bool Client::CheckKMultiExp(std::vector<Fr> const& v, RangeClaim& claim) {
   return false;
 }
 
-void Client::BuildClaim(uint64_t i, uint64_t j, RangeClaim& claim) {
+void Client::BuildClaim(uint64_t i, uint64_t j, Claim& claim) {
   Tick _tick_(__FUNCTION__);
   claim.i = i;
   claim.j = j;
@@ -267,4 +252,4 @@ bool Client::SaveDecrypted(std::string const& file) {
 
   return MToFile(file, b_->bulletin().size, s_, start_, count_, decrypted_m_);
 }
-}  // namespace scheme_misc::plain
+}  // namespace scheme_misc::plain::range

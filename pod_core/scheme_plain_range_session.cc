@@ -1,4 +1,4 @@
-#include "scheme_plain_session.h"
+#include "scheme_plain_range_session.h"
 #include "misc.h"
 #include "public.h"
 #include "scheme_misc.h"
@@ -7,9 +7,7 @@
 #include "scheme_plain_protocol.h"
 #include "tick.h"
 
-namespace scheme_misc::plain {
-
-namespace {}  // namespace
+namespace scheme_misc::plain::range {
 
 Session::Session(APtr a, h256_t const& self_id, h256_t const& peer_id)
     : a_(a),
@@ -20,8 +18,7 @@ Session::Session(APtr a, h256_t const& self_id, h256_t const& peer_id)
   seed0_ = misc::RandMpz32();
 }
 
-bool Session::OnRangeRequest(RangeRequest const& request,
-                             RangeResponse& response) {
+bool Session::OnRequest(Request const& request, Response& response) {
   Tick _tick_(__FUNCTION__);
 
   if (!request.count || request.start >= n_ ||
@@ -32,9 +29,9 @@ bool Session::OnRangeRequest(RangeRequest const& request,
 
   H2(seed0_, request_.count * s_, v_);
 
-  if (evil_) {    
+  if (evil_) {
     uint64_t evil_i = rand() % n_;
-    uint64_t evil_j = s_ - 1; // last col
+    uint64_t evil_j = s_ - 1;  // last col
     v_[evil_i * s_ + evil_j] = FrRand();
     std::cout << "evil: " << evil_i << "," << evil_j << "\n";
   }
@@ -46,8 +43,7 @@ bool Session::OnRangeRequest(RangeRequest const& request,
   return true;
 }
 
-bool Session::OnRangeChallenge(RangeChallenge const& challenge,
-                               RangeReply& reply) {
+bool Session::OnChallenge(Challenge const& challenge, Reply& reply) {
   Tick _tick_(__FUNCTION__);
 
   challenge_ = challenge;
@@ -70,7 +66,7 @@ bool Session::OnRangeChallenge(RangeChallenge const& challenge,
   return true;
 }
 
-bool Session::OnRangeReceipt(RangeReceipt const& receipt, RangeSecret& secret) {
+bool Session::OnReceipt(Receipt const& receipt, Secret& secret) {
   if (receipt.seed2 != challenge_.seed2) {
     assert(false);
     return false;
@@ -82,4 +78,5 @@ bool Session::OnRangeReceipt(RangeReceipt const& receipt, RangeSecret& secret) {
   secret.seed0 = seed0_;
   return true;
 }
-}  // namespace scheme_misc::plain
+
+}  // namespace scheme_misc::plain::range

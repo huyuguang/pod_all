@@ -2,10 +2,10 @@
 #include "scheme_plain.h"
 #include "scheme_plain_a.h"
 #include "scheme_plain_b.h"
-#include "scheme_plain_client.h"
-#include "scheme_plain_protocol.h"
-#include "scheme_plain_session.h"
 #include "scheme_plain_notary.h"
+#include "scheme_plain_protocol.h"
+#include "scheme_plain_range_client.h"
+#include "scheme_plain_range_session.h"
 
 namespace scheme_misc::plain {
 
@@ -16,50 +16,51 @@ const h256_t kDummySessionId = h256_t{1};
 const h256_t kDummyClientId = h256_t{2};
 }  // namespace
 
-bool Range(std::string const& output_file, APtr a, BPtr b, uint64_t start,
-           uint64_t count, bool evil) {
+namespace range {
+bool Test(std::string const& output_file, APtr a, BPtr b, uint64_t start,
+          uint64_t count, bool evil) {
   Tick _tick_(__FUNCTION__);
 
   Session session(a, kDummySessionId, kDummyClientId);
   Client client(b, kDummyClientId, kDummySessionId, start, count);
   if (evil) session.TestSetEvil();
 
-  RangeRequest request;
+  Request request;
   request.start = start;
   request.count = count;
-  RangeResponse response;
-  if (!session.OnRangeRequest(request, response)) {
+  Response response;
+  if (!session.OnRequest(request, response)) {
     assert(false);
     return false;
   }
 
-  RangeChallenge challenge;
-  if (!client.OnRangeResponse(std::move(response), challenge)) {
+  Challenge challenge;
+  if (!client.OnResponse(std::move(response), challenge)) {
     assert(false);
     return false;
   }
 
-  RangeReply reply;
-  if (!session.OnRangeChallenge(challenge, reply)) {
+  Reply reply;
+  if (!session.OnChallenge(challenge, reply)) {
     assert(false);
     return false;
   }
 
-  RangeReceipt receipt;
-  if (!client.OnRangeReply(std::move(reply), receipt)) {
+  Receipt receipt;
+  if (!client.OnReply(std::move(reply), receipt)) {
     assert(false);
     return false;
   }
 
-  RangeSecret secret;
-  if (!session.OnRangeReceipt(receipt, secret)) {
+  Secret secret;
+  if (!session.OnReceipt(receipt, secret)) {
     assert(false);
     return false;
   }
 
   if (!evil) {
-    RangeClaim claim;
-    if (!client.OnRangeSecret(secret, claim)) {
+    Claim claim;
+    if (!client.OnSecret(secret, claim)) {
       assert(false);
       return false;
     }
@@ -69,13 +70,13 @@ bool Range(std::string const& output_file, APtr a, BPtr b, uint64_t start,
       return false;
     }
   } else {
-    RangeClaim claim;
-    if (client.OnRangeSecret(secret, claim)) {
+    Claim claim;
+    if (client.OnSecret(secret, claim)) {
       assert(false);
       return false;
     }
     std::cout << "claim: " << claim.i << "," << claim.j << "\n";
-    if (!VerifyRangeClaim(count, a->bulletin().s, receipt, secret, claim)) {
+    if (!range::VerifyClaim(count, a->bulletin().s, receipt, secret, claim)) {
       assert(false);
       return false;
     }
@@ -83,6 +84,7 @@ bool Range(std::string const& output_file, APtr a, BPtr b, uint64_t start,
 
   return true;
 }
+}  // namespace range
 
 bool Test(std::string const& publish_path, std::string const& output_path,
           uint64_t start, uint64_t count) {
@@ -92,7 +94,7 @@ bool Test(std::string const& publish_path, std::string const& output_path,
     std::string bulletin_file = publish_path + "/bulletin";
     std::string public_path = publish_path + "/public";
     auto b = std::make_shared<B>(bulletin_file, public_path);
-    return Range(output_path, a, b, start, count, true);
+    return range::Test(output_path, a, b, start, count, false);
   } catch (std::exception& e) {
     std::cerr << __FUNCTION__ << "\t" << e.what() << "\n";
     return false;

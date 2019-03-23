@@ -23,6 +23,18 @@
     <Filter Include="local">
       <UniqueIdentifier>{c642617c-6caf-4fe6-a815-5e04f67a12de}</UniqueIdentifier>
     </Filter>
+    <Filter Include="local\range">
+      <UniqueIdentifier>{0742b305-509e-4e71-8e73-652dcde7090e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="local\otvrfq">
+      <UniqueIdentifier>{03f8c434-dc86-437c-bcc3-c263a91f1453}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="local\otrange">
+      <UniqueIdentifier>{fa12c8c4-46b4-4910-9650-54f530dc9fdb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="local\vrfq">
+      <UniqueIdentifier>{442344d4-7977-4d71-9725-7c3bee1dc0a7}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="fp.cc">
@@ -71,31 +83,40 @@
       <Filter>local</Filter>
     </ClCompile>
     <ClCompile Include="pod_core\scheme_plain_range_client.cc">
-      <Filter>local</Filter>
+      <Filter>local\range</Filter>
     </ClCompile>
     <ClCompile Include="pod_core\scheme_plain_range_session.cc">
-      <Filter>local</Filter>
-    </ClCompile>
-    <ClCompile Include="pod_core\scheme_table_vrfq_client.cc">
-      <Filter>local</Filter>
-    </ClCompile>
-    <ClCompile Include="pod_core\scheme_table_vrfq_session.cc">
-      <Filter>local</Filter>
-    </ClCompile>
-    <ClCompile Include="pod_core\scheme_table_otvrfq_client.cc">
-      <Filter>local</Filter>
-    </ClCompile>
-    <ClCompile Include="pod_core\scheme_table_otvrfq_session.cc">
-      <Filter>local</Filter>
-    </ClCompile>
-    <ClCompile Include="pod_core\scheme_table_vrfq_test.cc">
-      <Filter>local</Filter>
+      <Filter>local\range</Filter>
     </ClCompile>
     <ClCompile Include="pod_core\scheme_plain_range_test.cc">
-      <Filter>local</Filter>
+      <Filter>local\range</Filter>
+    </ClCompile>
+    <ClCompile Include="pod_core\scheme_table_otvrfq_client.cc">
+      <Filter>local\otvrfq</Filter>
+    </ClCompile>
+    <ClCompile Include="pod_core\scheme_table_otvrfq_session.cc">
+      <Filter>local\otvrfq</Filter>
     </ClCompile>
     <ClCompile Include="pod_core\scheme_table_otvrfq_test.cc">
-      <Filter>local</Filter>
+      <Filter>local\otvrfq</Filter>
+    </ClCompile>
+    <ClCompile Include="pod_core\scheme_table_vrfq_client.cc">
+      <Filter>local\vrfq</Filter>
+    </ClCompile>
+    <ClCompile Include="pod_core\scheme_table_vrfq_session.cc">
+      <Filter>local\vrfq</Filter>
+    </ClCompile>
+    <ClCompile Include="pod_core\scheme_table_vrfq_test.cc">
+      <Filter>local\vrfq</Filter>
+    </ClCompile>
+    <ClCompile Include="pod_core\scheme_plain_otrange_client.cc">
+      <Filter>local\otrange</Filter>
+    </ClCompile>
+    <ClCompile Include="pod_core\scheme_plain_otrange_session.cc">
+      <Filter>local\otrange</Filter>
+    </ClCompile>
+    <ClCompile Include="pod_core\scheme_plain_otrange_test.cc">
+      <Filter>local\otrange</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -337,31 +358,40 @@
       <Filter>local</Filter>
     </ClInclude>
     <ClInclude Include="pod_core\scheme_plain_range_client.h">
-      <Filter>local</Filter>
+      <Filter>local\range</Filter>
     </ClInclude>
     <ClInclude Include="pod_core\scheme_plain_range_session.h">
-      <Filter>local</Filter>
-    </ClInclude>
-    <ClInclude Include="pod_core\scheme_table_vrfq_client.h">
-      <Filter>local</Filter>
-    </ClInclude>
-    <ClInclude Include="pod_core\scheme_table_vrfq_session.h">
-      <Filter>local</Filter>
-    </ClInclude>
-    <ClInclude Include="pod_core\scheme_table_otvrfq_client.h">
-      <Filter>local</Filter>
-    </ClInclude>
-    <ClInclude Include="pod_core\scheme_table_otvrfq_session.h">
-      <Filter>local</Filter>
-    </ClInclude>
-    <ClInclude Include="pod_core\scheme_table_vrfq_test.h">
-      <Filter>local</Filter>
+      <Filter>local\range</Filter>
     </ClInclude>
     <ClInclude Include="pod_core\scheme_plain_range_test.h">
-      <Filter>local</Filter>
+      <Filter>local\range</Filter>
+    </ClInclude>
+    <ClInclude Include="pod_core\scheme_table_otvrfq_client.h">
+      <Filter>local\otvrfq</Filter>
+    </ClInclude>
+    <ClInclude Include="pod_core\scheme_table_otvrfq_session.h">
+      <Filter>local\otvrfq</Filter>
     </ClInclude>
     <ClInclude Include="pod_core\scheme_table_otvrfq_test.h">
-      <Filter>local</Filter>
+      <Filter>local\otvrfq</Filter>
+    </ClInclude>
+    <ClInclude Include="pod_core\scheme_table_vrfq_client.h">
+      <Filter>local\vrfq</Filter>
+    </ClInclude>
+    <ClInclude Include="pod_core\scheme_table_vrfq_session.h">
+      <Filter>local\vrfq</Filter>
+    </ClInclude>
+    <ClInclude Include="pod_core\scheme_table_vrfq_test.h">
+      <Filter>local\vrfq</Filter>
+    </ClInclude>
+    <ClInclude Include="pod_core\scheme_plain_otrange_client.h">
+      <Filter>local\otrange</Filter>
+    </ClInclude>
+    <ClInclude Include="pod_core\scheme_plain_otrange_session.h">
+      <Filter>local\otrange</Filter>
+    </ClInclude>
+    <ClInclude Include="pod_core\scheme_plain_otrange_test.h">
+      <Filter>local\otrange</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

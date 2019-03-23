@@ -1,11 +1,11 @@
-#include "scheme_plain_range_test.h"
+#include "scheme_plain_otrange_test.h"
 #include "scheme_plain.h"
 #include "scheme_plain_a.h"
 #include "scheme_plain_b.h"
 #include "scheme_plain_notary.h"
 #include "scheme_plain_protocol.h"
-#include "scheme_plain_range_client.h"
-#include "scheme_plain_range_session.h"
+#include "scheme_plain_otrange_client.h"
+#include "scheme_plain_otrange_session.h"
 
 namespace {
 // The session id must be hash(addr_A), and the client id must be hash(addr_B).
@@ -14,7 +14,7 @@ const h256_t kDummySessionId = h256_t{1};
 const h256_t kDummyClientId = h256_t{2};
 }  // namespace
 
-namespace scheme::plain::range {
+namespace scheme::plain::otrange {
 
 bool Test(std::string const& output_file, APtr a, BPtr b, uint64_t start,
           uint64_t count, bool evil) {
@@ -99,4 +99,4 @@ bool Test(std::string const& publish_path, std::string const& output_path,
   }
 }
 
-}  // namespace scheme::plain::range
+}  // namespace scheme::plain::otrange

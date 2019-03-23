@@ -112,6 +112,9 @@
     <ClCompile Include="pod_core\main.cc" />
     <ClCompile Include="pod_core\scheme_plain_a.cc" />
     <ClCompile Include="pod_core\scheme_plain_b.cc" />
+    <ClCompile Include="pod_core\scheme_plain_otrange_client.cc" />
+    <ClCompile Include="pod_core\scheme_plain_otrange_session.cc" />
+    <ClCompile Include="pod_core\scheme_plain_otrange_test.cc" />
     <ClCompile Include="pod_core\scheme_plain_range_client.cc" />
     <ClCompile Include="pod_core\scheme_plain_notary.cc" />
     <ClCompile Include="pod_core\scheme_plain_range_session.cc" />
@@ -196,6 +199,9 @@
     <ClInclude Include="multiexp.h" />
     <ClInclude Include="pod_core\scheme_plain_a.h" />
     <ClInclude Include="pod_core\scheme_plain_b.h" />
+    <ClInclude Include="pod_core\scheme_plain_otrange_client.h" />
+    <ClInclude Include="pod_core\scheme_plain_otrange_session.h" />
+    <ClInclude Include="pod_core\scheme_plain_otrange_test.h" />
     <ClInclude Include="pod_core\scheme_plain_range_client.h" />
     <ClInclude Include="pod_core\scheme_plain_notary.h" />
     <ClInclude Include="pod_core\scheme_plain_protocol.h" />

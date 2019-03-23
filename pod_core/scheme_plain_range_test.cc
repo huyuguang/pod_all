@@ -1,4 +1,4 @@
-#include "scheme_plain_test.h"
+#include "scheme_plain_range_test.h"
 #include "scheme_plain.h"
 #include "scheme_plain_a.h"
 #include "scheme_plain_b.h"
@@ -7,8 +7,6 @@
 #include "scheme_plain_range_client.h"
 #include "scheme_plain_range_session.h"
 
-namespace scheme_misc::plain {
-
 namespace {
 // The session id must be hash(addr_A), and the client id must be hash(addr_B).
 // Here just just two dummy values for test.
@@ -16,7 +14,8 @@ const h256_t kDummySessionId = h256_t{1};
 const h256_t kDummyClientId = h256_t{2};
 }  // namespace
 
-namespace range {
+namespace scheme_misc::plain::range {
+
 bool Test(std::string const& output_file, APtr a, BPtr b, uint64_t start,
           uint64_t count, bool evil) {
   Tick _tick_(__FUNCTION__);
@@ -84,7 +83,6 @@ bool Test(std::string const& output_file, APtr a, BPtr b, uint64_t start,
 
   return true;
 }
-}  // namespace range
 
 bool Test(std::string const& publish_path, std::string const& output_path,
           uint64_t start, uint64_t count) {
@@ -101,4 +99,4 @@ bool Test(std::string const& publish_path, std::string const& output_path,
   }
 }
 
-}  // namespace scheme_misc::plain
+}  // namespace scheme_misc::plain::range

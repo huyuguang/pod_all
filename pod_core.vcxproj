@@ -115,7 +115,7 @@
     <ClCompile Include="pod_core\scheme_plain_range_client.cc" />
     <ClCompile Include="pod_core\scheme_plain_notary.cc" />
     <ClCompile Include="pod_core\scheme_plain_range_session.cc" />
-    <ClCompile Include="pod_core\scheme_plain_test.cc" />
+    <ClCompile Include="pod_core\scheme_plain_range_test.cc" />
     <ClCompile Include="pod_core\scheme_table_a.cc" />
     <ClCompile Include="pod_core\scheme_table_b.cc" />
     <ClCompile Include="pod_core\scheme_table_otvrfq_client.cc" />
@@ -199,7 +199,7 @@
     <ClInclude Include="pod_core\scheme_plain_notary.h" />
     <ClInclude Include="pod_core\scheme_plain_protocol.h" />
     <ClInclude Include="pod_core\scheme_plain_range_session.h" />
-    <ClInclude Include="pod_core\scheme_plain_test.h" />
+    <ClInclude Include="pod_core\scheme_plain_range_test.h" />
     <ClInclude Include="pod_core\scheme_table_a.h" />
     <ClInclude Include="pod_core\scheme_table_b.h" />
     <ClInclude Include="pod_core\scheme_table_otvrfq_client.h" />

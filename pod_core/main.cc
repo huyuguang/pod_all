@@ -1,7 +1,7 @@
 #include "ecc_pub.h"
 #include "public.h"
 #include "scheme_misc.h"
-#include "scheme_plain_test.h"
+#include "scheme_plain_range_test.h"
 #include "scheme_table_vrfq_test.h"
 
 namespace {}  // namespace
@@ -119,11 +119,13 @@ int main(int argc, char** argv) {
 
   if (mode == Mode::kPlain) {
     auto output_file = output_path + "/decrypted_data";
-    return scheme_misc::plain::Test(publish_path, output_file, start, count)
+    return scheme_misc::plain::range::Test(publish_path, output_file, start,
+                                           count)
                ? 0
                : -1;
   } else {
-    return scheme_misc::table::vrfq::Test(publish_path, key_name, key_values) ? 0
-                                                                        : -1;
+    return scheme_misc::table::vrfq::Test(publish_path, key_name, key_values)
+               ? 0
+               : -1;
   }
 }

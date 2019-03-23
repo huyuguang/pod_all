@@ -61,9 +61,6 @@
     <ClCompile Include="pod_core\scheme_plain_b.cc">
       <Filter>local</Filter>
     </ClCompile>
-    <ClCompile Include="pod_core\scheme_plain_test.cc">
-      <Filter>local</Filter>
-    </ClCompile>
     <ClCompile Include="pod_core\scheme_table_a.cc">
       <Filter>local</Filter>
     </ClCompile>
@@ -92,6 +89,9 @@
       <Filter>local</Filter>
     </ClCompile>
     <ClCompile Include="pod_core\scheme_table_vrfq_test.cc">
+      <Filter>local</Filter>
+    </ClCompile>
+    <ClCompile Include="pod_core\scheme_plain_range_test.cc">
       <Filter>local</Filter>
     </ClCompile>
   </ItemGroup>
@@ -318,9 +318,6 @@
     <ClInclude Include="pod_core\scheme_plain_b.h">
       <Filter>local</Filter>
     </ClInclude>
-    <ClInclude Include="pod_core\scheme_plain_test.h">
-      <Filter>local</Filter>
-    </ClInclude>
     <ClInclude Include="pod_core\scheme_table_a.h">
       <Filter>local</Filter>
     </ClInclude>
@@ -355,6 +352,9 @@
       <Filter>local</Filter>
     </ClInclude>
     <ClInclude Include="pod_core\scheme_table_vrfq_test.h">
+      <Filter>local</Filter>
+    </ClInclude>
+    <ClInclude Include="pod_core\scheme_plain_range_test.h">
       <Filter>local</Filter>
     </ClInclude>
   </ItemGroup>

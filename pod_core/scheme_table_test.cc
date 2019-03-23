@@ -17,13 +17,13 @@ const h256_t kDummyClientId = h256_t{2};
 
 namespace vrfq {
 bool QueryInternal(APtr a, BPtr b, std::string const& key_name,
-                   std::string const& key_value) {
+                   std::vector<std::string> const& key_values) {
   Session session(a, kDummySessionId, kDummyClientId);
-  Client client(b, kDummyClientId, kDummySessionId, key_name, key_value);
+  Client client(b, kDummyClientId, kDummySessionId, key_name, key_values);
 
   Request query_req;
-  query_req.key_name = key_name;
-  query_req.key_value = key_value;
+  client.GetRequest(query_req);
+
   Response query_rsp;
   if (!session.OnRequest(query_req, query_rsp)) {
     assert(false);
@@ -42,20 +42,26 @@ bool QueryInternal(APtr a, BPtr b, std::string const& key_name,
     return false;
   }
 
-  std::vector<uint64_t> positions;
+  std::vector<std::vector<uint64_t>> positions;
   if (!client.OnSecret(query_secret, positions)) {
     assert(false);
     return false;
   }
 
-  if (positions.empty()) {
-    std::cout << "Query " << key_name << " = " << key_value << ": not exist\n";
-  } else {
-    std::cout << "Query " << key_name << " = " << key_value << ", Positions: ";
-    for (auto i : positions) {
-      std::cout << i << ";";
+  assert(positions.size() == key_values.size());
+  for (size_t i = 0; i < positions.size(); ++i) {
+    auto const& position = positions[i];
+    if (position.empty()) {
+      std::cout << "Query " << key_name << " = " << key_values[i]
+                << ": not exist\n";
+    } else {
+      std::cout << "Query " << key_name << " = " << key_values[i]
+                << ", Positions: ";
+      for (auto p : position) {
+        std::cout << p << ";";
+      }
+      std::cout << "\n";
     }
-    std::cout << "\n";
   }
 
   return true;
@@ -70,11 +76,13 @@ bool Test(APtr a, BPtr b, std::string const& key_name,
   if (unique) {
     for (uint64_t i = 0;; ++i) {
       std::string key_value_with_suffix = key_value + "_" + std::to_string(i);
-      if (!QueryInternal(a, b, key_name, key_value_with_suffix)) return false;
+      std::vector<std::string> values{key_value_with_suffix};
+      if (!QueryInternal(a, b, key_name, values)) return false;
     }
     return true;
   } else {
-    return QueryInternal(a, b, key_name, key_value);
+    std::vector<std::string> values{key_value};
+    return QueryInternal(a, b, key_name, values);
   }
 }
 }  // namespace vrfq

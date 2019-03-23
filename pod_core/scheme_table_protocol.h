@@ -11,11 +11,11 @@ namespace scheme_misc::table {
 namespace vrfq {
 struct Request {
   std::string key_name;
-  std::string key_value;
+  std::vector<h256_t> key_digests;
 };
 
 struct Response {
-  vrf::Psk<> psk_exp_r;
+  std::vector<vrf::Psk<>> psk_exp_r;
   G1 g_exp_r;
 };
 

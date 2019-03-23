@@ -13,26 +13,26 @@ Session::Session(APtr a, h256_t const& self_id, h256_t const& peer_id)
 }
 
 bool Session::OnRequest(Request const& request, Response& response) {
+  if (request.key_digests.empty()) return false;
   auto key_meta = a_->GetKeyMetaByName(request.key_name);
   if (!key_meta) return false;
 
   response.g_exp_r = g_exp_r_;
-
-  h256_t digest;
-  CryptoPP::SHA256 hash;
-  hash.Update((uint8_t*)request.key_value.data(), request.key_value.size());
-  hash.Final(digest.data());
-
-  vrf::ProveWithR(a_->vrf_sk(), digest.data(), r_, response.psk_exp_r);
+  response.psk_exp_r.resize(request.key_digests.size());
+  for (size_t i = 0; i < request.key_digests.size(); ++i) {
+    auto const& key_digest = request.key_digests[i];
+    auto& psk_exp_r = response.psk_exp_r[i];
+    vrf::ProveWithR(a_->vrf_sk(), key_digest.data(), r_, psk_exp_r);
 
 #ifdef _DEBUG
-  vrf::Fsk fsk2 = vrf::Vrf(a_->vrf_sk(), digest.data());
-  vrf::VerifyWithR(a_->vrf_pk(), digest.data(), response.psk_exp_r,
-                   response.g_exp_r);
-  vrf::Fsk fsk1;
-  vrf::GetFskFromPskExpR(response.psk_exp_r.back(), r_, fsk1);
-  assert(fsk1 == fsk2);
+    vrf::Fsk fsk2 = vrf::Vrf(a_->vrf_sk(), key_digest.data());
+    vrf::VerifyWithR(a_->vrf_pk(), key_digest.data(), psk_exp_r,
+                     response.g_exp_r);
+    vrf::Fsk fsk1;
+    vrf::GetFskFromPskExpR(psk_exp_r.back(), r_, fsk1);
+    assert(fsk1 == fsk2);
 #endif
+  }
   return true;
 }
 

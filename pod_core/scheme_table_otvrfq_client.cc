@@ -146,9 +146,9 @@ bool Client::OnSecret(Secret const& query_secret,
     auto const& km = key_m[vrf_key_->j];
 
     auto& postion = positions[i];
-    for (uint64_t i = 0; i < km.size(); ++i) {
-      if (fr_fsk == km[i]) {
-        postion.push_back(i);
+    for (uint64_t j = 0; j < km.size(); ++j) {
+      if (fr_fsk == km[j]) {
+        postion.push_back(j);
         if (vrf_key_->unique) break;
       }
     }

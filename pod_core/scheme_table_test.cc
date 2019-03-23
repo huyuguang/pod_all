@@ -68,27 +68,28 @@ bool QueryInternal(APtr a, BPtr b, std::string const& key_name,
 }
 
 bool Test(APtr a, BPtr b, std::string const& key_name,
-          std::string const& key_value) {
+          std::vector<std::string> const& key_values) {
   auto vrf_key = GetKeyMetaByName(b->vrf_meta(), key_name);
   if (!vrf_key) return false;
   bool unique = vrf_key->unique;
 
   if (unique) {
-    for (uint64_t i = 0;; ++i) {
-      std::string key_value_with_suffix = key_value + "_" + std::to_string(i);
-      std::vector<std::string> values{key_value_with_suffix};
-      if (!QueryInternal(a, b, key_name, values)) return false;
+    for (auto const& key_value : key_values) {
+      for (uint64_t i = 0;; ++i) {
+        std::string key_value_with_suffix = key_value + "_" + std::to_string(i);
+        std::vector<std::string> values{key_value_with_suffix};
+        if (!QueryInternal(a, b, key_name, values)) return false;
+      }
     }
     return true;
   } else {
-    std::vector<std::string> values{key_value};
-    return QueryInternal(a, b, key_name, values);
+    return QueryInternal(a, b, key_name, key_values);
   }
 }
 }  // namespace vrfq
 
 bool Test(std::string const& publish_path, std::string const& key_name,
-          std::string const& key_value) {
+          std::vector<std::string> const& key_values) {
   try {
     auto a = std::make_shared<A>(publish_path);
 
@@ -96,7 +97,7 @@ bool Test(std::string const& publish_path, std::string const& key_name,
     std::string public_path = publish_path + "/public";
     auto b = std::make_shared<B>(bulletin_file, public_path);
 
-    return vrfq::Test(a, b, key_name, key_value);
+    return vrfq::Test(a, b, key_name, key_values);
   } catch (std::exception& e) {
     std::cerr << __FUNCTION__ << "\t" << e.what() << "\n";
     return false;

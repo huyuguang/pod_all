@@ -17,7 +17,7 @@ int main(int argc, char** argv) {
   uint64_t start;
   uint64_t count;
   std::string key_name;
-  std::string key_value;
+  std::vector<std::string> key_values;
   uint32_t omp_thread_num;
 
   try {
@@ -40,8 +40,10 @@ int main(int argc, char** argv) {
         "Provide the retrieve block count(plain mode)")(
         "key_name,k", po::value<std::string>(&key_name)->default_value(""),
         "Provide the query key name(table mode)")(
-        "key_value,v", po::value<std::string>(&key_value)->default_value(""),
-        "Provide the query key value(table mode)")(
+        "key_value,v",
+        po::value<std::vector<std::string>>(&key_values)->multitoken(),
+        "Provide the query key values(table mode, for example -v value_a "
+        "value_b value_c)")(
         "omp_thread_num,t",
         po::value<uint32_t>(&omp_thread_num)->default_value(0),
         "Provide the number of the openmp thread, 1: disable openmp, 0: "
@@ -88,8 +90,8 @@ int main(int argc, char** argv) {
         return -1;
       }
     } else {
-      if (key_name.empty() || key_value.empty()) {
-        std::cout << "key_name and key_value can not be empty.\n";
+      if (key_name.empty() || key_values.empty()) {
+        std::cout << "key_name and key_values can not be empty.\n";
         std::cout << options << std::endl;
         return -1;
       }
@@ -103,7 +105,7 @@ int main(int argc, char** argv) {
 
   if (omp_thread_num) {
     std::cout << "omp_set_num_threads: " << omp_thread_num << "\n";
-    omp_set_num_threads(omp_thread_num);    
+    omp_set_num_threads(omp_thread_num);
   }
 
   std::cout << "omp_get_max_threads: " << omp_get_max_threads() << "\n";
@@ -121,6 +123,7 @@ int main(int argc, char** argv) {
                ? 0
                : -1;
   } else {
-    return scheme_misc::table::Test(publish_path, key_name, key_value) ? 0 : -1;
+    return scheme_misc::table::Test(publish_path, key_name, key_values) ? 0
+                                                                        : -1;
   }
 }

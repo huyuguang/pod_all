@@ -2,7 +2,7 @@
 #include "public.h"
 #include "scheme_misc.h"
 #include "scheme_plain_test.h"
-#include "scheme_table_test.h"
+#include "scheme_table_vrfq_test.h"
 
 namespace {}  // namespace
 
@@ -123,7 +123,7 @@ int main(int argc, char** argv) {
                ? 0
                : -1;
   } else {
-    return scheme_misc::table::Test(publish_path, key_name, key_values) ? 0
+    return scheme_misc::table::vrfq::Test(publish_path, key_name, key_values) ? 0
                                                                         : -1;
   }
 }

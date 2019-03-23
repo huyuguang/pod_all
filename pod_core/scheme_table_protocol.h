@@ -11,7 +11,7 @@ namespace scheme::table {
 namespace vrfq {
 struct Request {
   std::string key_name;
-  std::vector<h256_t> key_digests;
+  std::vector<h256_t> value_digests;
 };
 
 struct Response {
@@ -47,15 +47,15 @@ struct NegoBResponse {
 
 struct Request {
   std::string key_name;
-  std::vector<h256_t> mixed_key_digests; // sizeof() = L
-  std::vector<G1> vi; // sizeof() = K
+  std::vector<h256_t> mixed_value_digests;  // sizeof() = L
+  std::vector<G1> vi;                       // sizeof() = K
   G1 v;
 };
 
 struct Response {
-  std::vector<vrf::Psk<>> psk_exp_r_mixed; // sizeof() = L
+  std::vector<vrf::Psk<>> psk_exp_r_mixed;  // sizeof() = L
   G1 g_exp_r;
-  std::vector<G1> ui; // sizeof() = K
+  std::vector<G1> ui;  // sizeof() = K
 };
 
 struct Receipt {

@@ -1,6 +1,6 @@
 #include "scheme_plain_a.h"
-#include "scheme_plain.h"
 #include "scheme_misc.h"
+#include "scheme_plain.h"
 
 namespace {}
 
@@ -38,8 +38,8 @@ A::A(std::string const& publish_path) : publish_path_(publish_path) {
   }
 
   //// check sigma
-  //auto check_sigma = CalcSigma(m_, bulletin_.n, bulletin_.s);
-  //if (check_sigma != sigmas_) {
+  // auto check_sigma = CalcSigma(m_, bulletin_.n, bulletin_.s);
+  // if (check_sigma != sigmas_) {
   //  assert(false);
   //  throw std::runtime_error("invalid sigma");
   //}

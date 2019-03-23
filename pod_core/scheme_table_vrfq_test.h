@@ -4,6 +4,6 @@
 #include <vector>
 
 namespace scheme::table::vrfq {
-bool Test(std::string const& publish_path, std::string const& key_name,
-          std::vector<std::string> const& key_values);
+bool Test(std::string const& publish_path, std::string const& query_key,
+          std::vector<std::string> const& query_values);
 }

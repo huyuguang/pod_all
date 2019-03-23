@@ -120,6 +120,7 @@
     <ClCompile Include="pod_core\scheme_table_b.cc" />
     <ClCompile Include="pod_core\scheme_table_otvrfq_client.cc" />
     <ClCompile Include="pod_core\scheme_table_otvrfq_session.cc" />
+    <ClCompile Include="pod_core\scheme_table_otvrfq_test.cc" />
     <ClCompile Include="pod_core\scheme_table_vrfq_client.cc" />
     <ClCompile Include="pod_core\scheme_table_vrfq_session.cc" />
     <ClCompile Include="pod_core\scheme_table_vrfq_test.cc" />
@@ -204,6 +205,7 @@
     <ClInclude Include="pod_core\scheme_table_b.h" />
     <ClInclude Include="pod_core\scheme_table_otvrfq_client.h" />
     <ClInclude Include="pod_core\scheme_table_otvrfq_session.h" />
+    <ClInclude Include="pod_core\scheme_table_otvrfq_test.h" />
     <ClInclude Include="pod_core\scheme_table_vrfq_client.h" />
     <ClInclude Include="pod_core\scheme_table_protocol.h" />
     <ClInclude Include="pod_core\scheme_table_vrfq_session.h" />

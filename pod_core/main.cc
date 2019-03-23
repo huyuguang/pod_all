@@ -2,6 +2,7 @@
 #include "public.h"
 #include "scheme_misc.h"
 #include "scheme_plain_range_test.h"
+#include "scheme_table_otvrfq_test.h"
 #include "scheme_table_vrfq_test.h"
 
 namespace {}  // namespace
@@ -17,7 +18,8 @@ int main(int argc, char** argv) {
   uint64_t start;
   uint64_t count;
   std::string key_name;
-  std::vector<std::string> key_values;
+  std::vector<std::string> query_values;
+  std::vector<std::string> phantoms;
   uint32_t omp_thread_num;
 
   try {
@@ -41,9 +43,13 @@ int main(int argc, char** argv) {
         "key_name,k", po::value<std::string>(&key_name)->default_value(""),
         "Provide the query key name(table mode)")(
         "key_value,v",
-        po::value<std::vector<std::string>>(&key_values)->multitoken(),
+        po::value<std::vector<std::string>>(&query_values)->multitoken(),
         "Provide the query key values(table mode, for example -v value_a "
         "value_b value_c)")(
+        "phantoms,n",
+        po::value<std::vector<std::string>>(&phantoms)->multitoken(),
+        "Provide the query key phantoms(table mode, for example -n phantoms_a "
+        "phantoms_b phantoms_c)")(
         "omp_thread_num,t",
         po::value<uint32_t>(&omp_thread_num)->default_value(0),
         "Provide the number of the openmp thread, 1: disable openmp, 0: "
@@ -90,8 +96,8 @@ int main(int argc, char** argv) {
         return -1;
       }
     } else {
-      if (key_name.empty() || key_values.empty()) {
-        std::cout << "key_name and key_values can not be empty.\n";
+      if (key_name.empty() || query_values.empty()) {
+        std::cout << "key_name and query_values can not be empty.\n";
         std::cout << options << std::endl;
         return -1;
       }
@@ -119,13 +125,19 @@ int main(int argc, char** argv) {
 
   if (mode == Mode::kPlain) {
     auto output_file = output_path + "/decrypted_data";
-    return scheme::plain::range::Test(publish_path, output_file, start,
-                                           count)
+    return scheme::plain::range::Test(publish_path, output_file, start, count)
                ? 0
                : -1;
   } else {
-    return scheme::table::vrfq::Test(publish_path, key_name, key_values)
-               ? 0
-               : -1;
+    if (phantoms.empty()) {
+      return scheme::table::vrfq::Test(publish_path, key_name, query_values)
+                 ? 0
+                 : -1;
+    } else {
+      return scheme::table::otvrfq::Test(publish_path, key_name, query_values,
+                                         phantoms)
+                 ? 0
+                 : -1;
+    }
   }
 }

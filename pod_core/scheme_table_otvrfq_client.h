@@ -17,8 +17,8 @@ class Client {
  public:
   // The self_id and peer_id are useless now, just for later convenience.
   Client(BPtr b, h256_t const& self_id, h256_t const& peer_id,
-         std::string const& key_name,
-         std::vector<std::string> const& key_values,
+         std::string const& query_key,
+         std::vector<std::string> const& query_values,
          std::vector<std::string> const& phantoms);
 
  public:
@@ -36,14 +36,14 @@ class Client {
   BPtr b_;
   h256_t const self_id_;
   h256_t const peer_id_;
-  std::string const key_name_;
-  std::vector<std::string> const key_values_;
-  size_t phantoms_count_;
+  std::string const query_key_;
+  std::vector<std::string> const query_values_;
+  size_t const phantoms_count_;
 
  private:
   VrfKeyMeta const* vrf_key_;
-  std::vector<h256_t> key_digests_;
-  std::vector<h256_t> mixed_key_digests_;
+  std::vector<h256_t> value_digests_;
+  std::vector<h256_t> mixed_value_digests_;
   G1 g_exp_r_;
   std::vector<G1> last_psk_exp_r_;
   std::vector<vrf::Fsk> fsk_;

@@ -7,42 +7,43 @@
 namespace scheme::table::otvrfq {
 
 Client::Client(BPtr b, h256_t const& self_id, h256_t const& peer_id,
-               std::string const& key_name,
-               std::vector<std::string> const& key_values,
+               std::string const& query_key,
+               std::vector<std::string> const& query_values,
                std::vector<std::string> const& phantoms)
     : b_(b),
       self_id_(self_id),
       peer_id_(peer_id),
-      key_name_(key_name),
-      key_values_(key_values),
+      query_key_(query_key),
+      query_values_(query_values),
       phantoms_count_(phantoms.size()) {
-  assert(!phantoms.empty());
-  vrf_key_ = GetKeyMetaByName(b_->vrf_meta(), key_name);
-  if (!vrf_key_) throw std::runtime_error("invalid key_name");
+  if (phantoms.empty()) throw std::runtime_error("invalid phantoms");
+  vrf_key_ = GetKeyMetaByName(b_->vrf_meta(), query_key);
+  if (!vrf_key_) throw std::runtime_error("invalid query_key");
 
   CryptoPP::SHA256 hash;
-  mixed_key_digests_.resize(key_digests_.size() + phantoms.size());
-  for (size_t i = 0; i < key_values.size(); ++i) {
-    hash.Update((uint8_t*)key_values[i].data(), key_values[i].size());
-    hash.Final(key_digests_[i].data());
-    mixed_key_digests_[i] = key_digests_[i];
+  value_digests_.resize(query_values_.size());
+  mixed_value_digests_.resize(query_values_.size() + phantoms.size());
+  for (size_t i = 0; i < query_values.size(); ++i) {
+    hash.Update((uint8_t*)query_values[i].data(), query_values[i].size());
+    hash.Final(value_digests_[i].data());
+    mixed_value_digests_[i] = value_digests_[i];
   }
 
   // do not need to unique
   for (size_t i = 0; i < phantoms.size(); ++i) {
     hash.Update((uint8_t*)phantoms[i].data(), phantoms[i].size());
-    hash.Final(mixed_key_digests_[i + key_digests_.size()].data());
+    hash.Final(mixed_value_digests_[i + value_digests_.size()].data());
   }
 
-  std::default_random_engine generator {std::random_device{}()};
-  std::shuffle(mixed_key_digests_.begin(), mixed_key_digests_.end(),
+  std::default_random_engine generator{std::random_device{}()};
+  std::shuffle(mixed_value_digests_.begin(), mixed_value_digests_.end(),
                generator);
-  mix_index_.resize(key_digests_.size());
+  mix_index_.resize(value_digests_.size());
   for (size_t i = 0; i < mix_index_.size(); ++i) {
-    auto it = std::find(mixed_key_digests_.begin(), mixed_key_digests_.end(),
-                        key_digests_[i]);
-    assert(it != mixed_key_digests_.end());
-    mix_index_[i] = std::distance(mixed_key_digests_.begin(), it);
+    auto it = std::find(mixed_value_digests_.begin(),
+                        mixed_value_digests_.end(), value_digests_[i]);
+    assert(it != mixed_value_digests_.end());
+    mix_index_[i] = std::distance(mixed_value_digests_.begin(), it);
   }
 
   ot_self_pk_ = G1Rand();
@@ -66,12 +67,12 @@ bool Client::OnNegoResponse(NegoBResponse const& response) {
 }
 
 void Client::GetRequest(Request& request) {
-  request.key_name = key_name_;
-  request.mixed_key_digests = std::move(mixed_key_digests_);
+  request.key_name = query_key_;
+  request.mixed_value_digests = std::move(mixed_value_digests_);
 
-  request.vi.resize(key_digests_.size());
+  request.vi.resize(value_digests_.size());
   for (size_t i = 0; i < request.vi.size(); ++i) {
-    h256_t const& key_digest = key_digests_[i];
+    h256_t const& key_digest = value_digests_[i];
     Fr key_fr = BinToFr31(key_digest.data(), key_digest.data() + 31);
     request.vi[i] = ot_sk_ * (ot_rand_b_ * key_fr);
   }
@@ -79,17 +80,17 @@ void Client::GetRequest(Request& request) {
 }
 
 bool Client::OnResponse(Response const& response, Receipt& receipt) {
-  if (response.ui.size() != key_digests_.size()) {
+  if (response.ui.size() != value_digests_.size()) {
     assert(false);
     return false;
   }
   if (response.psk_exp_r_mixed.size() !=
-      (phantoms_count_ + key_digests_.size())) {
+      (phantoms_count_ + value_digests_.size())) {
     assert(false);
     return false;
   }
 
-  std::vector<vrf::Psk<>> psk_exp_r(key_digests_.size());
+  std::vector<vrf::Psk<>> psk_exp_r(value_digests_.size());
   for (size_t i = 0; i < mix_index_.size(); ++i) {
     psk_exp_r[i] = response.psk_exp_r_mixed[mix_index_[i]];
   }
@@ -107,7 +108,7 @@ bool Client::OnResponse(Response const& response, Receipt& receipt) {
       j -= ge;
     }
 
-    if (!vrf::VerifyWithR(b_->vrf_pk(), key_digests_[i].data(), psk_exp_r[i],
+    if (!vrf::VerifyWithR(b_->vrf_pk(), value_digests_[i].data(), psk_exp_r[i],
                           response.g_exp_r)) {
       assert(false);
       return false;
@@ -129,6 +130,7 @@ bool Client::OnSecret(Secret const& query_secret,
   }
 
   positions.resize(last_psk_exp_r_.size());
+  fsk_.resize(last_psk_exp_r_.size());
   for (size_t i = 0; i < last_psk_exp_r_.size(); ++i) {
     vrf::GetFskFromPskExpR(last_psk_exp_r_[i], query_secret.r, fsk_[i]);
 

@@ -29,13 +29,13 @@ bool Session::OnNegoResponse(NegoAResponse const& response) {
 }
 
 bool Session::OnRequest(Request const& request, Response& response) {
-  if (request.vi.empty() || request.mixed_key_digests.empty() ||
+  if (request.vi.empty() || request.mixed_value_digests.empty() ||
       request.key_name.empty()) {
     assert(false);
     return false;
   }
 
-  if (request.mixed_key_digests.size() < request.vi.size()) {
+  if (request.mixed_value_digests.size() <= request.vi.size()) {
     assert(false);
     return false;
   }
@@ -52,9 +52,9 @@ bool Session::OnRequest(Request const& request, Response& response) {
     response.ui[i] = request.vi[i] * c;
   }
 
-  response.psk_exp_r_mixed.resize(request.mixed_key_digests.size());
-  for (size_t i = 0; i < request.mixed_key_digests.size(); ++i) {
-    auto const& key_digest = request.mixed_key_digests[i];
+  response.psk_exp_r_mixed.resize(request.mixed_value_digests.size());
+  for (size_t i = 0; i < request.mixed_value_digests.size(); ++i) {
+    auto const& key_digest = request.mixed_value_digests[i];
     Fr key_fr = BinToFr31(key_digest.data(), key_digest.data() + 31);
 
     auto& psk_exp_r_mixed = response.psk_exp_r_mixed[i];

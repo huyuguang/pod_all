@@ -94,6 +94,9 @@
     <ClCompile Include="pod_core\scheme_plain_range_test.cc">
       <Filter>local</Filter>
     </ClCompile>
+    <ClCompile Include="pod_core\scheme_table_otvrfq_test.cc">
+      <Filter>local</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="mcl\include\mcl\aggregate_sig.hpp">
@@ -355,6 +358,9 @@
       <Filter>local</Filter>
     </ClInclude>
     <ClInclude Include="pod_core\scheme_plain_range_test.h">
+      <Filter>local</Filter>
+    </ClInclude>
+    <ClInclude Include="pod_core\scheme_table_otvrfq_test.h">
       <Filter>local</Filter>
     </ClInclude>
   </ItemGroup>

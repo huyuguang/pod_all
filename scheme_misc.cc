@@ -193,10 +193,10 @@ bool LoadSigma(std::string const& input, uint64_t n, h256_t const* root,
       if (*root != mkl::CalcRoot(std::move(get_sigma), n)) {
         assert(false);
         return false;
-      }      
+      }
     }
 
-    sigmas.resize(n);    
+    sigmas.resize(n);
     for (size_t i = 0; i < n; ++i) {
       sigmas[i] = BinToG1(start + i * 32);
     }
@@ -279,4 +279,3 @@ void H2(mpz_class const& seed, uint64_t count, std::vector<Fr>& v) {
 }
 
 }  // namespace scheme
-

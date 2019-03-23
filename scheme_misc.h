@@ -6,8 +6,8 @@
 
 #include "bp.h"
 #include "ecc.h"
-#include "vrf.h"
 #include "mpz.h"
+#include "vrf.h"
 
 namespace scheme {
 

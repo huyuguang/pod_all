@@ -13,14 +13,14 @@ Session::Session(APtr a, h256_t const& self_id, h256_t const& peer_id)
 }
 
 bool Session::OnRequest(Request const& request, Response& response) {
-  if (request.key_digests.empty()) return false;
+  if (request.value_digests.empty()) return false;
   auto key_meta = a_->GetKeyMetaByName(request.key_name);
   if (!key_meta) return false;
 
   response.g_exp_r = g_exp_r_;
-  response.psk_exp_r.resize(request.key_digests.size());
-  for (size_t i = 0; i < request.key_digests.size(); ++i) {
-    auto const& key_digest = request.key_digests[i];
+  response.psk_exp_r.resize(request.value_digests.size());
+  for (size_t i = 0; i < request.value_digests.size(); ++i) {
+    auto const& key_digest = request.value_digests[i];
     auto& psk_exp_r = response.psk_exp_r[i];
     vrf::ProveWithR(a_->vrf_sk(), key_digest.data(), r_, psk_exp_r);
 

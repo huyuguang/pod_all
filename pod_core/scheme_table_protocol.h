@@ -6,7 +6,7 @@
 #include "ecc.h"
 #include "vrf.h"
 
-namespace scheme_misc::table {
+namespace scheme::table {
 
 namespace vrfq {
 struct Request {
@@ -67,4 +67,4 @@ struct Secret {
 };
 }  // namespace otvrfq
 
-}  // namespace scheme_misc::table
+}  // namespace scheme::table

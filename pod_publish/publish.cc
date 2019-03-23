@@ -17,7 +17,7 @@
 
 namespace {
 
-using namespace scheme_misc;
+using namespace scheme;
 bool LoadCsvTable(std::string const& file, std::vector<std::string>& col_names,
                   table::Table& table) {
   using namespace csv;
@@ -60,11 +60,11 @@ void PadRubbishRow(table::Table& table) {
 }  // namespace
 
 bool PublishTable(std::string publish_file, std::string output_path,
-                  scheme_misc::table::Type table_type,
+                  scheme::table::Type table_type,
                   std::vector<uint64_t> vrf_colnums_index,
                   std::vector<bool> unique_key) {
-  using namespace scheme_misc;
-  using namespace scheme_misc::table;
+  using namespace scheme;
+  using namespace scheme::table;
   using namespace misc;
 
   assert(unique_key.size() == vrf_colnums_index.size());
@@ -265,8 +265,8 @@ bool PublishTable(std::string publish_file, std::string output_path,
 
 bool PublishPlain(std::string publish_file, std::string output_path,
                   uint64_t column_num) {
-  using namespace scheme_misc;
-  using namespace scheme_misc::plain;
+  using namespace scheme;
+  using namespace scheme::plain;
   using namespace misc;
 
   auto& ecc_pub = GetEccPub();

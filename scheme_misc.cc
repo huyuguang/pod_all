@@ -7,7 +7,7 @@
 #include "multiexp.h"
 #include "public.h"
 
-namespace scheme_misc {
+namespace scheme {
 std::istream& operator>>(std::istream& in, Mode& t) {
   std::string token;
   in >> token;
@@ -278,5 +278,5 @@ void H2(mpz_class const& seed, uint64_t count, std::vector<Fr>& v) {
   }
 }
 
-}  // namespace scheme_misc
+}  // namespace scheme
 

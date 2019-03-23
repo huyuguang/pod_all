@@ -8,7 +8,7 @@
 #include "scheme_table_protocol.h"
 #include "vrf.h"
 
-namespace scheme_misc::table {
+namespace scheme::table {
 
 struct VrfKeyMeta;
 
@@ -41,4 +41,4 @@ class Client {
 };
 }  // namespace vrfq
 
-}  // namespace scheme_misc::table
+}  // namespace scheme::table

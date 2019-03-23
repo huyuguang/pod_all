@@ -7,7 +7,7 @@
 #include "scheme_plain_protocol.h"
 #include "tick.h"
 
-namespace scheme_misc::plain::range {
+namespace scheme::plain::range {
 
 Session::Session(APtr a, h256_t const& self_id, h256_t const& peer_id)
     : a_(a),
@@ -79,4 +79,4 @@ bool Session::OnReceipt(Receipt const& receipt, Secret& secret) {
   return true;
 }
 
-}  // namespace scheme_misc::plain::range
+}  // namespace scheme::plain::range

@@ -14,7 +14,7 @@ const h256_t kDummySessionId = h256_t{1};
 const h256_t kDummyClientId = h256_t{2};
 }  // namespace
 
-namespace scheme_misc::plain::range {
+namespace scheme::plain::range {
 
 bool Test(std::string const& output_file, APtr a, BPtr b, uint64_t start,
           uint64_t count, bool evil) {
@@ -99,4 +99,4 @@ bool Test(std::string const& publish_path, std::string const& output_path,
   }
 }
 
-}  // namespace scheme_misc::plain::range
+}  // namespace scheme::plain::range

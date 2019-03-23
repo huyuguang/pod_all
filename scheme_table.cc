@@ -3,7 +3,7 @@
 #include "public.h"
 #include "scheme_misc.h"
 
-namespace scheme_misc::table {
+namespace scheme::table {
 
 std::istream& operator>>(std::istream& in, Type& t) {
   std::string token;
@@ -138,4 +138,4 @@ VrfKeyMeta const* GetKeyMetaByName(VrfMeta const& vrf_meta,
   return nullptr;
 }
 
-}  // namespace scheme_misc::table
+}  // namespace scheme::table

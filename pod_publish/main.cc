@@ -13,8 +13,8 @@ namespace {}  // namespace
 int main(int argc, char** argv) {
   setlocale(LC_ALL, "");
 
-  using scheme_misc::Mode;
-  using scheme_misc::table::Type;
+  using scheme::Mode;
+  using scheme::table::Type;
 
   Mode task_mode;
   std::string publish_file;

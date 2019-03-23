@@ -11,7 +11,7 @@
 #include "vrf.h"
 #include "vrf_meta.h"
 
-namespace scheme_misc::table {
+namespace scheme::table {
 
 class B {
  public:
@@ -39,4 +39,4 @@ class B {
 };
 
 typedef std::shared_ptr<B> BPtr;
-}  // namespace scheme_misc::table
+}  // namespace scheme::table

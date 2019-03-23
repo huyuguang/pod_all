@@ -13,7 +13,7 @@ const h256_t kDummySessionId = h256_t{1};
 const h256_t kDummyClientId = h256_t{2};
 }  // namespace
 
-namespace scheme_misc::table::vrfq {
+namespace scheme::table::vrfq {
 
 bool QueryInternal(APtr a, BPtr b, std::string const& query_key,
                    std::vector<std::string> const& query_values,
@@ -122,4 +122,4 @@ bool Test(std::string const& publish_path, std::string const& query_key,
   }
 }
 
-}  // namespace scheme_misc::table::vrfq
+}  // namespace scheme::table::vrfq

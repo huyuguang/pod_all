@@ -12,7 +12,7 @@
 #include "vrf.h"
 #include "vrf_meta.h"
 
-namespace scheme_misc::table {
+namespace scheme::table {
 
 class A {
  public:
@@ -28,7 +28,7 @@ class A {
 
  private:
   std::string const publish_path_;
-  scheme_misc::table::Bulletin bulletin_;
+  scheme::table::Bulletin bulletin_;
   vrf::Pk<> vrf_pk_;
   vrf::Sk<> vrf_sk_;  // secret
   VrfMeta vrf_meta_;
@@ -41,4 +41,4 @@ class A {
 };
 
 typedef std::shared_ptr<A> APtr;
-}  // namespace scheme_misc::table
+}  // namespace scheme::table

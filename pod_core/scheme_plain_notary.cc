@@ -2,7 +2,7 @@
 #include "chain.h"
 #include "mkl_tree.h"
 
-namespace scheme_misc::plain::range {
+namespace scheme::plain::range {
 bool VerifyClaim(uint64_t count, uint64_t s, Receipt const& receipt,
                  Secret const& secret, Claim const& claim) {
   h256_t k_bin = G1ToBin(claim.kij);
@@ -23,4 +23,4 @@ bool VerifyClaim(uint64_t count, uint64_t s, Receipt const& receipt,
 
   return true;
 }
-}  // namespace scheme_misc::plain::range
+}  // namespace scheme::plain::range

@@ -1,7 +1,7 @@
 #include "scheme_plain_b.h"
 #include "misc.h"
 
-namespace scheme_misc::plain {
+namespace scheme::plain {
 B::B(Bulletin const& bulletin, std::string const& public_path)
     : bulletin_(bulletin), public_path_(public_path) {
   LoadData();
@@ -61,4 +61,4 @@ void B::LoadData() {
   }
 }
 
-}  // namespace scheme_misc::plain
+}  // namespace scheme::plain

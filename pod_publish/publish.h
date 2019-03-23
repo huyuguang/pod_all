@@ -9,7 +9,7 @@
 #include "scheme_table.h"
 
 bool PublishTable(std::string publish_file, std::string output_path,
-                  scheme_misc::table::Type table_type,
+                  scheme::table::Type table_type,
                   std::vector<uint64_t> vrf_colnums_index,
                   std::vector<bool> unique_key);
 

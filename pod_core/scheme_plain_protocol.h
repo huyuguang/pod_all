@@ -7,7 +7,7 @@
 #include "ecc.h"
 #include "vrf.h"
 
-namespace scheme_misc::plain {
+namespace scheme::plain {
 namespace range {
 struct Request {
   uint64_t start;
@@ -42,4 +42,4 @@ struct Claim {
   std::vector<h256_t> mkl_path;
 };
 }  // namespace range
-}  // namespace scheme_misc::plain
+}  // namespace scheme::plain

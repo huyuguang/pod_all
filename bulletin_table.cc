@@ -4,7 +4,7 @@
 #include "mkl_tree.h"
 #include "public.h"
 
-namespace scheme_misc {
+namespace scheme {
 namespace table {
 bool IsBulletinValid(Bulletin const& bulletin) {
   auto const& ecc_pub = GetEccPub();
@@ -50,4 +50,4 @@ bool LoadBulletin(std::string const& input, Bulletin& bulletin) {
   }
 }
 }  // namespace table
-}  // namespace scheme_misc
+}  // namespace scheme

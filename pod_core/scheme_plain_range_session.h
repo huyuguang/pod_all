@@ -8,7 +8,7 @@
 #include "scheme_plain_a.h"
 #include "scheme_plain_protocol.h"
 
-namespace scheme_misc::plain {
+namespace scheme::plain {
 
 namespace range {
 class Session {
@@ -46,4 +46,4 @@ class Session {
 
 }  // namespace range
 
-}  // namespace scheme_misc::plain
+}  // namespace scheme::plain

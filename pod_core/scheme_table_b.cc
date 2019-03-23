@@ -2,7 +2,7 @@
 #include "misc.h"
 #include "scheme_table_protocol.h"
 
-namespace scheme_misc::table {
+namespace scheme::table {
 
 B::B(Bulletin const& bulletin, std::string const& public_path)
     : bulletin_(bulletin), public_path_(public_path) {
@@ -107,4 +107,4 @@ void B::LoadData() {
   }
 }
 
-}  // namespace scheme_misc::table
+}  // namespace scheme::table

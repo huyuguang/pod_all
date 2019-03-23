@@ -3,7 +3,7 @@
 #include "scheme_table.h"
 #include "scheme_table_b.h"
 
-namespace scheme_misc::table::vrfq {
+namespace scheme::table::vrfq {
 
 Client::Client(BPtr b, h256_t const& self_id, h256_t const& peer_id,
                std::string const& key_name,
@@ -91,4 +91,4 @@ bool Client::OnSecret(Secret const& query_secret,
 
   return true;
 }
-}  // namespace scheme_misc::table::vrfq
+}  // namespace scheme::table::vrfq

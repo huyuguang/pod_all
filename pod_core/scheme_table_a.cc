@@ -7,7 +7,7 @@ namespace {
 
 }  // namespace
 
-namespace scheme_misc::table {
+namespace scheme::table {
 
 A::A(std::string const& publish_path) : publish_path_(publish_path) {
   std::string public_path = publish_path_ +"/public";

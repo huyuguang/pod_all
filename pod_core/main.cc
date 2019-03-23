@@ -9,7 +9,7 @@ namespace {}  // namespace
 int main(int argc, char** argv) {
   setlocale(LC_ALL, "");
 
-  using scheme_misc::Mode;
+  using scheme::Mode;
   Mode mode;
   std::string publish_path;
   std::string output_path;
@@ -119,12 +119,12 @@ int main(int argc, char** argv) {
 
   if (mode == Mode::kPlain) {
     auto output_file = output_path + "/decrypted_data";
-    return scheme_misc::plain::range::Test(publish_path, output_file, start,
+    return scheme::plain::range::Test(publish_path, output_file, start,
                                            count)
                ? 0
                : -1;
   } else {
-    return scheme_misc::table::vrfq::Test(publish_path, key_name, key_values)
+    return scheme::table::vrfq::Test(publish_path, key_name, key_values)
                ? 0
                : -1;
   }

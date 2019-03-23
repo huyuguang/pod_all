@@ -7,7 +7,7 @@
 #include "scheme_plain_protocol.h"
 #include "vrf.h"
 
-namespace scheme_misc::plain::range {
+namespace scheme::plain::range {
 
 Client::Client(BPtr b, h256_t const& self_id, h256_t const& peer_id,
                uint64_t start, uint64_t count)
@@ -252,4 +252,4 @@ bool Client::SaveDecrypted(std::string const& file) {
 
   return MToFile(file, b_->bulletin().size, s_, start_, count_, decrypted_m_);
 }
-}  // namespace scheme_misc::plain::range
+}  // namespace scheme::plain::range

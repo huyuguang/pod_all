@@ -4,7 +4,7 @@
 
 namespace {}
 
-namespace scheme_misc::plain {
+namespace scheme::plain {
 
 A::A(std::string const& publish_path) : publish_path_(publish_path) {
   std::string public_path = publish_path_ + "/public";
@@ -45,4 +45,4 @@ A::A(std::string const& publish_path) : publish_path_(publish_path) {
   //}
 }
 
-}  // namespace scheme_misc::plain
+}  // namespace scheme::plain

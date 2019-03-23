@@ -4,7 +4,7 @@
 #include "scheme_misc.h"
 #include "mkl_tree.h"
 
-namespace scheme_misc::plain {
+namespace scheme::plain {
 
 uint64_t GetDataBlockCount(uint64_t size, uint64_t column_num) {
   uint64_t slice_count = (size + 31 - 1) / 31;
@@ -108,4 +108,4 @@ h256_t CalcRootOfK(std::vector<G1> const& k) {
   return mkl::CalcRoot(std::move(get_k), k.size());
 }
 
-}  // namespace scheme_misc::plain
+}  // namespace scheme::plain

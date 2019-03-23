@@ -8,7 +8,7 @@
 #include "mkl_tree.h"
 #include "scheme_misc.h"
 
-namespace scheme_misc::plain {
+namespace scheme::plain {
 
 class B {
  public:
@@ -31,4 +31,4 @@ class B {
 
 typedef std::shared_ptr<B> BPtr;
 
-}  // namespace scheme_misc::plain
+}  // namespace scheme::plain

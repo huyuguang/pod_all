@@ -8,7 +8,7 @@
 #include "scheme_table_a.h"
 #include "scheme_table_protocol.h"
 
-namespace scheme_misc::table::vrfq {
+namespace scheme::table::vrfq {
 
 class Session {
  public:
@@ -31,4 +31,4 @@ class Session {
 
 typedef std::unique_ptr<Session> SessionUPtr;
 
-}  // namespace scheme_misc::table::vrfq
+}  // namespace scheme::table::vrfq

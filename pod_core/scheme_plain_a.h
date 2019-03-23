@@ -10,7 +10,7 @@
 #include "mkl_tree.h"
 #include "scheme_misc.h"
 
-namespace scheme_misc::plain {
+namespace scheme::plain {
 class A {
  public:
   A(std::string const& publish_path);
@@ -20,11 +20,11 @@ class A {
 
  private:
   std::string const publish_path_;
-  scheme_misc::plain::Bulletin bulletin_;
+  scheme::plain::Bulletin bulletin_;
   std::vector<G1> sigmas_;
   mkl::Tree sigma_mkl_tree_;
   std::vector<Fr> m_;  // secret
 };
 
 typedef std::shared_ptr<A> APtr;
-}  // namespace scheme_misc::plain
+}  // namespace scheme::plain

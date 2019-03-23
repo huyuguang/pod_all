@@ -6,7 +6,7 @@
 #include "public.h"
 #include "scheme_plain.h"
 
-namespace scheme_misc {
+namespace scheme {
 namespace plain {
 bool IsBulletinValid(Bulletin const& bulletin) {
   auto const& ecc_pub = GetEccPub();
@@ -52,4 +52,4 @@ bool LoadBulletin(std::string const& input, Bulletin& bulletin) {
   }
 }
 }  // namespace plain
-}  // namespace scheme_misc
+}  // namespace scheme

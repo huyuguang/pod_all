@@ -4,7 +4,7 @@
 #include "scheme_table.h"
 #include "scheme_table_b.h"
 
-namespace scheme_misc::table::otvrfq {
+namespace scheme::table::otvrfq {
 
 Client::Client(BPtr b, h256_t const& self_id, h256_t const& peer_id,
                std::string const& key_name,
@@ -34,10 +34,9 @@ Client::Client(BPtr b, h256_t const& self_id, h256_t const& peer_id,
     hash.Final(mixed_key_digests_[i + key_digests_.size()].data());
   }
 
-  uint64_t seed;
-  misc::RandomBytes((uint8_t*)&seed, sizeof(seed));
+  std::default_random_engine generator {std::random_device{}()};
   std::shuffle(mixed_key_digests_.begin(), mixed_key_digests_.end(),
-               std::default_random_engine(seed));
+               generator);
   mix_index_.resize(key_digests_.size());
   for (size_t i = 0; i < mix_index_.size(); ++i) {
     auto it = std::find(mixed_key_digests_.begin(), mixed_key_digests_.end(),
@@ -156,4 +155,4 @@ bool Client::OnSecret(Secret const& query_secret,
 
   return true;
 }
-}  // namespace scheme_misc::table::otvrfq
+}  // namespace scheme::table::otvrfq

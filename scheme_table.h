@@ -7,7 +7,7 @@
 #include "vrf.h"
 #include "vrf_meta.h"
 
-namespace scheme_misc::table {
+namespace scheme::table {
 typedef std::vector<std::string> Record;
 
 typedef std::vector<Record> Table;
@@ -33,4 +33,4 @@ void DataToM(Table const& table, std::vector<uint64_t> columens_index,
 
 VrfKeyMeta const* GetKeyMetaByName(VrfMeta const& vrf_meta,
                                    std::string const& name);
-}  // namespace scheme_misc::table
+}  // namespace scheme::table

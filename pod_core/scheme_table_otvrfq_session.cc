@@ -3,7 +3,7 @@
 #include "scheme_table_a.h"
 #include "vrf.h"
 
-namespace scheme_misc::table::otvrfq {
+namespace scheme::table::otvrfq {
 
 Session::Session(APtr a, h256_t const& self_id, h256_t const& peer_id)
     : a_(a), self_id_(self_id), peer_id_(peer_id) {
@@ -90,4 +90,4 @@ bool Session::OnReceipt(Receipt const& receipt, Secret& secret) {
   secret.r = r_;
   return true;
 }
-}  // namespace scheme_misc::table::otvrfq
+}  // namespace scheme::table::otvrfq

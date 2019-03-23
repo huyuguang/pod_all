@@ -7,7 +7,7 @@
 #include "scheme_plain_b.h"
 #include "scheme_plain_protocol.h"
 
-namespace scheme_misc::plain {
+namespace scheme::plain {
 
 namespace range {
 class Client {
@@ -52,4 +52,4 @@ class Client {
 };
 }  // namespace range
 
-}  // namespace scheme_misc::plain
+}  // namespace scheme::plain

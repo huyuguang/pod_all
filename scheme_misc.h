@@ -9,7 +9,7 @@
 #include "vrf.h"
 #include "mpz.h"
 
-namespace scheme_misc {
+namespace scheme {
 
 enum Mode { kPlain, kTable };
 
@@ -46,4 +46,4 @@ bool IsElementUnique(std::vector<Fr> const v);
 
 void H2(mpz_class const& seed, uint64_t count, std::vector<Fr>& v);
 
-}  // namespace scheme_misc
+}  // namespace scheme

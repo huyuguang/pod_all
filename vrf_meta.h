@@ -8,7 +8,7 @@
 #include "bp.h"
 #include "vrf.h"
 
-namespace scheme_misc::table {
+namespace scheme::table {
 struct Bulletin;
 
 struct VrfKeyMeta {
@@ -65,4 +65,4 @@ h256_t HashVrfKey(std::string const& k, vrf::Sk<> const& vrf_sk);
 
 bool LoadKeyM(std::string const& input, uint64_t n, bool unique,
               h256_t const* root, std::vector<Fr>& km);
-}  // namespace scheme_misc::table
+}  // namespace scheme::table

@@ -8,7 +8,7 @@
 #include "public.h"
 #include "scheme_misc.h"
 
-namespace scheme_misc {
+namespace scheme {
 namespace table {
 bool VrfKeyMeta::operator==(VrfKeyMeta const& v) const {
   return column_index == v.column_index && mj_mkl_root == v.mj_mkl_root &&
@@ -405,4 +405,4 @@ bool LoadKeyM(std::string const& input, uint64_t n, bool unique,
   return true;
 }
 }  // namespace table
-}  // namespace scheme_misc
+}  // namespace scheme

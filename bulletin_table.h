@@ -6,7 +6,7 @@
 
 #include "basic_types.h"
 
-namespace scheme_misc {
+namespace scheme {
 namespace table {
 
 struct Bulletin {
@@ -23,4 +23,4 @@ bool SaveBulletin(std::string const& output, Bulletin const& bulletin);
 bool LoadBulletin(std::string const& input, Bulletin& bulletin);
 
 }  // namespace table
-}  // namespace scheme_misc
+}  // namespace scheme

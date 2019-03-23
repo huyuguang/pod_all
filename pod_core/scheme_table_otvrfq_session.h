@@ -8,7 +8,7 @@
 #include "scheme_table_a.h"
 #include "scheme_table_protocol.h"
 
-namespace scheme_misc::table::otvrfq {
+namespace scheme::table::otvrfq {
 
 class Session {
  public:
@@ -42,4 +42,4 @@ class Session {
 
 typedef std::unique_ptr<Session> SessionUPtr;
 
-}  // namespace scheme_misc::table::otvrfq
+}  // namespace scheme::table::otvrfq

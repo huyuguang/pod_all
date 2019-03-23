@@ -6,7 +6,7 @@
 
 #include "ecc.h"
 
-namespace scheme_misc::plain {
+namespace scheme::plain {
 
 uint64_t GetDataBlockCount(uint64_t size, uint64_t column_num);
 
@@ -19,4 +19,4 @@ bool MToFile(std::string const& file, uint64_t size, uint64_t s, uint64_t start,
 void BuildK(std::vector<Fr> const& v, std::vector<G1>& k, uint64_t s);
 
 h256_t CalcRootOfK(std::vector<G1> const& k);
-}  // namespace scheme_misc::plain
+}  // namespace scheme::plain

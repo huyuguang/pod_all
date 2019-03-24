@@ -1,8 +1,11 @@
 #sudo apt-get install libomp-dev
+#sudo apt-get install libcrypto++-dev
+#sudo apt-get install libboost-all-dev
 
 CXX11_HOME = /usr
 
-MCL_HOME = ./mcl/include
+MCL_HOME = ../mcl/include
+PUB_HOME = ../public
 
 CXXFLAGS := \
  -g3 \
@@ -18,17 +21,20 @@ CXXFLAGS := \
  -fmerge-all-constants  \
  -I $(CXX11_HOME)/include \
  -I $(MCL_HOME) \
- -I.
+ -I $(PUB_HOME) \
+ -I. \
+ -I.. \
 
 MCL_FLAGS := \
  -DMCL_DONT_USE_OPENSSL
 
+BOOST_FLAGS := \
+ -DBOOST_SPIRIT_THREADSAFE 
+
 RELEASE_FLAGS := \
  -O3 \
- -DDTREE_ICASE \
  -DNDEBUG \
  -DLINUX \
- -DMULTICORE \
 
 DEBUG_FLAGS := \
  -O0 \
@@ -44,42 +50,45 @@ LIBS := \
  -lpthread \
  -lrt \
  -lgmpxx \
- -lgmp
+ -lgmp \
+ -lcryptopp \
+ -lgomp \
+ -lboost_filesystem \
+ -lboost_system \
+ -lboost_iostreams \
+ -lboost_program_options
 
-DIR := . 
+BUILD := ./build/self
+BUILDPUB := ./build/public
+$(shell mkdir -p $(BUILD))
+$(shell mkdir -p $(BUILDPUB))
+
+DIR := . ../public
 
 SRC := $(foreach d, $(DIR), $(wildcard $(d)/*.cc))
-
-
 
 RELEASE_OBJ := $(patsubst %.cc, %.o, $(SRC))
 
 DEBUG_OBJ := $(patsubst %.cc, %.d.o, $(SRC))
 
-
-
 CXX := export LD_LIBRARY_PATH=${CXX11_HOME}/lib; ${CXX11_HOME}/bin/g++
-
-#CC := export LD_LIBRARY_PATH=${CXX11_HOME}/lib; ${CXX11_HOME}/bin/gcc
-
-
 
 all: pod_setupd pod_setup
 
 %.o : %.cc
-	$(CXX) -c $^ $(CXXFLAGS) $(RELEASE_FLAGS) $(MCL_FLAGS) -o $@
+	$(CXX) -c $^ $(CXXFLAGS) $(RELEASE_FLAGS) $(MCL_FLAGS) $(BOOST_FLAGS) -o $(BUILD)/$@
 
 
 %.d.o : %.cc
-	$(CXX) -c $^ $(CXXFLAGS) $(DEBUG_FLAGS) $(MCL_FLAGS) -o $@
+	$(CXX) -c $^ $(CXXFLAGS) $(DEBUG_FLAGS) $(MCL_FLAGS) $(BOOST_FLAGS) -o $(BUILD)/$@
 
 
 
 pod_setupd : $(DEBUG_OBJ)
-	$(CXX) $^ -o $@.exe $(LDFLAGS) $(LIBS)
+	$(CXX) $(addprefix $(BUILD)/, $^) -o $@.exe $(LDFLAGS) $(LIBS)
 
 pod_setup : $(RELEASE_OBJ)
-	$(CXX) $^ -o $@.exe $(LDFLAGS) $(LIBS)
+	$(CXX) $(addprefix $(BUILD)/, $^) -o $@.exe $(LDFLAGS) $(LIBS)
 
 clean:
 	find . -regex "\(.*\.o\|.*\.exe\)" | xargs rm

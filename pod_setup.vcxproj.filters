@@ -25,14 +25,14 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="fp.cc">
-      <Filter>libmcl</Filter>
-    </ClCompile>
-    <ClCompile Include="ecc.cc">
-      <Filter>public</Filter>
-    </ClCompile>
     <ClCompile Include="pod_setup\main.cc">
       <Filter>local</Filter>
+    </ClCompile>
+    <ClCompile Include="public\fp.cc">
+      <Filter>public</Filter>
+    </ClCompile>
+    <ClCompile Include="public\ecc.cc">
+      <Filter>public</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -192,16 +192,16 @@
     <ClInclude Include="mcl\include\cybozu\xorshift.hpp">
       <Filter>libmcl\include\cybozu</Filter>
     </ClInclude>
-    <ClInclude Include="ecc.h">
+    <ClInclude Include="public\ecc.h">
       <Filter>public</Filter>
     </ClInclude>
-    <ClInclude Include="ecc_pub.h">
+    <ClInclude Include="public\ecc_pub.h">
       <Filter>public</Filter>
     </ClInclude>
-    <ClInclude Include="msvc_hack.h">
+    <ClInclude Include="public\msvc_hack.h">
       <Filter>public</Filter>
     </ClInclude>
-    <ClInclude Include="tick.h">
+    <ClInclude Include="public\tick.h">
       <Filter>public</Filter>
     </ClInclude>
   </ItemGroup>

@@ -5,8 +5,9 @@
 
 CXX11_HOME = /usr
 
-MCL_HOME = ./mcl/include
-CSV_HOME = ./csv
+MCL_HOME = ../mcl/include
+PUB_HOME = ../public
+CSV_HOME = ../csv
 
 CXXFLAGS := \
  -g3 \
@@ -23,7 +24,9 @@ CXXFLAGS := \
  -I $(CXX11_HOME)/include \
  -I $(MCL_HOME) \
  -I $(CSV_HOME) \
- -I.
+ -I $(PUB_HOME) \
+ -I. \
+ -I.. \
 
 MCL_FLAGS := \
  -DMCL_DONT_USE_OPENSSL
@@ -58,7 +61,14 @@ LIBS := \
  -lboost_iostreams \
  -lboost_program_options
 
-DIR := . $(CSV_HOME)
+BUILD := ./build/self
+BUILDPUB := ./build/public
+BUILDCSV := ./build/csv
+$(shell mkdir -p $(BUILD))
+$(shell mkdir -p $(BUILDPUB))
+$(shell mkdir -p $(BUILDCSV))
+
+DIR := . $(CSV_HOME) ../public
 
 SRC := $(foreach d, $(DIR), $(wildcard $(d)/*.cc))
 
@@ -68,21 +78,20 @@ DEBUG_OBJ := $(patsubst %.cc, %.d.o, $(SRC))
 
 CXX := export LD_LIBRARY_PATH=${CXX11_HOME}/lib; ${CXX11_HOME}/bin/g++
 
-
 all: pod_publishd pod_publish
 
 %.o : %.cc
-	$(CXX) -c $^ $(CXXFLAGS) $(RELEASE_FLAGS) $(MCL_FLAGS) $(BOOST_FLAGS) -o $@
+	$(CXX) -c $^ $(CXXFLAGS) $(RELEASE_FLAGS) $(MCL_FLAGS) $(BOOST_FLAGS) -o $(BUILD)/$@
 
 
 %.d.o : %.cc
-	$(CXX) -c $^ $(CXXFLAGS) $(DEBUG_FLAGS) $(MCL_FLAGS) $(BOOST_FLAGS) -o $@
+	$(CXX) -c $^ $(CXXFLAGS) $(DEBUG_FLAGS) $(MCL_FLAGS) $(BOOST_FLAGS) -o $(BUILD)/$@
 
 pod_publishd : $(DEBUG_OBJ)
-	$(CXX) $^ -o $@.exe $(LDFLAGS) $(LIBS)
+	$(CXX) $(addprefix $(BUILD)/, $^) -o $@.exe $(LDFLAGS) $(LIBS)
 
 pod_publish : $(RELEASE_OBJ)
-	$(CXX) $^ -o $@.exe $(LDFLAGS) $(LIBS)
+	$(CXX) $(addprefix $(BUILD)/, $^) -o $@.exe $(LDFLAGS) $(LIBS)
 
 clean:
 	find . -regex "\(.*\.o\|.*\.exe\)" | xargs rm

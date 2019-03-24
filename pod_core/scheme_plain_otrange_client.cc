@@ -186,7 +186,10 @@ void Client::BuildClaim(uint64_t i, uint64_t j, Claim& claim) {
         return G1ToBin(response_.k[i]);
       },
       count_* s_, ij, &claim.mkl_path);
-  assert(root == k_mkl_root_);
+  if (root != k_mkl_root_) {
+    assert(false);
+    throw std::runtime_error("oops, mkl root mismatch");
+  }
 }
 
 uint64_t Client::FindMismatchI(uint64_t mismatch_j,
@@ -252,4 +255,4 @@ bool Client::SaveDecrypted(std::string const& file) {
 
   return MToFile(file, b_->bulletin().size, s_, start_, count_, decrypted_m_);
 }
-}  // namespace scheme::plain::range
+}  // namespace scheme::plain::otrange

@@ -4,6 +4,7 @@
 #include <algorithm>
 #include <functional>
 #include <memory>
+#include <vector>
 
 #include "basic_types.h"
 

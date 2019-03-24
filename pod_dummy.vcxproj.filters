@@ -25,16 +25,19 @@
     <Filter Include="libmcl\include\mcl">
       <UniqueIdentifier>{05e30be5-3541-4681-9b73-59b2fc219638}</UniqueIdentifier>
     </Filter>
+    <Filter Include="public">
+      <UniqueIdentifier>{11f954a5-36d5-4bef-a7e0-1cd654942a47}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="ecc.cc">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="fp.cc">
-      <Filter>libmcl</Filter>
-    </ClCompile>
     <ClCompile Include="pod_dummy\main.cc">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="public\ecc.cc">
+      <Filter>public</Filter>
+    </ClCompile>
+    <ClCompile Include="public\fp.cc">
+      <Filter>public</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

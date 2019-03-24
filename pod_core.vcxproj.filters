@@ -37,33 +37,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="fp.cc">
-      <Filter>libmcl</Filter>
-    </ClCompile>
-    <ClCompile Include="bulletin_plain.cc">
-      <Filter>public</Filter>
-    </ClCompile>
-    <ClCompile Include="bulletin_table.cc">
-      <Filter>public</Filter>
-    </ClCompile>
-    <ClCompile Include="ecc.cc">
-      <Filter>public</Filter>
-    </ClCompile>
-    <ClCompile Include="scheme_misc.cc">
-      <Filter>public</Filter>
-    </ClCompile>
-    <ClCompile Include="scheme_plain.cc">
-      <Filter>public</Filter>
-    </ClCompile>
-    <ClCompile Include="mkl_tree.cc">
-      <Filter>public</Filter>
-    </ClCompile>
-    <ClCompile Include="scheme_table.cc">
-      <Filter>public</Filter>
-    </ClCompile>
-    <ClCompile Include="vrf_meta.cc">
-      <Filter>public</Filter>
-    </ClCompile>
     <ClCompile Include="pod_core\main.cc">
       <Filter>local</Filter>
     </ClCompile>
@@ -117,6 +90,33 @@
     </ClCompile>
     <ClCompile Include="pod_core\scheme_plain_otrange_test.cc">
       <Filter>local\otrange</Filter>
+    </ClCompile>
+    <ClCompile Include="public\bulletin_plain.cc">
+      <Filter>public</Filter>
+    </ClCompile>
+    <ClCompile Include="public\bulletin_table.cc">
+      <Filter>public</Filter>
+    </ClCompile>
+    <ClCompile Include="public\ecc.cc">
+      <Filter>public</Filter>
+    </ClCompile>
+    <ClCompile Include="public\fp.cc">
+      <Filter>public</Filter>
+    </ClCompile>
+    <ClCompile Include="public\mkl_tree.cc">
+      <Filter>public</Filter>
+    </ClCompile>
+    <ClCompile Include="public\scheme_misc.cc">
+      <Filter>public</Filter>
+    </ClCompile>
+    <ClCompile Include="public\scheme_plain.cc">
+      <Filter>public</Filter>
+    </ClCompile>
+    <ClCompile Include="public\scheme_table.cc">
+      <Filter>public</Filter>
+    </ClCompile>
+    <ClCompile Include="public\vrf_meta.cc">
+      <Filter>public</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -276,66 +276,6 @@
     <ClInclude Include="mcl\include\cybozu\xorshift.hpp">
       <Filter>libmcl\include\cybozu</Filter>
     </ClInclude>
-    <ClInclude Include="basic_types.h">
-      <Filter>public</Filter>
-    </ClInclude>
-    <ClInclude Include="bp.h">
-      <Filter>public</Filter>
-    </ClInclude>
-    <ClInclude Include="bulletin_plain.h">
-      <Filter>public</Filter>
-    </ClInclude>
-    <ClInclude Include="bulletin_table.h">
-      <Filter>public</Filter>
-    </ClInclude>
-    <ClInclude Include="chain.h">
-      <Filter>public</Filter>
-    </ClInclude>
-    <ClInclude Include="ecc.h">
-      <Filter>public</Filter>
-    </ClInclude>
-    <ClInclude Include="ecc_pub.h">
-      <Filter>public</Filter>
-    </ClInclude>
-    <ClInclude Include="misc.h">
-      <Filter>public</Filter>
-    </ClInclude>
-    <ClInclude Include="mkl_tree.h">
-      <Filter>public</Filter>
-    </ClInclude>
-    <ClInclude Include="mpz.h">
-      <Filter>public</Filter>
-    </ClInclude>
-    <ClInclude Include="msvc_hack.h">
-      <Filter>public</Filter>
-    </ClInclude>
-    <ClInclude Include="multiexp.h">
-      <Filter>public</Filter>
-    </ClInclude>
-    <ClInclude Include="public.h">
-      <Filter>public</Filter>
-    </ClInclude>
-    <ClInclude Include="scheme_misc.h">
-      <Filter>public</Filter>
-    </ClInclude>
-    <ClInclude Include="scheme_plain.h">
-      <Filter>public</Filter>
-    </ClInclude>
-    <ClInclude Include="scheme_table.h">
-      <Filter>public</Filter>
-    </ClInclude>
-    <ClInclude Include="schnorr.h">
-      <Filter>public</Filter>
-    </ClInclude>
-    <ClInclude Include="vrf.h">
-      <Filter>public</Filter>
-    </ClInclude>
-    <ClInclude Include="tick.h">
-      <Filter>public</Filter>
-    </ClInclude>
-    <ClInclude Include="vrf_meta.h">
-      <Filter>public</Filter>
-    </ClInclude>
     <ClInclude Include="pod_core\scheme_plain_a.h">
       <Filter>local</Filter>
     </ClInclude>
@@ -392,6 +332,66 @@
     </ClInclude>
     <ClInclude Include="pod_core\scheme_plain_otrange_test.h">
       <Filter>local\otrange</Filter>
+    </ClInclude>
+    <ClInclude Include="public\basic_types.h">
+      <Filter>public</Filter>
+    </ClInclude>
+    <ClInclude Include="public\bp.h">
+      <Filter>public</Filter>
+    </ClInclude>
+    <ClInclude Include="public\bulletin_plain.h">
+      <Filter>public</Filter>
+    </ClInclude>
+    <ClInclude Include="public\bulletin_table.h">
+      <Filter>public</Filter>
+    </ClInclude>
+    <ClInclude Include="public\chain.h">
+      <Filter>public</Filter>
+    </ClInclude>
+    <ClInclude Include="public\ecc.h">
+      <Filter>public</Filter>
+    </ClInclude>
+    <ClInclude Include="public\ecc_pub.h">
+      <Filter>public</Filter>
+    </ClInclude>
+    <ClInclude Include="public\misc.h">
+      <Filter>public</Filter>
+    </ClInclude>
+    <ClInclude Include="public\mkl_tree.h">
+      <Filter>public</Filter>
+    </ClInclude>
+    <ClInclude Include="public\mpz.h">
+      <Filter>public</Filter>
+    </ClInclude>
+    <ClInclude Include="public\msvc_hack.h">
+      <Filter>public</Filter>
+    </ClInclude>
+    <ClInclude Include="public\multiexp.h">
+      <Filter>public</Filter>
+    </ClInclude>
+    <ClInclude Include="public\public.h">
+      <Filter>public</Filter>
+    </ClInclude>
+    <ClInclude Include="public\scheme_misc.h">
+      <Filter>public</Filter>
+    </ClInclude>
+    <ClInclude Include="public\scheme_plain.h">
+      <Filter>public</Filter>
+    </ClInclude>
+    <ClInclude Include="public\scheme_table.h">
+      <Filter>public</Filter>
+    </ClInclude>
+    <ClInclude Include="public\schnorr.h">
+      <Filter>public</Filter>
+    </ClInclude>
+    <ClInclude Include="public\tick.h">
+      <Filter>public</Filter>
+    </ClInclude>
+    <ClInclude Include="public\vrf.h">
+      <Filter>public</Filter>
+    </ClInclude>
+    <ClInclude Include="public\vrf_meta.h">
+      <Filter>public</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

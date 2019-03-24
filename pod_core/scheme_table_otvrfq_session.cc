@@ -74,7 +74,10 @@ bool Session::OnRequest(Request const& request, Response& response) {
     mcl::bn256::pairing(e, v_exp_key_c, ot_sk_);
     uint8_t buf[32 * 12];
     auto ret_len = e.serialize(buf, sizeof(buf));
-    assert(ret_len == sizeof(buf));
+    if (ret_len != sizeof(buf)) {
+      assert(false);
+      throw std::runtime_error("oops");
+    }
     G1 ge = MapToG1(buf, sizeof(buf));
 
     for (auto& j : psk_exp_r_mixed) {

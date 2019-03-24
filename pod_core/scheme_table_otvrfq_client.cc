@@ -102,7 +102,10 @@ bool Client::OnResponse(Response const& response, Receipt& receipt) {
     mcl::bn256::pairing(e, ui_exp_a, ot_peer_pk_);
     uint8_t buf[32 * 12];
     auto ret_len = e.serialize(buf, sizeof(buf));
-    assert(ret_len == sizeof(buf));
+    if (ret_len != sizeof(buf)) {
+      assert(false);
+      throw std::runtime_error("oops");
+    }
     G1 ge = MapToG1(buf, sizeof(buf));
     for (auto& j : psk_exp_r[i]) {
       j -= ge;

@@ -42,9 +42,9 @@ int main(int argc, char** argv) {
         "Provide the retrieve block count(plain mode)")(
         "key_name,k", po::value<std::string>(&key_name)->default_value(""),
         "Provide the query key name(table mode)")(
-        "key_value,v",
+        "key_value,ot_v",
         po::value<std::vector<std::string>>(&query_values)->multitoken(),
-        "Provide the query key values(table mode, for example -v value_a "
+        "Provide the query key values(table mode, for example -ot_v value_a "
         "value_b value_c)")(
         "phantoms,n",
         po::value<std::vector<std::string>>(&phantoms)->multitoken(),
@@ -125,7 +125,8 @@ int main(int argc, char** argv) {
 
   if (mode == Mode::kPlain) {
     auto output_file = output_path + "/decrypted_data";
-    return scheme::plain::range::Test(publish_path, output_file, start, count)
+    return scheme::plain::range::Test(publish_path, output_file,
+                                      Range(start, count))
                ? 0
                : -1;
   } else {

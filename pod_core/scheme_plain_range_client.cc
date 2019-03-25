@@ -10,21 +10,25 @@
 namespace scheme::plain::range {
 
 Client::Client(BPtr b, h256_t const& self_id, h256_t const& peer_id,
-               uint64_t start, uint64_t count)
+               Range const& demand)
     : b_(b),
       self_id_(self_id),
       peer_id_(peer_id),
       n_(b_->bulletin().n),
       s_(b_->bulletin().s),
-      start_(start),
-      count_(count) {
+      demand_(demand) {
   seed2_ = misc::RandMpz32();
+}
+
+void Client::GetRequest(Request& request) {
+  request.start = demand_.start;
+  request.count = demand_.count;
 }
 
 bool Client::OnResponse(Response response, Challenge& challenge) {
   Tick _tick_(__FUNCTION__);
 
-  if (response.k.size() != count_ * s_) {
+  if (response.k.size() != demand_.count * s_) {
     assert(false);
     return false;
   }
@@ -38,19 +42,19 @@ bool Client::OnResponse(Response response, Challenge& challenge) {
 bool Client::OnReply(Reply reply, Receipt& receipt) {
   Tick _tick_(__FUNCTION__);
 
-  if (reply.m.size() != count_ * s_) {
+  if (reply.m.size() != demand_.count * s_) {
     assert(false);
     return false;
   }
 
-  H2(seed2_, count_, w_);
+  H2(seed2_, demand_.count, w_);
 
   if (!CheckEncryptedM(reply.m)) {
     assert(false);
     return false;
   }
 
-  reply_ = std::move(reply);
+  encrypted_m_ = std::move(reply.m);
 
   receipt.k_mkl_root = k_mkl_root_;
   receipt.seed2 = seed2_;
@@ -64,10 +68,11 @@ bool Client::CheckEncryptedM(std::vector<Fr> const& encrypted_m) {
   auto const& ecc_pub = GetEccPub();
   auto const& sigmas = b_->sigmas();
 
-  int not_equal_times = 0;
+  int not_equal = 0;
 #pragma omp parallel for
-  for (int64_t i = 0; i < (int64_t)count_; ++i) {
-    G1 const& sigma = sigmas[start_ + i];
+  for (int64_t i = 0; i < (int64_t)demand_.count; ++i) {
+    if (not_equal) continue;
+    G1 const& sigma = sigmas[demand_.start + i];
     G1 left = sigma * w_[i];
     auto is = i * s_;
     for (uint64_t j = 0; j < s_; ++j) {
@@ -80,11 +85,11 @@ bool Client::CheckEncryptedM(std::vector<Fr> const& encrypted_m) {
     }
     if (left != right) {
 #pragma omp atomic
-      ++not_equal_times;
+      ++not_equal;
     }
   }
 
-  if (not_equal_times) {
+  if (not_equal) {
     assert(false);
     return false;
   }
@@ -96,7 +101,7 @@ bool Client::OnSecret(Secret const& secret, Claim& claim) {
 
   // compute v
   std::vector<Fr> v;
-  H2(secret.seed0, count_ * s_, v);
+  H2(secret.seed0, demand_.count * s_, v);
 
   if (!CheckK(v, claim)) return false;
 
@@ -121,7 +126,7 @@ bool Client::CheckKDirect(std::vector<Fr> const& v, Claim& claim) {
   BuildK(v, k, s_);
 
   // compare k
-  for (uint64_t i = 0; i < count_; ++i) {
+  for (uint64_t i = 0; i < demand_.count; ++i) {
     for (uint64_t j = 0; j < s_; ++j) {
       auto offset = i * s_ + j;
       if (k[offset] == response_.k[offset]) continue;
@@ -139,14 +144,14 @@ bool Client::CheckKMultiExp(std::vector<Fr> const& v, Claim& claim) {
   uint64_t mismatch_j = (uint64_t)(-1);
   for (uint64_t j = 0; j < s_; ++j) {
     Fr sigma_vij = FrZero();
-    std::vector<G1 const*> k(count_);
-    for (uint64_t i = 0; i < count_; ++i) {
+    std::vector<G1 const*> k(demand_.count);
+    for (uint64_t i = 0; i < demand_.count; ++i) {
       sigma_vij += v[i * s_ + j] * w_[i];
       k[i] = &response_.k[i * s_ + j];
     }
 
     G1 check_sigma_kij = ecc_pub.PowerU1(j, sigma_vij);
-    G1 sigma_kij = MultiExpBdlo12(k, w_, 0, count_);
+    G1 sigma_kij = MultiExpBdlo12(k, w_, 0, demand_.count);
     if (check_sigma_kij != sigma_kij) {
       mismatch_j = j;
       break;
@@ -155,9 +160,9 @@ bool Client::CheckKMultiExp(std::vector<Fr> const& v, Claim& claim) {
 
   if (mismatch_j == (uint64_t)(-1)) return true;
 
-  std::vector<G1 const*> k_col(count_);
-  std::vector<Fr const*> v_col(count_);
-  for (uint64_t i = 0; i < count_; ++i) {
+  std::vector<G1 const*> k_col(demand_.count);
+  std::vector<Fr const*> v_col(demand_.count);
+  for (uint64_t i = 0; i < demand_.count; ++i) {
     auto offset = i * s_ + mismatch_j;
     k_col[i] = &response_.k[offset];
     v_col[i] = &v[offset];
@@ -185,7 +190,7 @@ void Client::BuildClaim(uint64_t i, uint64_t j, Claim& claim) {
         assert(i < response_.k.size());
         return G1ToBin(response_.k[i]);
       },
-      count_* s_, ij, &claim.mkl_path);
+      demand_.count* s_, ij, &claim.mkl_path);
   if (root != k_mkl_root_) {
     assert(false);
     throw std::runtime_error("oops, mkl root mismatch");
@@ -229,30 +234,29 @@ uint64_t Client::FindMismatchI(uint64_t mismatch_j,
 void Client::DecryptM(std::vector<Fr> const& v) {
   Tick _tick_(__FUNCTION__);
 
-  std::vector<Fr> inv_w(count_);
+  std::vector<Fr> inv_w(demand_.count);
 
 #pragma omp parallel for
-  for (int64_t i = 0; i < (int64_t)count_; ++i) {
+  for (int64_t i = 0; i < (int64_t)demand_.count; ++i) {
     inv_w[i] = FrInv(w_[i]);
   }
 
-  auto& m = reply_.m;
-
 #pragma omp parallel for
-  for (int64_t i = 0; i < (int64_t)count_; ++i) {
+  for (int64_t i = 0; i < (int64_t)demand_.count; ++i) {
     auto is = i * s_;
     for (uint64_t j = 0; j < s_; ++j) {
       auto ij = is + j;
-      m[ij] = (m[ij] - v[ij]) * inv_w[i];
+      encrypted_m_[ij] = (encrypted_m_[ij] - v[ij]) * inv_w[i];
     }
   }
 
-  decrypted_m_ = std::move(reply_.m);
+  decrypted_m_ = std::move(encrypted_m_);
 }
 
 bool Client::SaveDecrypted(std::string const& file) {
   Tick _tick_(__FUNCTION__);
 
-  return MToFile(file, b_->bulletin().size, s_, start_, count_, decrypted_m_);
+  return MToFile(file, b_->bulletin().size, s_, demand_.start, demand_.count,
+                 decrypted_m_);
 }
 }  // namespace scheme::plain::range

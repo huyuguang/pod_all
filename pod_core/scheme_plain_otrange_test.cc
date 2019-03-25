@@ -16,17 +16,17 @@ const h256_t kDummyClientId = h256_t{2};
 
 namespace scheme::plain::otrange {
 
-bool Test(std::string const& output_file, APtr a, BPtr b, uint64_t start,
-          uint64_t count, bool evil) {
+bool Test(std::string const& output_file, APtr a, BPtr b, Range const& demand,
+          Range const& phantom, bool evil) {
   Tick _tick_(__FUNCTION__);
 
   Session session(a, kDummySessionId, kDummyClientId);
-  Client client(b, kDummyClientId, kDummySessionId, start, count);
+  Client client(b, kDummyClientId, kDummySessionId, demand, phantom);
   if (evil) session.TestSetEvil();
 
   Request request;
-  request.start = start;
-  request.count = count;
+  client.GetRequest(request);
+
   Response response;
   if (!session.OnRequest(request, response)) {
     assert(false);
@@ -75,7 +75,7 @@ bool Test(std::string const& output_file, APtr a, BPtr b, uint64_t start,
       return false;
     }
     std::cout << "claim: " << claim.i << "," << claim.j << "\n";
-    if (!VerifyClaim(count, a->bulletin().s, receipt, secret, claim)) {
+    if (!VerifyClaim(demand.count, a->bulletin().s, receipt, secret, claim)) {
       assert(false);
       return false;
     }
@@ -85,14 +85,14 @@ bool Test(std::string const& output_file, APtr a, BPtr b, uint64_t start,
 }
 
 bool Test(std::string const& publish_path, std::string const& output_path,
-          uint64_t start, uint64_t count) {
+          Range const& demand, Range const& phantom) {
   try {
     auto a = std::make_shared<A>(publish_path);
 
     std::string bulletin_file = publish_path + "/bulletin";
     std::string public_path = publish_path + "/public";
     auto b = std::make_shared<B>(bulletin_file, public_path);
-    return Test(output_path, a, b, start, count, false);
+    return Test(output_path, a, b, demand, phantom, false);
   } catch (std::exception& e) {
     std::cerr << __FUNCTION__ << "\t" << e.what() << "\n";
     return false;

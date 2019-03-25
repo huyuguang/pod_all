@@ -22,28 +22,28 @@ Client::Client(BPtr b, h256_t const& self_id, h256_t const& peer_id,
 
   CryptoPP::SHA256 hash;
   value_digests_.resize(query_values_.size());
-  mixed_value_digests_.resize(query_values_.size() + phantoms.size());
+  shuffled_value_digests_.resize(query_values_.size() + phantoms.size());
   for (size_t i = 0; i < query_values.size(); ++i) {
     hash.Update((uint8_t*)query_values[i].data(), query_values[i].size());
     hash.Final(value_digests_[i].data());
-    mixed_value_digests_[i] = value_digests_[i];
+    shuffled_value_digests_[i] = value_digests_[i];
   }
 
   // do not need to unique
   for (size_t i = 0; i < phantoms.size(); ++i) {
     hash.Update((uint8_t*)phantoms[i].data(), phantoms[i].size());
-    hash.Final(mixed_value_digests_[i + value_digests_.size()].data());
+    hash.Final(shuffled_value_digests_[i + value_digests_.size()].data());
   }
 
   std::default_random_engine generator{std::random_device{}()};
-  std::shuffle(mixed_value_digests_.begin(), mixed_value_digests_.end(),
+  std::shuffle(shuffled_value_digests_.begin(), shuffled_value_digests_.end(),
                generator);
-  mix_index_.resize(value_digests_.size());
-  for (size_t i = 0; i < mix_index_.size(); ++i) {
-    auto it = std::find(mixed_value_digests_.begin(),
-                        mixed_value_digests_.end(), value_digests_[i]);
-    assert(it != mixed_value_digests_.end());
-    mix_index_[i] = std::distance(mixed_value_digests_.begin(), it);
+  shuffle_reference_.resize(value_digests_.size());
+  for (size_t i = 0; i < shuffle_reference_.size(); ++i) {
+    auto it = std::find(shuffled_value_digests_.begin(),
+                        shuffled_value_digests_.end(), value_digests_[i]);
+    assert(it != shuffled_value_digests_.end());
+    shuffle_reference_[i] = std::distance(shuffled_value_digests_.begin(), it);
   }
 
   ot_self_pk_ = G1Rand();
@@ -68,37 +68,37 @@ bool Client::OnNegoResponse(NegoBResponse const& response) {
 
 void Client::GetRequest(Request& request) {
   request.key_name = query_key_;
-  request.mixed_value_digests = std::move(mixed_value_digests_);
+  request.shuffled_value_digests = std::move(shuffled_value_digests_);
 
-  request.vi.resize(value_digests_.size());
-  for (size_t i = 0; i < request.vi.size(); ++i) {
+  request.ot_vi.resize(value_digests_.size());
+  for (size_t i = 0; i < request.ot_vi.size(); ++i) {
     h256_t const& key_digest = value_digests_[i];
     Fr key_fr = BinToFr31(key_digest.data(), key_digest.data() + 31);
-    request.vi[i] = ot_sk_ * (ot_rand_b_ * key_fr);
+    request.ot_vi[i] = ot_sk_ * (ot_rand_b_ * key_fr);
   }
-  request.v = ot_self_pk_ * (ot_rand_a_ * ot_rand_b_);
+  request.ot_v = ot_self_pk_ * (ot_rand_a_ * ot_rand_b_);
 }
 
 bool Client::OnResponse(Response const& response, Receipt& receipt) {
-  if (response.ui.size() != value_digests_.size()) {
+  if (response.ot_ui.size() != value_digests_.size()) {
     assert(false);
     return false;
   }
-  if (response.psk_exp_r_mixed.size() !=
+  if (response.shuffled_psk_exp_r.size() !=
       (phantoms_count_ + value_digests_.size())) {
     assert(false);
     return false;
   }
 
   std::vector<vrf::Psk<>> psk_exp_r(value_digests_.size());
-  for (size_t i = 0; i < mix_index_.size(); ++i) {
-    psk_exp_r[i] = response.psk_exp_r_mixed[mix_index_[i]];
+  for (size_t i = 0; i < shuffle_reference_.size(); ++i) {
+    psk_exp_r[i] = response.shuffled_psk_exp_r[shuffle_reference_[i]];
   }
 
   last_psk_exp_r_.resize(psk_exp_r.size());
   for (size_t i = 0; i < psk_exp_r.size(); ++i) {
     Fp12 e;
-    G1 ui_exp_a = response.ui[i] * ot_rand_a_;
+    G1 ui_exp_a = response.ot_ui[i] * ot_rand_a_;
     mcl::bn256::pairing(e, ui_exp_a, ot_peer_pk_);
     uint8_t buf[32 * 12];
     auto ret_len = e.serialize(buf, sizeof(buf));
@@ -139,12 +139,7 @@ bool Client::OnSecret(Secret const& query_secret,
 
     uint8_t fsk_bin[12 * 32];
     fsk_[i].serialize(fsk_bin, sizeof(fsk_bin), mcl::IoMode::IoSerialize);
-
-    CryptoPP::SHA256 hash;
-    h256_t digest;
-    hash.Update(fsk_bin, sizeof(fsk_bin));
-    hash.Final(digest.data());
-    Fr fr_fsk = BinToFr31(digest.data(), digest.data() + 31);
+    Fr fr_fsk = MapToFr(fsk_bin, sizeof(fsk_bin));
 
     auto const& key_m = b_->key_m();
     auto const& km = key_m[vrf_key_->j];

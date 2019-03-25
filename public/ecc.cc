@@ -1,4 +1,6 @@
 #include "ecc.h"
+
+#include <cryptopp/sha.h>
 #include "msvc_hack.h"
 #include "ecc_pub.h"
 
@@ -517,4 +519,17 @@ Fr FrPower(Fr const& base, mpz_class const& exp) {
   //  }
   //}
   //return result;
+}
+
+Fr MapToFr(void const* b, size_t n) {
+  CryptoPP::SHA256 hash;
+  h256_t digest;
+  hash.Update((uint8_t const*)b, n);
+  hash.Final(digest.data());
+  return BinToFr31(digest.data(), digest.data() + 31);	
+}
+
+Fr MapToFr(uint64_t b) {
+  auto b_big = boost::endian::native_to_big(b);
+  return MapToFr((uint8_t const*)&b_big, sizeof(b_big));
 }

@@ -44,13 +44,32 @@ struct Claim {
 }  // namespace range
 
 namespace otrange {
+struct NegoARequest {
+  G2 s;
+};
+
+struct NegoAResponse {
+  G2 s_exp_beta;
+};
+
+struct NegoBRequest {
+  G1 t;
+};
+
+struct NegoBResponse {
+  G1 t_exp_alpha;
+};
+
 struct Request {
   uint64_t start;
-  uint64_t count;
+  uint64_t count; // = L
+  std::vector<G1> ot_vi; // sizeof() = K
+  G1 ot_v;
 };
 
 struct Response {
-  std::vector<G1> k;
+  std::vector<G1> k; // sizeof() = L
+  std::vector<G1> ot_ui; // sizeof() = K
 };
 
 struct Challenge {
@@ -58,7 +77,7 @@ struct Challenge {
 };
 
 struct Reply {
-  std::vector<Fr> m;
+  std::vector<Fr> m; // sizeof() = L  
 };
 
 struct Receipt {

@@ -1,12 +1,12 @@
 #pragma once
 
+#include <omp.h>
 #include <algorithm>
 #include <array>
 #include <chrono>
 #include <iostream>
 #include <string>
 #include <vector>
-#include <omp.h>
 
 #ifdef _WIN32
 #pragma warning(push)
@@ -24,14 +24,13 @@
 
 using mcl::bn256::Fp;
 using mcl::bn256::Fp12;
-using mcl::bn256::Fp6;
 using mcl::bn256::Fp2;
+using mcl::bn256::Fp6;
 using mcl::bn256::Fr;
 using mcl::bn256::G1;
 using mcl::bn256::G2;
 typedef mcl::fp::WindowMethod<G1> G1WM;
 typedef mcl::fp::WindowMethod<G2> G2WM;
-
 
 void InitEcc();
 
@@ -80,6 +79,10 @@ G2 MapToG2(Fp2 t);
 G2 MapToG2(void const* b, size_t n);
 
 G2 MapToG2(std::string const& s);
+
+Fr MapToFr(void const* b, size_t n);
+
+Fr MapToFr(uint64_t b);
 
 // inner product
 G1 MultiExp(G1 const* g, Fr const* f, size_t n);
@@ -152,4 +155,3 @@ G1 MultiExpBosCoster(std::function<G1(size_t)> const& get_g,
 bool PairingMatch(G1 const& a, G1 const& c, G2 const& d);
 
 bool PairingMatch(G1 const& a, G2 const& b, G1 const& c, G2 const& d);
-

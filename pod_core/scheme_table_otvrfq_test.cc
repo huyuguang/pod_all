@@ -47,28 +47,28 @@ bool QueryInternal(APtr a, BPtr b, std::string const& query_key,
     return false;
   }
 
-  Request query_req;
-  client.GetRequest(query_req);
+  Request request;
+  client.GetRequest(request);
 
-  Response query_rsp;
-  if (!session.OnRequest(query_req, query_rsp)) {
+  Response response;
+  if (!session.OnRequest(request, response)) {
     assert(false);
     return false;
   }
 
-  Receipt query_receipt;
-  if (!client.OnResponse(query_rsp, query_receipt)) {
+  Receipt receipt;
+  if (!client.OnResponse(response, receipt)) {
     assert(false);
     return false;
   }
 
-  Secret query_secret;
-  if (!session.OnReceipt(query_receipt, query_secret)) {
+  Secret secret;
+  if (!session.OnReceipt(receipt, secret)) {
     assert(false);
     return false;
   }
 
-  if (!client.OnSecret(query_secret, positions)) {
+  if (!client.OnSecret(secret, positions)) {
     assert(false);
     return false;
   }

@@ -47,15 +47,15 @@ struct NegoBResponse {
 
 struct Request {
   std::string key_name;
-  std::vector<h256_t> mixed_value_digests;  // sizeof() = L
-  std::vector<G1> vi;                       // sizeof() = K
-  G1 v;
+  std::vector<h256_t> shuffled_value_digests;  // sizeof() = L
+  std::vector<G1> ot_vi;                       // sizeof() = K
+  G1 ot_v;
 };
 
 struct Response {
-  std::vector<vrf::Psk<>> psk_exp_r_mixed;  // sizeof() = L
+  std::vector<vrf::Psk<>> shuffled_psk_exp_r;  // sizeof() = L
   G1 g_exp_r;
-  std::vector<G1> ui;  // sizeof() = K
+  std::vector<G1> ot_ui;  // sizeof() = K
 };
 
 struct Receipt {

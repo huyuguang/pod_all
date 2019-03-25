@@ -43,11 +43,11 @@ class Client {
  private:
   VrfKeyMeta const* vrf_key_;
   std::vector<h256_t> value_digests_;
-  std::vector<h256_t> mixed_value_digests_;
+  std::vector<h256_t> shuffled_value_digests_;
   G1 g_exp_r_;
   std::vector<G1> last_psk_exp_r_;
   std::vector<vrf::Fsk> fsk_;
-  std::vector<size_t> mix_index_;
+  std::vector<size_t> shuffle_reference_;
 
  private:
   G1 ot_self_pk_;

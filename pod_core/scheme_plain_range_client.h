@@ -13,8 +13,11 @@ namespace range {
 class Client {
  public:
   // The self_id and peer_id are useless now, just for later convenience.
-  Client(BPtr b, h256_t const& self_id, h256_t const& peer_id, uint64_t start,
-         uint64_t count);
+  Client(BPtr b, h256_t const& self_id, h256_t const& peer_id,
+         Range const& demand);
+
+ public:
+  void GetRequest(Request& request);
   bool OnResponse(Response response, Challenge& challenge);
   bool OnReply(Reply reply, Receipt& receipt);
   bool OnSecret(Secret const& secret, Claim& claim);
@@ -37,17 +40,16 @@ class Client {
   h256_t const peer_id_;
   uint64_t const n_;
   uint64_t const s_;
-  uint64_t const start_;
-  uint64_t const count_;
+  Range const demand_;
 
  private:
   Response response_;
-  Reply reply_;
 
  private:
   mpz_class seed2_;
   std::vector<Fr> w_;  // size() is count
   h256_t k_mkl_root_;
+  std::vector<Fr> encrypted_m_;
   std::vector<Fr> decrypted_m_;
 };
 }  // namespace range

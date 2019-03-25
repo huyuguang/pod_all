@@ -21,7 +21,7 @@ Session::Session(APtr a, h256_t const& self_id, h256_t const& peer_id)
 bool Session::OnRequest(Request const& request, Response& response) {
   Tick _tick_(__FUNCTION__);
 
-  if (!request.count || request.start >= n_ ||
+  if (!request.count || request.start >= n_ || request.count > n_ ||
       (request.start + request.count) > n_)
     return false;
 

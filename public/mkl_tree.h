@@ -13,12 +13,6 @@ namespace mkl {
 typedef std::vector<h256_t> Tree;
 typedef std::vector<h256_t> Path;
 
-struct Range {
-  Range(uint64_t start = 0, uint64_t count = 0) : start(start), count(count) {}
-  uint64_t start;
-  uint64_t count;
-};
-
 typedef std::function<h256_t(uint64_t)> GetItem;
 
 size_t Log2UB(size_t n);

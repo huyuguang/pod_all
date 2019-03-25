@@ -29,13 +29,13 @@ bool Session::OnNegoResponse(NegoAResponse const& response) {
 }
 
 bool Session::OnRequest(Request const& request, Response& response) {
-  if (request.vi.empty() || request.mixed_value_digests.empty() ||
+  if (request.ot_vi.empty() || request.shuffled_value_digests.empty() ||
       request.key_name.empty()) {
     assert(false);
     return false;
   }
 
-  if (request.mixed_value_digests.size() <= request.vi.size()) {
+  if (request.shuffled_value_digests.size() <= request.ot_vi.size()) {
     assert(false);
     return false;
   }
@@ -46,31 +46,31 @@ bool Session::OnRequest(Request const& request, Response& response) {
   response.g_exp_r = g_exp_r_;
 
   Fr c = FrRand();
-  response.ui.resize(request.vi.size());
+  response.ot_ui.resize(request.ot_vi.size());
 
-  for (size_t i = 0; i < response.ui.size(); ++i) {
-    response.ui[i] = request.vi[i] * c;
+  for (size_t i = 0; i < response.ot_ui.size(); ++i) {
+    response.ot_ui[i] = request.ot_vi[i] * c;
   }
 
-  response.psk_exp_r_mixed.resize(request.mixed_value_digests.size());
-  for (size_t i = 0; i < request.mixed_value_digests.size(); ++i) {
-    auto const& key_digest = request.mixed_value_digests[i];
+  response.shuffled_psk_exp_r.resize(request.shuffled_value_digests.size());
+  for (size_t i = 0; i < request.shuffled_value_digests.size(); ++i) {
+    auto const& key_digest = request.shuffled_value_digests[i];
     Fr key_fr = BinToFr31(key_digest.data(), key_digest.data() + 31);
 
-    auto& psk_exp_r_mixed = response.psk_exp_r_mixed[i];
-    vrf::ProveWithR(a_->vrf_sk(), key_digest.data(), r_, psk_exp_r_mixed);
+    auto& shuffled_psk_exp_r = response.shuffled_psk_exp_r[i];
+    vrf::ProveWithR(a_->vrf_sk(), key_digest.data(), r_, shuffled_psk_exp_r);
 
 #ifdef _DEBUG
     vrf::Fsk fsk2 = vrf::Vrf(a_->vrf_sk(), key_digest.data());
-    vrf::VerifyWithR(a_->vrf_pk(), key_digest.data(), psk_exp_r_mixed,
+    vrf::VerifyWithR(a_->vrf_pk(), key_digest.data(), shuffled_psk_exp_r,
                      response.g_exp_r);
     vrf::Fsk fsk1;
-    vrf::GetFskFromPskExpR(psk_exp_r_mixed.back(), r_, fsk1);
+    vrf::GetFskFromPskExpR(shuffled_psk_exp_r.back(), r_, fsk1);
     assert(fsk1 == fsk2);
 #endif
 
     Fp12 e;
-    G1 v_exp_key_c = request.v * (key_fr * c);
+    G1 v_exp_key_c = request.ot_v * (key_fr * c);
     mcl::bn256::pairing(e, v_exp_key_c, ot_sk_);
     uint8_t buf[32 * 12];
     auto ret_len = e.serialize(buf, sizeof(buf));
@@ -80,7 +80,7 @@ bool Session::OnRequest(Request const& request, Response& response) {
     }
     G1 ge = MapToG1(buf, sizeof(buf));
 
-    for (auto& j : psk_exp_r_mixed) {
+    for (auto& j : shuffled_psk_exp_r) {
       j += ge;
     }
   }

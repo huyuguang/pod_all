@@ -88,6 +88,8 @@ bool Client::OnReply(Reply reply, Receipt& receipt) {
     return false;
   }
 
+  H2(seed2_, phantom_.count, w_);
+
   encrypted_m_.resize(demand_.count * s_);
   uint64_t phantom_offset = phantom_.start - demand_.start;
   for (size_t i = 0; i < response_.ot_ui.size(); ++i) {
@@ -106,9 +108,7 @@ bool Client::OnReply(Reply reply, Receipt& receipt) {
     }    
   }
 
-  H2(seed2_, demand_.count, w_);
-
-  if (!CheckEncryptedM(reply.m)) {
+  if (!CheckEncryptedM()) {
     assert(false);
     return false;
   }
@@ -119,25 +119,25 @@ bool Client::OnReply(Reply reply, Receipt& receipt) {
   return true;
 }
 
-bool Client::CheckEncryptedM(std::vector<Fr> const& encrypted_m) {
+bool Client::CheckEncryptedM() {
   Tick _tick_(__FUNCTION__);
 
   auto const& ecc_pub = GetEccPub();
   auto const& sigmas = b_->sigmas();
 
+  uint64_t phantom_offset = phantom_.start - demand_.start;
   int not_equal = 0;
 #pragma omp parallel for
   for (int64_t i = 0; i < (int64_t)demand_.count; ++i) {
     if (not_equal) continue;
     G1 const& sigma = sigmas[demand_.start + i];
-    G1 left = sigma * w_[i];
-    auto is = i * s_;
+    G1 left = sigma * w_[i + phantom_offset];
     for (uint64_t j = 0; j < s_; ++j) {
-      left += response_.k[is + j];
+      left += response_.k[(phantom_offset + i) * s_ + j];
     }
     G1 right = G1Zero();
     for (uint64_t j = 0; j < s_; ++j) {
-      Fr const& m = encrypted_m[is + j];
+      Fr const& m = encrypted_m_[i * s_ + j];
       right += ecc_pub.PowerU1(j, m);
     }
     if (left != right) {
@@ -158,7 +158,7 @@ bool Client::OnSecret(Secret const& secret, Claim& claim) {
 
   // compute v
   std::vector<Fr> v;
-  H2(secret.seed0, demand_.count * s_, v);
+  H2(secret.seed0, phantom_.count * s_, v);
 
   if (!CheckK(v, claim)) return false;
 
@@ -183,7 +183,7 @@ bool Client::CheckKDirect(std::vector<Fr> const& v, Claim& claim) {
   BuildK(v, k, s_);
 
   // compare k
-  for (uint64_t i = 0; i < demand_.count; ++i) {
+  for (uint64_t i = 0; i < phantom_.count; ++i) {
     for (uint64_t j = 0; j < s_; ++j) {
       auto offset = i * s_ + j;
       if (k[offset] == response_.k[offset]) continue;
@@ -201,14 +201,14 @@ bool Client::CheckKMultiExp(std::vector<Fr> const& v, Claim& claim) {
   uint64_t mismatch_j = (uint64_t)(-1);
   for (uint64_t j = 0; j < s_; ++j) {
     Fr sigma_vij = FrZero();
-    std::vector<G1 const*> k(demand_.count);
-    for (uint64_t i = 0; i < demand_.count; ++i) {
+    std::vector<G1 const*> k(phantom_.count);
+    for (uint64_t i = 0; i < phantom_.count; ++i) {
       sigma_vij += v[i * s_ + j] * w_[i];
       k[i] = &response_.k[i * s_ + j];
     }
 
     G1 check_sigma_kij = ecc_pub.PowerU1(j, sigma_vij);
-    G1 sigma_kij = MultiExpBdlo12(k, w_, 0, demand_.count);
+    G1 sigma_kij = MultiExpBdlo12(k, w_, 0, phantom_.count);
     if (check_sigma_kij != sigma_kij) {
       mismatch_j = j;
       break;
@@ -217,9 +217,9 @@ bool Client::CheckKMultiExp(std::vector<Fr> const& v, Claim& claim) {
 
   if (mismatch_j == (uint64_t)(-1)) return true;
 
-  std::vector<G1 const*> k_col(demand_.count);
-  std::vector<Fr const*> v_col(demand_.count);
-  for (uint64_t i = 0; i < demand_.count; ++i) {
+  std::vector<G1 const*> k_col(phantom_.count);
+  std::vector<Fr const*> v_col(phantom_.count);
+  for (uint64_t i = 0; i < phantom_.count; ++i) {
     auto offset = i * s_ + mismatch_j;
     k_col[i] = &response_.k[offset];
     v_col[i] = &v[offset];
@@ -242,12 +242,14 @@ void Client::BuildClaim(uint64_t i, uint64_t j, Claim& claim) {
   claim.j = j;
   auto ij = i * s_ + j;
   claim.kij = response_.k[ij];
+
   auto root = mkl::CalcPath(
       [this](uint64_t i) -> h256_t {
         assert(i < response_.k.size());
         return G1ToBin(response_.k[i]);
       },
-      demand_.count* s_, ij, &claim.mkl_path);
+      phantom_.count* s_, ij, &claim.mkl_path);
+
   if (root != k_mkl_root_) {
     assert(false);
     throw std::runtime_error("oops, mkl root mismatch");
@@ -291,19 +293,20 @@ uint64_t Client::FindMismatchI(uint64_t mismatch_j,
 void Client::DecryptM(std::vector<Fr> const& v) {
   Tick _tick_(__FUNCTION__);
 
-  std::vector<Fr> inv_w(demand_.count);
+  std::vector<Fr> inv_w(phantom_.count);
 
+  uint64_t phantom_offset = phantom_.start - demand_.start;
 #pragma omp parallel for
   for (int64_t i = 0; i < (int64_t)demand_.count; ++i) {
-    inv_w[i] = FrInv(w_[i]);
+    inv_w[i + phantom_offset] = FrInv(w_[i + phantom_offset]);
   }
 
 #pragma omp parallel for
   for (int64_t i = 0; i < (int64_t)demand_.count; ++i) {
-    auto is = i * s_;
     for (uint64_t j = 0; j < s_; ++j) {
-      auto ij = is + j;
-      encrypted_m_[ij] = (encrypted_m_[ij] - v[ij]) * inv_w[i];
+      encrypted_m_[i * s_ + j] =
+          (encrypted_m_[i * s_ + j] - v[(i + phantom_offset) * s_ + j]) *
+          inv_w[i + phantom_offset];
     }
   }
 

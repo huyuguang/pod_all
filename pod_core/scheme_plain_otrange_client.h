@@ -28,7 +28,7 @@ class Client {
   bool SaveDecrypted(std::string const& file);
 
  private:
-  bool CheckEncryptedM(std::vector<Fr> const& m);
+  bool CheckEncryptedM();
   bool CheckK(std::vector<Fr> const& v, Claim& claim);
   bool CheckKDirect(std::vector<Fr> const& v, Claim& claim);
   bool CheckKMultiExp(std::vector<Fr> const& v, Claim& claim);
@@ -52,7 +52,7 @@ class Client {
 
  private:
   mpz_class seed2_;
-  std::vector<Fr> w_;  // size() is count
+  std::vector<Fr> w_;  // size() is L
   h256_t k_mkl_root_;
   std::vector<Fr> decrypted_m_;
   std::vector<Fr> encrypted_m_;

@@ -1,11 +1,27 @@
 #include "ecc_pub.h"
 #include "public.h"
 #include "scheme_misc.h"
+#include "scheme_plain_otrange_test.h"
 #include "scheme_plain_range_test.h"
 #include "scheme_table_otvrfq_test.h"
 #include "scheme_table_vrfq_test.h"
 
-namespace {}  // namespace
+namespace boost::program_options {
+// Called by program_options to parse a set of Range arguments
+void validate(boost::any& v, std::vector<std::string> const& values, Range*,
+              int) {
+  Range r;
+  // Extract tokens from values string vector and populate Model struct.
+  if (values.size() != 2) {
+    throw po::validation_error(po::validation_error::invalid_option_value,
+                               "start count");
+  }
+
+  r.start = boost::lexical_cast<uint64_t>(values[0]);
+  r.count = boost::lexical_cast<uint64_t>(values[1]);
+  v = r;
+}
+}  // namespace
 
 int main(int argc, char** argv) {
   setlocale(LC_ALL, "");
@@ -15,11 +31,12 @@ int main(int argc, char** argv) {
   std::string publish_path;
   std::string output_path;
   std::string ecc_pub_file;
-  uint64_t start;
-  uint64_t count;
-  std::string key_name;
+  std::pair<uint64_t, uint64_t> aaaa;
+  Range demand_range;
+  Range phantom_range;
+  std::string query_key;
   std::vector<std::string> query_values;
-  std::vector<std::string> phantoms;
+  std::vector<std::string> phantom_values;
   uint32_t omp_thread_num;
 
   try {
@@ -35,24 +52,27 @@ int main(int argc, char** argv) {
         "Provide the publish path")(
         "output_path,o",
         po::value<std::string>(&output_path)->default_value(""),
-        "Provide the output path")(
-        "start,s", po::value<uint64_t>(&start)->default_value(0),
-        "Provide the start block position(plain mode)")(
-        "count,c", po::value<uint64_t>(&count)->default_value(1),
-        "Provide the retrieve block count(plain mode)")(
-        "key_name,k", po::value<std::string>(&key_name)->default_value(""),
+        "Provide the output path")("demand_range,d",
+                                   po::value<Range>(&demand_range)->multitoken(),
+                                   "Provide the demand range(plain mode)")(
+        "phantom_range,g", po::value<Range>(&phantom_range)->multitoken(),
+        "Provide the phantom range(plain mode)")(
+        "query_key,k", po::value<std::string>(&query_key)->default_value(""),
         "Provide the query key name(table mode)")(
         "key_value,ot_v",
         po::value<std::vector<std::string>>(&query_values)->multitoken(),
-        "Provide the query key values(table mode, for example -ot_v value_a "
+        "Provide the query key values(table mode, for example "
+        "-ot_v value_a "
         "value_b value_c)")(
-        "phantoms,n",
-        po::value<std::vector<std::string>>(&phantoms)->multitoken(),
-        "Provide the query key phantoms(table mode, for example -n phantoms_a "
+        "phantom_key,pk",
+        po::value<std::vector<std::string>>(&phantom_values)->multitoken(),
+        "Provide the query key phantoms(table mode, for example -n "
+        "phantoms_a "
         "phantoms_b phantoms_c)")(
         "omp_thread_num,t",
         po::value<uint32_t>(&omp_thread_num)->default_value(0),
-        "Provide the number of the openmp thread, 1: disable openmp, 0: "
+        "Provide the number of the openmp thread, 1: disable "
+        "openmp, 0: "
         "default.");
 
     boost::program_options::variables_map vmap;
@@ -90,14 +110,21 @@ int main(int argc, char** argv) {
     }
 
     if (mode == Mode::kPlain) {
-      if (count == 0) {
-        std::cout << "count can not be 0.\n";
-        std::cout << options << std::endl;
+      if (demand_range.count == 0) {
+        std::cout << "demand count can not be 0.\n";
         return -1;
       }
+
+      if (phantom_range.count != 0) {
+        if (phantom_range.start < demand_range.start || phantom_range.count < demand_range.count) {
+          std::cout << "phantom must overwrite demand.\n";
+          return -1;
+        }
+      }
+
     } else {
-      if (key_name.empty() || query_values.empty()) {
-        std::cout << "key_name and query_values can not be empty.\n";
+      if (query_key.empty() || query_values.empty()) {
+        std::cout << "query_key and query_values can not be empty.\n";
         std::cout << options << std::endl;
         return -1;
       }
@@ -125,18 +152,23 @@ int main(int argc, char** argv) {
 
   if (mode == Mode::kPlain) {
     auto output_file = output_path + "/decrypted_data";
-    return scheme::plain::range::Test(publish_path, output_file,
-                                      Range(start, count))
-               ? 0
-               : -1;
+    if (!phantom_range.count) {
+      return scheme::plain::range::Test(publish_path, output_file, demand_range) ? 0
+                                                                           : -1;
+    } else {
+      return scheme::plain::otrange::Test(publish_path, output_file, demand_range,
+                                          phantom_range)
+                 ? 0
+                 : -1;
+    }
   } else {
-    if (phantoms.empty()) {
-      return scheme::table::vrfq::Test(publish_path, key_name, query_values)
+    if (phantom_values.empty()) {
+      return scheme::table::vrfq::Test(publish_path, query_key, query_values)
                  ? 0
                  : -1;
     } else {
-      return scheme::table::otvrfq::Test(publish_path, key_name, query_values,
-                                         phantoms)
+      return scheme::table::otvrfq::Test(publish_path, query_key, query_values,
+                                         phantom_values)
                  ? 0
                  : -1;
     }

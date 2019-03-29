@@ -13,10 +13,6 @@ namespace scheme {
 
 enum Mode { kPlain, kTable };
 
-std::istream& operator>>(std::istream& in, Mode& t);
-
-std::ostream& operator<<(std::ostream& os, Mode const& t);
-
 void LoadMij(uint8_t const* data_start, uint8_t const* data_end, uint64_t i,
              uint64_t j, uint64_t s, Fr& mij);
 
@@ -47,3 +43,10 @@ bool IsElementUnique(std::vector<Fr> const v);
 void H2(mpz_class const& seed, uint64_t count, std::vector<Fr>& v);
 
 }  // namespace scheme
+
+namespace std {
+
+std::istream& operator>>(std::istream& in, scheme::Mode& t);
+
+std::ostream& operator<<(std::ostream& os, scheme::Mode const& t);
+}

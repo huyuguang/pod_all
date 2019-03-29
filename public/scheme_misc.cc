@@ -8,29 +8,6 @@
 #include "public.h"
 
 namespace scheme {
-std::istream& operator>>(std::istream& in, Mode& t) {
-  std::string token;
-  in >> token;
-  if (token == "plain") {
-    t = Mode::kPlain;
-  } else if (token == "table") {
-    t = Mode::kTable;
-  } else {
-    in.setstate(std::ios_base::failbit);
-  }
-  return in;
-}
-
-std::ostream& operator<<(std::ostream& os, Mode const& t) {
-  if (t == Mode::kPlain) {
-    os << "plain";
-  } else if (t == Mode::kTable) {
-    os << "table";
-  } else {
-    os.setstate(std::ios_base::failbit);
-  }
-  return os;
-}
 
 bool GetBulletinMode(std::string const& file, Mode& mode) {
   try {
@@ -279,3 +256,29 @@ void H2(mpz_class const& seed, uint64_t count, std::vector<Fr>& v) {
 }
 
 }  // namespace scheme
+
+namespace std {
+std::istream& operator>>(std::istream& in, scheme::Mode& t) {
+  std::string token;
+  in >> token;
+  if (token == "plain") {
+    t = scheme::Mode::kPlain;
+  } else if (token == "table") {
+    t = scheme::Mode::kTable;
+  } else {
+    in.setstate(std::ios_base::failbit);
+  }
+  return in;
+}
+
+std::ostream& operator<<(std::ostream& os, scheme::Mode const& t) {
+  if (t == scheme::Mode::kPlain) {
+    os << "plain";
+  } else if (t == scheme::Mode::kTable) {
+    os << "table";
+  } else {
+    os.setstate(std::ios_base::failbit);
+  }
+  return os;
+}
+}  // namespace std

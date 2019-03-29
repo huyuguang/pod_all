@@ -24,6 +24,30 @@ bool Test(std::string const& output_file, APtr a, BPtr b, Range const& demand,
   Client client(b, kDummyClientId, kDummySessionId, demand, phantom);
   if (evil) session.TestSetEvil();
 
+  NegoBRequest b_nego_request;
+  client.GetNegoReqeust(b_nego_request);
+  NegoBResponse b_nego_response;
+  if (!session.OnNegoRequest(b_nego_request, b_nego_response)) {
+    assert(false);
+    return false;
+  }
+  if (!client.OnNegoResponse(b_nego_response)) {
+    assert(false);
+    return false;
+  }
+
+  NegoARequest a_nego_request;
+  session.GetNegoReqeust(a_nego_request);
+  NegoAResponse a_nego_response;
+  if (!client.OnNegoRequest(a_nego_request, a_nego_response)) {
+    assert(false);
+    return false;
+  }
+  if (!session.OnNegoResponse(a_nego_response)) {
+    assert(false);
+    return false;
+  }
+
   Request request;
   client.GetRequest(request);
 

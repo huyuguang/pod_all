@@ -92,7 +92,9 @@ bool Client::OnReply(Reply reply, Receipt& receipt) {
 
   encrypted_m_.resize(demand_.count * s_);
   uint64_t phantom_offset = phantom_.start - demand_.start;
-  for (size_t i = 0; i < response_.ot_ui.size(); ++i) {
+
+#pragma omp parallel for
+  for (int64_t i = 0; i < (int64_t)response_.ot_ui.size(); ++i) {
     Fp12 e;
     G1 ui_exp_a = response_.ot_ui[i] * ot_rand_a_;
     mcl::bn256::pairing(e, ui_exp_a, ot_peer_pk_);

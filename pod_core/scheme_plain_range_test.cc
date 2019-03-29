@@ -75,7 +75,7 @@ bool Test(std::string const& output_file, APtr a, BPtr b, Range const& demand,
       return false;
     }
     std::cout << "claim: " << claim.i << "," << claim.j << "\n";
-    if (!VerifyClaim(demand.count, a->bulletin().s, receipt, secret, claim)) {
+    if (!VerifyClaim(a->bulletin().s, receipt, secret, claim)) {
       assert(false);
       return false;
     }

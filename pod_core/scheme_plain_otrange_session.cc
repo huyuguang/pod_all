@@ -53,7 +53,7 @@ bool Session::OnRequest(Request const& request, Response& response) {
   H2(seed0_, request_.count * s_, v_);
 
   if (evil_) {
-    uint64_t evil_i = rand() % n_;
+    uint64_t evil_i = rand() % request_.count;
     uint64_t evil_j = s_ - 1;  // last col
     v_[evil_i * s_ + evil_j] = FrRand();
     std::cout << "evil: " << evil_i << "," << evil_j << "\n";
@@ -115,6 +115,10 @@ bool Session::OnReceipt(Receipt const& receipt, Secret& secret) {
     return false;
   }
   if (receipt.k_mkl_root != k_mkl_root_) {
+    assert(false);
+    return false;
+  }
+  if (receipt.count != request_.count) {
     assert(false);
     return false;
   }

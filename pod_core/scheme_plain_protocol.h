@@ -29,6 +29,7 @@ struct Reply {
 struct Receipt {
   mpz_class seed2;
   h256_t k_mkl_root;
+  uint64_t count;
 };
 
 struct Secret {
@@ -83,6 +84,7 @@ struct Reply {
 struct Receipt {
   mpz_class seed2;
   h256_t k_mkl_root;
+  uint64_t count;
 };
 
 struct Secret {

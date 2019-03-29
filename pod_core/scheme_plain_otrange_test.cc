@@ -99,7 +99,7 @@ bool Test(std::string const& output_file, APtr a, BPtr b, Range const& demand,
       return false;
     }
     std::cout << "claim: " << claim.i << "," << claim.j << "\n";
-    if (!VerifyClaim(demand.count, a->bulletin().s, receipt, secret, claim)) {
+    if (!VerifyClaim(a->bulletin().s, receipt, secret, claim)) {
       assert(false);
       return false;
     }
@@ -116,7 +116,7 @@ bool Test(std::string const& publish_path, std::string const& output_path,
     std::string bulletin_file = publish_path + "/bulletin";
     std::string public_path = publish_path + "/public";
     auto b = std::make_shared<B>(bulletin_file, public_path);
-    return Test(output_path, a, b, demand, phantom, false);
+    return Test(output_path, a, b, demand, phantom, true);
   } catch (std::exception& e) {
     std::cerr << __FUNCTION__ << "\t" << e.what() << "\n";
     return false;

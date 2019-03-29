@@ -3,10 +3,10 @@
 #include "mkl_tree.h"
 
 namespace scheme::plain::range {
-bool VerifyClaim(uint64_t count, uint64_t s, Receipt const& receipt,
-                 Secret const& secret, Claim const& claim) {
+bool VerifyClaim(uint64_t s, Receipt const& receipt, Secret const& secret,
+                 Claim const& claim) {
   h256_t k_bin = G1ToBin(claim.kij);
-  if (!mkl::VerifyPath(claim.i * s + claim.j, k_bin, count * s,
+  if (!mkl::VerifyPath(claim.i * s + claim.j, k_bin, receipt.count * s,
                        receipt.k_mkl_root, claim.mkl_path)) {
     assert(false);
     return false;
@@ -26,10 +26,10 @@ bool VerifyClaim(uint64_t count, uint64_t s, Receipt const& receipt,
 }  // namespace scheme::plain::range
 
 namespace scheme::plain::otrange {
-bool VerifyClaim(uint64_t count, uint64_t s, Receipt const& receipt,
-                 Secret const& secret, Claim const& claim) {
+bool VerifyClaim(uint64_t s, Receipt const& receipt, Secret const& secret,
+                 Claim const& claim) {
   h256_t k_bin = G1ToBin(claim.kij);
-  if (!mkl::VerifyPath(claim.i * s + claim.j, k_bin, count * s,
+  if (!mkl::VerifyPath(claim.i * s + claim.j, k_bin, receipt.count * s,
                        receipt.k_mkl_root, claim.mkl_path)) {
     assert(false);
     return false;

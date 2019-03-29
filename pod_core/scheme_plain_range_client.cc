@@ -56,6 +56,7 @@ bool Client::OnReply(Reply reply, Receipt& receipt) {
 
   encrypted_m_ = std::move(reply.m);
 
+  receipt.count = demand_.count;
   receipt.k_mkl_root = k_mkl_root_;
   receipt.seed2 = seed2_;
 

@@ -115,6 +115,7 @@ bool Client::OnReply(Reply reply, Receipt& receipt) {
     return false;
   }
 
+  receipt.count = phantom_.count;
   receipt.k_mkl_root = k_mkl_root_;
   receipt.seed2 = seed2_;
 

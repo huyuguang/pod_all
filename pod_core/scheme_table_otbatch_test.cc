@@ -9,7 +9,7 @@
 
 namespace {
 // The session id must be hash(addr_A), and the client id must be hash(addr_B).
-// Here just just two dummy values for test.
+// Here just use two dummy values for test.
 const h256_t kDummySessionId = h256_t{1};
 const h256_t kDummyClientId = h256_t{2};
 }  // namespace
@@ -53,7 +53,7 @@ bool Test(std::string const& output_file, APtr a, BPtr b,
   client.GetRequest(request);
 
   Response response;
-  if (!session.OnRequest(request, response)) {
+  if (!session.OnRequest(std::move(request), response)) {
     assert(false);
     return false;
   }

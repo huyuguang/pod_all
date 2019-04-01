@@ -22,8 +22,7 @@ Client::Client(BPtr b, h256_t const& self_id, h256_t const& peer_id,
 }
 
 void Client::GetRequest(Request& request) {
-  request.start = demand_.start;
-  request.count = demand_.count;
+  request.demand = demand_;
 }
 
 bool Client::OnResponse(Response response, Challenge& challenge) {
@@ -34,9 +33,9 @@ bool Client::OnResponse(Response response, Challenge& challenge) {
     return false;
   }
 
-  response_ = std::move(response);
+  k_ = std::move(response.k);
   challenge.seed2 = seed2_;
-  k_mkl_root_ = CalcRootOfK(response_.k);
+  k_mkl_root_ = CalcRootOfK(k_);
   return true;
 }
 
@@ -50,12 +49,12 @@ bool Client::OnReply(Reply reply, Receipt& receipt) {
 
   H2(seed2_, demand_.count, w_);
 
-  if (!CheckEncryptedM(reply.m)) {
+  encrypted_m_ = std::move(reply.m);
+
+  if (!CheckEncryptedM()) {
     assert(false);
     return false;
   }
-
-  encrypted_m_ = std::move(reply.m);
 
   receipt.count = demand_.count;
   receipt.k_mkl_root = k_mkl_root_;
@@ -64,7 +63,7 @@ bool Client::OnReply(Reply reply, Receipt& receipt) {
   return true;
 }
 
-bool Client::CheckEncryptedM(std::vector<Fr> const& encrypted_m) {
+bool Client::CheckEncryptedM() {
   Tick _tick_(__FUNCTION__);
 
   auto const& ecc_pub = GetEccPub();
@@ -78,11 +77,11 @@ bool Client::CheckEncryptedM(std::vector<Fr> const& encrypted_m) {
     G1 left = sigma * w_[i];
     auto is = i * s_;
     for (uint64_t j = 0; j < s_; ++j) {
-      left += response_.k[is + j];
+      left += k_[is + j];
     }
     G1 right = G1Zero();
     for (uint64_t j = 0; j < s_; ++j) {
-      Fr const& m = encrypted_m[is + j];
+      Fr const& m = encrypted_m_[is + j];
       right += ecc_pub.PowerU1(j, m);
     }
     if (left != right) {
@@ -131,7 +130,7 @@ bool Client::CheckKDirect(std::vector<Fr> const& v, Claim& claim) {
   for (uint64_t i = 0; i < demand_.count; ++i) {
     for (uint64_t j = 0; j < s_; ++j) {
       auto offset = i * s_ + j;
-      if (k[offset] == response_.k[offset]) continue;
+      if (k[offset] == k_[offset]) continue;
       BuildClaim(i, j, claim);
       return false;
     }
@@ -149,7 +148,7 @@ bool Client::CheckKMultiExp(std::vector<Fr> const& v, Claim& claim) {
     std::vector<G1 const*> k(demand_.count);
     for (uint64_t i = 0; i < demand_.count; ++i) {
       sigma_vij += v[i * s_ + j] * w_[i];
-      k[i] = &response_.k[i * s_ + j];
+      k[i] = &k_[i * s_ + j];
     }
 
     G1 check_sigma_kij = ecc_pub.PowerU1(j, sigma_vij);
@@ -166,7 +165,7 @@ bool Client::CheckKMultiExp(std::vector<Fr> const& v, Claim& claim) {
   std::vector<Fr const*> v_col(demand_.count);
   for (uint64_t i = 0; i < demand_.count; ++i) {
     auto offset = i * s_ + mismatch_j;
-    k_col[i] = &response_.k[offset];
+    k_col[i] = &k_[offset];
     v_col[i] = &v[offset];
   }
 
@@ -186,11 +185,11 @@ void Client::BuildClaim(uint64_t i, uint64_t j, Claim& claim) {
   claim.i = i;
   claim.j = j;
   auto ij = i * s_ + j;
-  claim.kij = response_.k[ij];
+  claim.kij = k_[ij];
   auto root = mkl::CalcPath(
       [this](uint64_t i) -> h256_t {
-        assert(i < response_.k.size());
-        return G1ToBin(response_.k[i]);
+        assert(i < k_.size());
+        return G1ToBin(k_[i]);
       },
       demand_.count* s_, ij, &claim.mkl_path);
   if (root != k_mkl_root_) {
@@ -236,19 +235,13 @@ uint64_t Client::FindMismatchI(uint64_t mismatch_j,
 void Client::DecryptM(std::vector<Fr> const& v) {
   Tick _tick_(__FUNCTION__);
 
-  std::vector<Fr> inv_w(demand_.count);
-
 #pragma omp parallel for
   for (int64_t i = 0; i < (int64_t)demand_.count; ++i) {
-    inv_w[i] = FrInv(w_[i]);
-  }
-
-#pragma omp parallel for
-  for (int64_t i = 0; i < (int64_t)demand_.count; ++i) {
+    Fr inv_w = FrInv(w_[i]);
     auto is = i * s_;
     for (uint64_t j = 0; j < s_; ++j) {
       auto ij = is + j;
-      encrypted_m_[ij] = (encrypted_m_[ij] - v[ij]) * inv_w[i];
+      encrypted_m_[ij] = (encrypted_m_[ij] - v[ij]) * inv_w;
     }
   }
 
@@ -258,7 +251,7 @@ void Client::DecryptM(std::vector<Fr> const& v) {
 bool Client::SaveDecrypted(std::string const& file) {
   Tick _tick_(__FUNCTION__);
 
-  return MToFile(file, b_->bulletin().size, s_, demand_.start, demand_.count,
-                 decrypted_m_);
+  return DecryptedMToFile(file, b_->bulletin().size, s_, demand_.start,
+                          demand_.count, decrypted_m_);
 }
 }  // namespace scheme::plain::range

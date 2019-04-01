@@ -7,18 +7,13 @@
 #include "scheme_table_b.h"
 #include "scheme_table_protocol.h"
 
-namespace scheme::table::otbatch {
+namespace scheme::table::batch {
 
 class Client {
  public:
   // The self_id and peer_id are useless now, just for later convenience.
   Client(BPtr b, h256_t const& self_id, h256_t const& peer_id,
-         std::vector<Range> demands, std::vector<Range> phantoms);
-
- public:
-  void GetNegoReqeust(NegoBRequest& request);
-  bool OnNegoRequest(NegoARequest const& request, NegoAResponse& response);
-  bool OnNegoResponse(NegoBResponse const& response);
+         std::vector<Range> demands);
 
  public:
   void GetRequest(Request& request);
@@ -46,17 +41,13 @@ class Client {
   uint64_t const n_;
   uint64_t const s_;
   std::vector<Range> const demands_;
-  std::vector<Range> const phantoms_;
   uint64_t demands_count_ = 0;
-  uint64_t phantoms_count_ = 0;
 
  private:
-  std::vector<G1> k_;      // sizeof() = L
-  std::vector<G1> ot_ui_;  // sizeof() = K
+  std::vector<G1> k_;
 
  private:
   struct Mapping {
-    uint64_t phantom_offset;
     uint64_t index_of_m;
   };
   std::vector<Mapping> mappings_;
@@ -67,13 +58,5 @@ class Client {
   h256_t k_mkl_root_;
   std::vector<Fr> decrypted_m_;
   std::vector<Fr> encrypted_m_;
-
- private:
-  G1 ot_self_pk_;
-  G2 ot_peer_pk_;
-  G1 ot_sk_;
-  Fr ot_beta_;
-  Fr ot_rand_a_;
-  Fr ot_rand_b_;
 };
-}  // namespace scheme::table::otbatch
+}  // namespace scheme::table::batch

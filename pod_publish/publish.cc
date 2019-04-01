@@ -341,7 +341,8 @@ bool PublishPlain(std::string publish_file, std::string output_path,
 
 #ifdef _DEBUG
   std::string debug_data_file = original_file + ".debug";
-  if (!MToFile(debug_data_file, bulletin.size, bulletin.s, 0, bulletin.n, m)) {
+  if (!DecryptedMToFile(debug_data_file, bulletin.size, bulletin.s, 0,
+                        bulletin.n, m)) {
     assert(false);
     return false;
   }

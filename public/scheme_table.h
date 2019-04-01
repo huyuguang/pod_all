@@ -35,4 +35,9 @@ void DataToM(Table const& table, std::vector<uint64_t> columens_index,
 
 VrfKeyMeta const* GetKeyMetaByName(VrfMeta const& vrf_meta,
                                    std::string const& name);
+
+bool DecryptedMToFile(std::string const& file, uint64_t s,
+                      VrfMeta const& vrf_meta,
+                      std::vector<Range> const& demands,
+                      std::vector<Fr> const& part_m);
 }  // namespace scheme::table

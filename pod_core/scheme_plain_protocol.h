@@ -10,8 +10,7 @@
 namespace scheme::plain {
 namespace range {
 struct Request {
-  uint64_t start;
-  uint64_t count;
+  Range demand;
 };
 
 struct Response {
@@ -62,15 +61,14 @@ struct NegoBResponse {
 };
 
 struct Request {
-  uint64_t start;
-  uint64_t count; // = L
-  std::vector<G1> ot_vi; // sizeof() = K
+  Range phantom;  // = L
+  std::vector<G1> ot_vi;  // sizeof() = K
   G1 ot_v;
 };
 
 struct Response {
-  std::vector<G1> k; // sizeof() = L
-  std::vector<G1> ot_ui; // sizeof() = K
+  std::vector<G1> k;      // sizeof() = L
+  std::vector<G1> ot_ui;  // sizeof() = K
 };
 
 struct Challenge {
@@ -78,7 +76,7 @@ struct Challenge {
 };
 
 struct Reply {
-  std::vector<Fr> m; // sizeof() = L  
+  std::vector<Fr> m;  // sizeof() = L
 };
 
 struct Receipt {
@@ -98,4 +96,93 @@ struct Claim {
   std::vector<h256_t> mkl_path;
 };
 }  // namespace otrange
+
+namespace batch {
+struct Request {
+  std::vector<Range> demands;
+};
+
+struct Response {
+  std::vector<G1> k;
+};
+
+struct Challenge {
+  mpz_class seed2;
+};
+
+struct Reply {
+  std::vector<Fr> m;  // sizeof() = L
+};
+
+struct Receipt {
+  mpz_class seed2;
+  h256_t k_mkl_root;
+  uint64_t count;
+};
+
+struct Secret {
+  mpz_class seed0;
+};
+
+struct Claim {
+  uint64_t i;
+  uint64_t j;
+  G1 kij;
+  std::vector<h256_t> mkl_path;
+};
+}  // namespace batch
+
+namespace otbatch {
+struct NegoARequest {
+  G2 s;
+};
+
+struct NegoAResponse {
+  G2 s_exp_beta;
+};
+
+struct NegoBRequest {
+  G1 t;
+};
+
+struct NegoBResponse {
+  G1 t_exp_alpha;
+};
+
+struct Request {
+  std::vector<Range> phantoms;  // sizeof() = L
+  std::vector<G1> ot_vi;        // sizeof() = K
+  G1 ot_v;
+};
+
+struct Response {
+  std::vector<G1> k;      // sizeof() = L
+  std::vector<G1> ot_ui;  // sizeof() = K
+};
+
+struct Challenge {
+  mpz_class seed2;
+};
+
+struct Reply {
+  std::vector<Fr> m;  // sizeof() = L
+};
+
+struct Receipt {
+  mpz_class seed2;
+  h256_t k_mkl_root;
+  uint64_t count;
+};
+
+struct Secret {
+  mpz_class seed0;
+};
+
+struct Claim {
+  uint64_t i;
+  uint64_t j;
+  G1 kij;
+  std::vector<h256_t> mkl_path;
+};
+}  // namespace otbatch
 }  // namespace scheme::plain

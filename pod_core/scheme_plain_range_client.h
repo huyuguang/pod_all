@@ -24,7 +24,7 @@ class Client {
   bool SaveDecrypted(std::string const& file);
 
  private:
-  bool CheckEncryptedM(std::vector<Fr> const& m);
+  bool CheckEncryptedM();
   bool CheckK(std::vector<Fr> const& v, Claim& claim);
   bool CheckKDirect(std::vector<Fr> const& v, Claim& claim);
   bool CheckKMultiExp(std::vector<Fr> const& v, Claim& claim);
@@ -43,7 +43,7 @@ class Client {
   Range const demand_;
 
  private:
-  Response response_;
+  std::vector<G1> k_;
 
  private:
   mpz_class seed2_;

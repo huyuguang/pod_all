@@ -1,58 +1,35 @@
-#include "scheme_plain_otrange_test.h"
-#include "scheme_plain.h"
-#include "scheme_plain_a.h"
-#include "scheme_plain_b.h"
-#include "scheme_plain_notary.h"
-#include "scheme_plain_protocol.h"
-#include "scheme_plain_otrange_client.h"
-#include "scheme_plain_otrange_session.h"
+#include "scheme_table_batch_test.h"
+#include "scheme_table.h"
+#include "scheme_table_a.h"
+#include "scheme_table_b.h"
+#include "scheme_table_batch_client.h"
+#include "scheme_table_batch_session.h"
+#include "scheme_table_notary.h"
+#include "scheme_table_protocol.h"
 
 namespace {
 // The session id must be hash(addr_A), and the client id must be hash(addr_B).
-// Here just just two dummy values for test.
+// Here just use two dummy values for test.
 const h256_t kDummySessionId = h256_t{1};
 const h256_t kDummyClientId = h256_t{2};
 }  // namespace
 
-namespace scheme::plain::otrange {
+namespace scheme::table::batch {
 
-bool Test(std::string const& output_file, APtr a, BPtr b, Range const& demand,
-          Range const& phantom, bool evil) {
+bool Test(std::string const& output_file, APtr a, BPtr b,
+          std::vector<Range> const& demands,
+          bool evil) {
   Tick _tick_(__FUNCTION__);
 
   Session session(a, kDummySessionId, kDummyClientId);
-  Client client(b, kDummyClientId, kDummySessionId, demand, phantom);
+  Client client(b, kDummyClientId, kDummySessionId, demands);
   if (evil) session.TestSetEvil();
-
-  NegoBRequest b_nego_request;
-  client.GetNegoReqeust(b_nego_request);
-  NegoBResponse b_nego_response;
-  if (!session.OnNegoRequest(b_nego_request, b_nego_response)) {
-    assert(false);
-    return false;
-  }
-  if (!client.OnNegoResponse(b_nego_response)) {
-    assert(false);
-    return false;
-  }
-
-  NegoARequest a_nego_request;
-  session.GetNegoReqeust(a_nego_request);
-  NegoAResponse a_nego_response;
-  if (!client.OnNegoRequest(a_nego_request, a_nego_response)) {
-    assert(false);
-    return false;
-  }
-  if (!session.OnNegoResponse(a_nego_response)) {
-    assert(false);
-    return false;
-  }
 
   Request request;
   client.GetRequest(request);
 
   Response response;
-  if (!session.OnRequest(std::move(request), response)) {
+  if (!session.OnRequest(request, response)) {
     assert(false);
     return false;
   }
@@ -108,19 +85,19 @@ bool Test(std::string const& output_file, APtr a, BPtr b, Range const& demand,
   return true;
 }
 
-bool Test(std::string const& publish_path, std::string const& output_path,
-          Range const& demand, Range const& phantom) {
+bool Test(std::string const& publish_path, std::string const& output_file,
+          std::vector<Range> const& demands) {
   try {
     auto a = std::make_shared<A>(publish_path);
 
     std::string bulletin_file = publish_path + "/bulletin";
     std::string public_path = publish_path + "/public";
     auto b = std::make_shared<B>(bulletin_file, public_path);
-    return Test(output_path, a, b, demand, phantom, true);
+    return Test(output_file, a, b, demands, false);
   } catch (std::exception& e) {
     std::cerr << __FUNCTION__ << "\t" << e.what() << "\n";
     return false;
   }
 }
 
-}  // namespace scheme::plain::otrange
+}  // namespace scheme::table::batch

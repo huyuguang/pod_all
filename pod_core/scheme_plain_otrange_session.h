@@ -21,7 +21,7 @@ class Session {
   bool OnNegoResponse(NegoAResponse const& response);
 
  public:
-  bool OnRequest(Request const& request, Response& response);
+  bool OnRequest(Request request, Response& response);
   bool OnChallenge(Challenge const& challenge, Reply& reply);
   bool OnReceipt(Receipt const& receipt, Secret& secret);
 
@@ -37,8 +37,10 @@ class Session {
   uint64_t const s_;
 
  private:
-  Request request_;
-  Challenge challenge_;
+  Range phantom_;  // = L
+  std::vector<G1> ot_vi_;  // sizeof() = K
+  G1 ot_v_;
+  mpz_class seed2_;
 
  private:
   mpz_class seed0_;

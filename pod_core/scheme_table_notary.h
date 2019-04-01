@@ -9,3 +9,8 @@ namespace scheme::table::otbatch {
 bool VerifyClaim(uint64_t s, Receipt const& receipt, Secret const& secret,
                  Claim const& claim);
 }
+
+namespace scheme::table::batch {
+bool VerifyClaim(uint64_t s, Receipt const& receipt, Secret const& secret,
+                 Claim const& claim);
+}

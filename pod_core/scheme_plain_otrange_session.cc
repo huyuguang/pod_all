@@ -34,26 +34,28 @@ bool Session::OnNegoResponse(NegoAResponse const& response) {
   return true;
 }
 
-bool Session::OnRequest(Request const& request, Response& response) {
+bool Session::OnRequest(Request request, Response& response) {
   Tick _tick_(__FUNCTION__);
 
-  if (!request.count || request.start >= n_ || request.count > n_ ||
-      (request.start + request.count) > n_) {
+  phantom_ = request.phantom;
+  ot_vi_ = std::move(request.ot_vi);
+  ot_v_ = std::move(request.ot_v);
+
+  if (!phantom_.count || phantom_.start >= n_ || phantom_.count > n_ ||
+      (phantom_.start + phantom_.count) > n_) {
     assert(false);
     return false;
   }
     
-  if (request.ot_vi.size() >= request.count) {
+  if (ot_vi_.size() >= phantom_.count) {
     assert(false);
     return false;
   }
 
-  request_ = request;
-
-  H2(seed0_, request_.count * s_, v_);
+  H2(seed0_, phantom_.count * s_, v_);
 
   if (evil_) {
-    uint64_t evil_i = rand() % request_.count;
+    uint64_t evil_i = rand() % phantom_.count;
     uint64_t evil_j = s_ - 1;  // last col
     v_[evil_i * s_ + evil_j] = FrRand();
     std::cout << "evil: " << evil_i << "," << evil_j << "\n";
@@ -64,11 +66,11 @@ bool Session::OnRequest(Request const& request, Response& response) {
   k_mkl_root_ = CalcRootOfK(response.k);
 
   ot_rand_c_ = FrRand();
-  response.ot_ui.resize(request_.ot_vi.size());
+  response.ot_ui.resize(ot_vi_.size());
 
 #pragma omp parallel for
   for (int64_t j = 0; j < (int64_t)response.ot_ui.size(); ++j) {
-    response.ot_ui[j] = request_.ot_vi[j] * ot_rand_c_;
+    response.ot_ui[j] = ot_vi_[j] * ot_rand_c_;
   }
   return true;
 }
@@ -76,19 +78,20 @@ bool Session::OnRequest(Request const& request, Response& response) {
 bool Session::OnChallenge(Challenge const& challenge, Reply& reply) {
   Tick _tick_(__FUNCTION__);
 
-  challenge_ = challenge;
-  H2(challenge_.seed2, request_.count, w_);
+  seed2_ = challenge.seed2;
+
+  H2(seed2_, phantom_.count, w_);
 
   // compute mij' = vij + wi * mij
   auto const& m = a_->m();
-  reply.m.resize(request_.count * s_);
-  auto offset = request_.start * s_;
+  reply.m.resize(phantom_.count * s_);
+  auto offset = phantom_.start * s_;
 
 #pragma omp parallel for
-  for (int64_t i = 0; i < (int64_t)request_.count; ++i) {
-    auto fr_i = MapToFr(i + request_.start);
+  for (int64_t i = 0; i < (int64_t)phantom_.count; ++i) {
+    auto fr_i = MapToFr(i + phantom_.start);
     Fp12 e;    
-    G1 v_exp_fr_c = request_.ot_v * (fr_i * ot_rand_c_);
+    G1 v_exp_fr_c = ot_v_ * (fr_i * ot_rand_c_);
     mcl::bn256::pairing(e, v_exp_fr_c, ot_sk_);
     uint8_t buf[32 * 12];
     auto ret_len = e.serialize(buf, sizeof(buf));
@@ -110,7 +113,7 @@ bool Session::OnChallenge(Challenge const& challenge, Reply& reply) {
 }
 
 bool Session::OnReceipt(Receipt const& receipt, Secret& secret) {
-  if (receipt.seed2 != challenge_.seed2) {
+  if (receipt.seed2 != seed2_) {
     assert(false);
     return false;
   }
@@ -118,7 +121,7 @@ bool Session::OnReceipt(Receipt const& receipt, Secret& secret) {
     assert(false);
     return false;
   }
-  if (receipt.count != request_.count) {
+  if (receipt.count != phantom_.count) {
     assert(false);
     return false;
   }

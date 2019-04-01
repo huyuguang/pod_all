@@ -40,7 +40,7 @@ void Session::BuildMapping() {
   Tick _tick_(__FUNCTION__);
   mappings_.resize(phantoms_count_);
   size_t index = 0;
-  for (auto const& p : request_.phantoms) {
+  for (auto const& p : phantoms_) {
     for (size_t i = p.start; i < (p.start + p.count); ++i) {
       mappings_[index++].index_of_m = i;
     }
@@ -61,22 +61,24 @@ bool Session::OnNegoResponse(NegoAResponse const& response) {
   return true;
 }
 
-bool Session::OnRequest(Request const& request, Response& response) {
+bool Session::OnRequest(Request request, Response& response) {
   Tick _tick_(__FUNCTION__);
   
-  if (!CheckPhantoms(n_, request.phantoms)) {
+  phantoms_ = request.phantoms;             // sizeof() = L
+  ot_vi_ = std::move(request.ot_vi);        // sizeof() = K
+  ot_v_ = std::move(request.ot_v);
+
+  if (!CheckPhantoms(n_, phantoms_)) {
     assert(false);
     return false;
   }
 
-  for (auto const& i : request.phantoms) phantoms_count_ += i.count;
+  for (auto const& i : phantoms_) phantoms_count_ += i.count;
 
-  if (request.ot_vi.size() >= phantoms_count_) {
+  if (ot_vi_.size() >= phantoms_count_) {
     assert(false);
     return false;
   }
-
-  request_ = request;
 
   BuildMapping();
 
@@ -94,11 +96,11 @@ bool Session::OnRequest(Request const& request, Response& response) {
   k_mkl_root_ = CalcRootOfK(response.k);
 
   ot_rand_c_ = FrRand();
-  response.ot_ui.resize(request_.ot_vi.size());
+  response.ot_ui.resize(ot_vi_.size());
 
 #pragma omp parallel for
   for (int64_t j = 0; j < (int64_t)response.ot_ui.size(); ++j) {
-    response.ot_ui[j] = request_.ot_vi[j] * ot_rand_c_;
+    response.ot_ui[j] = ot_vi_[j] * ot_rand_c_;
   }
   return true;
 }
@@ -106,8 +108,8 @@ bool Session::OnRequest(Request const& request, Response& response) {
 bool Session::OnChallenge(Challenge const& challenge, Reply& reply) {
   Tick _tick_(__FUNCTION__);
 
-  challenge_ = challenge;
-  H2(challenge_.seed2, phantoms_count_, w_);
+  seed2_ = challenge.seed2;
+  H2(seed2_, phantoms_count_, w_);
 
   // compute mij' = vij + wi * mij
   auto const& m = a_->m();
@@ -118,7 +120,7 @@ bool Session::OnChallenge(Challenge const& challenge, Reply& reply) {
     auto const& map = mappings_[i];
     auto fr_i = MapToFr(map.index_of_m);
     Fp12 e;
-    G1 v_exp_fr_c = request_.ot_v * (fr_i * ot_rand_c_);
+    G1 v_exp_fr_c = ot_v_ * (fr_i * ot_rand_c_);
     mcl::bn256::pairing(e, v_exp_fr_c, ot_sk_);
     uint8_t buf[32 * 12];
     auto ret_len = e.serialize(buf, sizeof(buf));
@@ -142,7 +144,7 @@ bool Session::OnChallenge(Challenge const& challenge, Reply& reply) {
 }
 
 bool Session::OnReceipt(Receipt const& receipt, Secret& secret) {
-  if (receipt.seed2 != challenge_.seed2) {
+  if (receipt.seed2 != seed2_) {
     assert(false);
     return false;
   }

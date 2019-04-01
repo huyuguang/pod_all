@@ -48,7 +48,8 @@ class Client {
   Range const phantom_;
 
  private:
-  Response response_;
+  std::vector<G1> k_;      // sizeof() = L
+  std::vector<G1> ot_ui_;  // sizeof() = K
 
  private:
   mpz_class seed2_;

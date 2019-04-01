@@ -103,12 +103,12 @@ bool BinToRecord(std::vector<uint8_t> const& bin, Record& record) {
   size_t left_len = bin.size();
   for (;;) {
     uint32_t item_len;
-    if (left_len < sizeof(item_len)) return false;    
+    if (left_len < sizeof(item_len)) return false;
     memcpy(&item_len, p, sizeof(item_len));
     item_len = boost::endian::big_to_native(item_len);
     if (item_len > left_len) return false;
     p += sizeof(item_len);
-    left_len -= sizeof(item_len);    
+    left_len -= sizeof(item_len);
     record.resize(record.size() + 1);
     auto& r = record.back();
     r.assign((char*)p, item_len);
@@ -157,6 +157,68 @@ VrfKeyMeta const* GetKeyMetaByName(VrfMeta const& vrf_meta,
     if (vrf_meta.keys[i].column_index == (uint64_t)col_index) return &vrf_key;
   }
   return nullptr;
+}
+
+bool DecryptedMToFile(std::string const& file, uint64_t s,
+                      VrfMeta const& vrf_meta,
+                      std::vector<Range> const& demands,
+                      std::vector<Fr> const& part_m) {
+  boost::system::error_code err;
+  fs::remove(file, err);
+
+  std::ofstream out(file);
+  if (!out) return false;
+
+  std::string str;
+  for (auto const& i : vrf_meta.column_names) {
+    str += i + "\t";
+  }
+  str.pop_back();
+  out << str;
+  out << "\n";
+
+  uint64_t demands_count = 0;
+  for (auto const& i : demands) demands_count += i.count;
+  h256_t pad_fr;
+  uint64_t prefix_count = vrf_meta.keys.size() + 1;
+  std::vector<uint8_t> record_bin((s - prefix_count) * 31 + 1);
+  for (size_t i = 0; i < demands_count; ++i) {
+    // pad fr
+    size_t j = vrf_meta.keys.size();
+    FrToBin(part_m[i * s + j], pad_fr.data());
+    uint32_t real_len;
+    memcpy(&real_len, pad_fr.data(), sizeof(real_len));
+    real_len = boost::endian::big_to_native(real_len);
+    if (real_len >= record_bin.size()) {
+      assert(false);
+      return false;
+    }
+
+    for (j = j + 1; j < s; ++j) {
+      auto row_index = j - prefix_count;
+      auto prow = record_bin.data() + row_index * 31;
+      FrToBin(part_m[i * s + j], prow);
+      assert(prow[31] == 0);
+    }
+
+    record_bin.resize(real_len);
+
+    Record record;
+    record.reserve(vrf_meta.column_names.size());
+    if (!BinToRecord(record_bin, record)) {
+      assert(false);
+      return false;
+    }
+    assert(record.size() <= vrf_meta.column_names.size());
+
+    for (auto const& r : record) {
+      out << r << "\t";
+    }
+
+    out << "\n";
+  }
+
+  return true;
 }
 
 }  // namespace scheme::table

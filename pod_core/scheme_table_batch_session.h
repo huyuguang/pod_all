@@ -5,17 +5,18 @@
 #include <vector>
 
 #include "ecc.h"
-#include "scheme_plain_a.h"
-#include "scheme_plain_protocol.h"
+#include "scheme_table_a.h"
+#include "scheme_table_protocol.h"
 
-namespace scheme::plain {
+namespace scheme::table::batch {
 
-namespace range {
 class Session {
  public:
   // The self_id and peer_id are useless now, just for later convenience.
   Session(APtr a, h256_t const& self_id, h256_t const& peer_id);
-  bool OnRequest(Request const& request, Response& response);
+
+ public:
+  bool OnRequest(Request request, Response& response);
   bool OnChallenge(Challenge const& challenge, Reply& reply);
   bool OnReceipt(Receipt const& receipt, Secret& secret);
 
@@ -23,6 +24,8 @@ class Session {
   void TestSetEvil() { evil_ = true; }
 
  private:
+  void BuildMapping();
+
  private:
   APtr a_;
   h256_t const self_id_;
@@ -31,8 +34,15 @@ class Session {
   uint64_t const s_;
 
  private:
-  Range demand_;
+  std::vector<Range> demands_;
   mpz_class seed2_;
+
+ private:
+  struct Mapping {
+    uint64_t index_of_m;
+  };
+  uint64_t demands_count_ = 0;
+  std::vector<Mapping> mappings_;
 
  private:
   mpz_class seed0_;
@@ -44,6 +54,4 @@ class Session {
   bool evil_ = false;
 };
 
-}  // namespace range
-
-}  // namespace scheme::plain
+}  // namespace scheme::table::batch

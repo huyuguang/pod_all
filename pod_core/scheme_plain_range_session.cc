@@ -21,16 +21,16 @@ Session::Session(APtr a, h256_t const& self_id, h256_t const& peer_id)
 bool Session::OnRequest(Request const& request, Response& response) {
   Tick _tick_(__FUNCTION__);
 
-  if (!request.count || request.start >= n_ || request.count > n_ ||
-      (request.start + request.count) > n_)
-    return false;
+  demand_ = request.demand;
 
-  request_ = request;
+  if (!demand_.count || demand_.start >= n_ || demand_.count > n_ ||
+      (demand_.start + demand_.count) > n_)
+    return false;  
 
-  H2(seed0_, request_.count * s_, v_);
+  H2(seed0_, demand_.count * s_, v_);
 
   if (evil_) {
-    uint64_t evil_i = rand() % request_.count;
+    uint64_t evil_i = rand() % demand_.count;
     uint64_t evil_j = s_ - 1;  // last col
     v_[evil_i * s_ + evil_j] = FrRand();
     std::cout << "evil: " << evil_i << "," << evil_j << "\n";
@@ -46,16 +46,17 @@ bool Session::OnRequest(Request const& request, Response& response) {
 bool Session::OnChallenge(Challenge const& challenge, Reply& reply) {
   Tick _tick_(__FUNCTION__);
 
-  challenge_ = challenge;
-  H2(challenge_.seed2, request_.count, w_);
+  seed2_ = challenge.seed2;
+
+  H2(seed2_, demand_.count, w_);
 
   // compute mij' = vij + wi * mij
   auto const& m = a_->m();
-  reply.m.resize(request_.count * s_);
-  auto offset = request_.start * s_;
+  reply.m.resize(demand_.count * s_);
+  auto offset = demand_.start * s_;
 
 #pragma omp parallel for
-  for (int64_t i = 0; i < (int64_t)request_.count; ++i) {
+  for (int64_t i = 0; i < (int64_t)demand_.count; ++i) {
     auto is = i * s_;
     for (uint64_t j = 0; j < s_; ++j) {
       auto ij = is + j;
@@ -67,7 +68,7 @@ bool Session::OnChallenge(Challenge const& challenge, Reply& reply) {
 }
 
 bool Session::OnReceipt(Receipt const& receipt, Secret& secret) {
-  if (receipt.seed2 != challenge_.seed2) {
+  if (receipt.seed2 != seed2_) {
     assert(false);
     return false;
   }
@@ -75,7 +76,7 @@ bool Session::OnReceipt(Receipt const& receipt, Secret& secret) {
     assert(false);
     return false;
   }
-  if (receipt.count != request_.count) {
+  if (receipt.count != demand_.count) {
     assert(false);
     return false;
   }

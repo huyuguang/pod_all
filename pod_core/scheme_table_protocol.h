@@ -67,6 +67,41 @@ struct Secret {
 };
 }  // namespace otvrfq
 
+namespace batch {
+struct Request {
+  std::vector<Range> demands;
+};
+
+struct Response {
+  std::vector<G1> k;
+};
+
+struct Challenge {
+  mpz_class seed2;
+};
+
+struct Reply {
+  std::vector<Fr> m;  // sizeof() = L
+};
+
+struct Receipt {
+  mpz_class seed2;
+  h256_t k_mkl_root;
+  uint64_t count;
+};
+
+struct Secret {
+  mpz_class seed0;
+};
+
+struct Claim {
+  uint64_t i;
+  uint64_t j;
+  G1 kij;
+  std::vector<h256_t> mkl_path;
+};
+}  // namespace batch
+
 namespace otbatch {
 struct NegoARequest {
   G2 s;

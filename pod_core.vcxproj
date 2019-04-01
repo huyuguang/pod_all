@@ -116,6 +116,9 @@
     <ClCompile Include="pod_core\scheme_plain_range_test.cc" />
     <ClCompile Include="pod_core\scheme_table_a.cc" />
     <ClCompile Include="pod_core\scheme_table_b.cc" />
+    <ClCompile Include="pod_core\scheme_table_batch_client.cc" />
+    <ClCompile Include="pod_core\scheme_table_batch_session.cc" />
+    <ClCompile Include="pod_core\scheme_table_batch_test.cc" />
     <ClCompile Include="pod_core\scheme_table_notary.cc" />
     <ClCompile Include="pod_core\scheme_table_otbatch_client.cc" />
     <ClCompile Include="pod_core\scheme_table_otbatch_session.cc" />
@@ -201,6 +204,9 @@
     <ClInclude Include="pod_core\scheme_plain_range_test.h" />
     <ClInclude Include="pod_core\scheme_table_a.h" />
     <ClInclude Include="pod_core\scheme_table_b.h" />
+    <ClInclude Include="pod_core\scheme_table_batch_client.h" />
+    <ClInclude Include="pod_core\scheme_table_batch_session.h" />
+    <ClInclude Include="pod_core\scheme_table_batch_test.h" />
     <ClInclude Include="pod_core\scheme_table_notary.h" />
     <ClInclude Include="pod_core\scheme_table_otbatch_client.h" />
     <ClInclude Include="pod_core\scheme_table_otbatch_session.h" />

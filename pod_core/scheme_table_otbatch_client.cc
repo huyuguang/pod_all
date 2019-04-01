@@ -51,19 +51,6 @@ void CheckDemandPhantoms(uint64_t n, std::vector<Range> const& demands,
   }
 }
 
-uint64_t GetIndexOfMByRangesOffset(std::vector<Range> const& ranges,
-                                   uint64_t offset) {
-  for (size_t i = 0; i < ranges.size(); ++i) {
-    auto const& range = ranges[i];
-    if (offset < range.count) {
-      return range.start + offset;
-    }
-    offset -= range.count;
-  }
-  assert(false);
-  throw std::runtime_error(__FUNCTION__);
-}
-
 uint64_t GetRangesOffsetByIndexOfM(std::vector<Range> const& ranges,
                                    uint64_t index) {
   uint64_t offset = 0;
@@ -112,7 +99,6 @@ void Client::BuildMapping() {
     for (size_t i = d.start; i < (d.start + d.count); ++i) {
       auto& map = mappings_[index];
       map.index_of_m = i;
-      assert(index == GetRangesOffsetByIndexOfM(demands_, i));
       map.phantom_offset = GetRangesOffsetByIndexOfM(phantoms_, i);
       ++index;
     }
@@ -156,9 +142,11 @@ bool Client::OnResponse(Response response, Challenge& challenge) {
     assert(false);
     return false;
   }
-  response_ = std::move(response);
+  
+  k_ = std::move(response.k);
+  ot_ui_ = std::move(response.ot_ui);
   challenge.seed2 = seed2_;
-  k_mkl_root_ = CalcRootOfK(response_.k);
+  k_mkl_root_ = CalcRootOfK(k_);
 
   return true;
 }
@@ -176,9 +164,9 @@ bool Client::OnReply(Reply reply, Receipt& receipt) {
   encrypted_m_.resize(demands_count_ * s_);
 
 #pragma omp parallel for
-  for (int64_t i = 0; i < (int64_t)response_.ot_ui.size(); ++i) {
+  for (int64_t i = 0; i < (int64_t)ot_ui_.size(); ++i) {
     Fp12 e;
-    G1 ui_exp_a = response_.ot_ui[i] * ot_rand_a_;
+    G1 ui_exp_a = ot_ui_[i] * ot_rand_a_;
     mcl::bn256::pairing(e, ui_exp_a, ot_peer_pk_);
     uint8_t buf[32 * 12];
     auto ret_len = e.serialize(buf, sizeof(buf));
@@ -221,7 +209,7 @@ bool Client::CheckEncryptedM() {
     G1 const& sigma = sigmas[mapping.index_of_m];
     G1 left = sigma * w_[mapping.phantom_offset];
     for (uint64_t j = 0; j < s_; ++j) {
-      left += response_.k[mapping.phantom_offset * s_ + j];
+      left += k_[mapping.phantom_offset * s_ + j];
     }
     G1 right = G1Zero();
     for (uint64_t j = 0; j < s_; ++j) {
@@ -274,7 +262,7 @@ bool Client::CheckKDirect(std::vector<Fr> const& v, Claim& claim) {
   for (uint64_t i = 0; i < phantoms_count_; ++i) {
     for (uint64_t j = 0; j < s_; ++j) {
       auto offset = i * s_ + j;
-      if (k[offset] == response_.k[offset]) continue;
+      if (k[offset] == k_[offset]) continue;
       BuildClaim(i, j, claim);
       return false;
     }
@@ -292,7 +280,7 @@ bool Client::CheckKMultiExp(std::vector<Fr> const& v, Claim& claim) {
     std::vector<G1 const*> k(phantoms_count_);
     for (uint64_t i = 0; i < phantoms_count_; ++i) {
       sigma_vij += v[i * s_ + j] * w_[i];
-      k[i] = &response_.k[i * s_ + j];
+      k[i] = &k_[i * s_ + j];
     }
 
     G1 check_sigma_kij = ecc_pub.PowerU1(j, sigma_vij);
@@ -309,7 +297,7 @@ bool Client::CheckKMultiExp(std::vector<Fr> const& v, Claim& claim) {
   std::vector<Fr const*> v_col(phantoms_count_);
   for (uint64_t i = 0; i < phantoms_count_; ++i) {
     auto offset = i * s_ + mismatch_j;
-    k_col[i] = &response_.k[offset];
+    k_col[i] = &k_[offset];
     v_col[i] = &v[offset];
   }
 
@@ -329,12 +317,12 @@ void Client::BuildClaim(uint64_t i, uint64_t j, Claim& claim) {
   claim.i = i;
   claim.j = j;
   auto ij = i * s_ + j;
-  claim.kij = response_.k[ij];
+  claim.kij = k_[ij];
 
   auto root = mkl::CalcPath(
       [this](uint64_t i) -> h256_t {
-        assert(i < response_.k.size());
-        return G1ToBin(response_.k[i]);
+        assert(i < k_.size());
+        return G1ToBin(k_[i]);
       },
       phantoms_count_* s_, ij, &claim.mkl_path);
 
@@ -397,61 +385,7 @@ void Client::DecryptM(std::vector<Fr> const& v) {
 
 bool Client::SaveDecrypted(std::string const& file) {
   Tick _tick_(__FUNCTION__);
-  
-  boost::system::error_code err;
-  fs::remove(file, err);
 
-  std::ofstream out(file);
-  if (!out) return false;
-
-  std::string str;
-  auto const& vrf_meta = b_->vrf_meta();  
-  for (auto const& i : vrf_meta.column_names) {
-    str += i + "\t";
-  }
-  str.pop_back();
-  out << str;
-  out << "\n";
-
-  h256_t pad_fr;
-  uint64_t prefix_count = vrf_meta.keys.size() + 1;
-  std::vector<uint8_t> record_bin((s_ - prefix_count) * 31 + 1);
-  for (size_t i = 0; i < demands_count_; ++i) {
-    // pad fr
-    size_t j = vrf_meta.keys.size();
-    FrToBin(decrypted_m_[i*s_ + j], pad_fr.data());
-    uint32_t real_len;
-    memcpy(&real_len, pad_fr.data(), sizeof(real_len));
-    real_len = boost::endian::big_to_native(real_len);
-    if (real_len >= record_bin.size()) {
-      assert(false);
-      return false;
-    }    
-
-    for (j = j + 1; j < s_; ++j) {
-      auto row_index = j - prefix_count;
-      auto prow = record_bin.data() + row_index * 31;
-      FrToBin(decrypted_m_[i * s_ + j], prow);
-      assert(prow[31] == 0);
-    }
-
-    record_bin.resize(real_len);
-
-    Record record;
-    record.reserve(vrf_meta.column_names.size());
-    if (!BinToRecord(record_bin, record)) {
-      assert(false);
-      return false;
-    }
-    assert(record.size() <= vrf_meta.column_names.size());
-
-    for (auto const& r : record) {
-      out << r << "\t";
-    }
-
-    out << "\n";
-  }
-
-  return true;
+  return DecryptedMToFile(file, s_, b_->vrf_meta(), demands_, decrypted_m_);
 }
 }  // namespace scheme::table::otbatch

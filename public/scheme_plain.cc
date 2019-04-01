@@ -38,8 +38,9 @@ bool DataToM(std::string const& pathname, uint64_t size, uint64_t n,
   }
 }
 
-bool MToFile(std::string const& file, uint64_t size, uint64_t s, uint64_t start,
-             uint64_t count, std::vector<Fr> const& part_m) {
+bool DecryptedMToFile(std::string const& file, uint64_t size, uint64_t s,
+                      uint64_t start, uint64_t count,
+                      std::vector<Fr> const& part_m) {
   if (s < 1 || !count || !size) return false;
   uint64_t column_num = s - 1;
   uint64_t n = GetDataBlockCount(size, column_num);

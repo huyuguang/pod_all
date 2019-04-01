@@ -118,7 +118,7 @@ bool Test(std::string const& publish_path, std::string const& output_file,
     std::string bulletin_file = publish_path + "/bulletin";
     std::string public_path = publish_path + "/public";
     auto b = std::make_shared<B>(bulletin_file, public_path);
-    return Test(output_file, a, b, demands, phantoms, true);
+    return Test(output_file, a, b, demands, phantoms, false);
   } catch (std::exception& e) {
     std::cerr << __FUNCTION__ << "\t" << e.what() << "\n";
     return false;

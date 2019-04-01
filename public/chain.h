@@ -21,43 +21,27 @@ inline G1 HashNameI(h256_t const& name, uint64_t i) {
 }
 
 inline Fr Chain(uint8_t const* seed_buf, uint64_t seed_len, uint64_t index) {
-  auto index_big = boost::endian::native_to_big(index);
-  uint8_t digest[32];
+  uint64_t index_be = boost::endian::native_to_big(index);
+
+  h256_t digest_be;
   CryptoPP::Keccak_256 hash;
   hash.Update(seed_buf, seed_len);
-  hash.Update((uint8_t const*)&index_big, sizeof(index_big));
-  hash.Final(digest);
-
-  mpz_class z = MpzFromBE(digest, sizeof(digest));
-
+  hash.Update((uint8_t const*)&index_be, sizeof(index_be));
+  hash.Final(digest_be.data());
+  
   // setArrayMaskMod want little endian
-  uint8_t digest2[32];
-  MpzToLE(z, digest2, sizeof(digest2));
+  h256_t digest_le;
+  for (size_t i = 0; i < digest_be.size(); ++i) {
+    digest_le.data()[i] = digest_be.data()[digest_be.size() - i - 1];
+  }
 
   Fr r;
-  r.setArrayMaskMod(digest2, sizeof(digest2));
+  r.setArrayMaskMod(digest_le.data(), digest_le.size());
   return r;
 }
 
 inline Fr Chain(h256_t const& seed, uint64_t index) {
-  h256_t index_bin;
-  index = boost::endian::native_to_big(index);
-  memcpy(index_bin.data(), &index, sizeof(index));
-
-  uint8_t digest[32];
-  CryptoPP::Keccak_256 hash;
-  hash.Update(seed.data(), seed.size());
-  hash.Update(index_bin.data(), index_bin.size());
-  hash.Final(digest);
-
-  // setArrayMaskMod want little endian
-  mpz_class z = MpzFromBE(digest, sizeof(digest));  
-  uint8_t digest2[32];
-  MpzToLE(z, digest2, sizeof(digest2));
-
-  Fr r;
-  r.setArrayMaskMod(digest2, sizeof(digest2));
-  return r;
+  return Chain(seed.data(), seed.size(), index);
 }
 
 inline uint32_t ChainUint32(h256_t const& seed, uint64_t index) {

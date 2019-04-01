@@ -33,16 +33,16 @@ class Session {
   h256_t const peer_id_;
   uint64_t const n_;
   uint64_t const s_;
-  Fr seed2_seed_;
+  h256_t seed2_seed_;
 
  private:
   Range phantom_;  // = L
   std::vector<G1> ot_vi_;  // sizeof() = K
   G1 ot_v_;
-  mpz_class seed2_;
+  h256_t seed2_;
 
  private:
-  mpz_class seed0_;
+  h256_t seed0_;
   std::vector<Fr> v_;  // size() is count * s_
   std::vector<Fr> w_;  // size() is count
   h256_t k_mkl_root_;

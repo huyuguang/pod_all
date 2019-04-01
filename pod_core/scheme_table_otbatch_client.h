@@ -52,7 +52,7 @@ class Client {
  private:
   std::vector<G1> k_;      // sizeof() = L
   std::vector<G1> ot_ui_;  // sizeof() = K
-  Fr seed2_seed_;
+  h256_t seed2_seed_;
 
  private:
   struct Mapping {
@@ -62,7 +62,7 @@ class Client {
   std::vector<Mapping> mappings_;
 
  private:
-  mpz_class seed2_;
+  h256_t seed2_;
   std::vector<Fr> w_;  // size() is L
   h256_t k_mkl_root_;
   std::vector<Fr> decrypted_m_;

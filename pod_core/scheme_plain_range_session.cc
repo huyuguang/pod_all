@@ -15,13 +15,13 @@ Session::Session(APtr a, h256_t const& self_id, h256_t const& peer_id)
       peer_id_(peer_id),
       n_(a_->bulletin().n),
       s_(a_->bulletin().s) {
-  seed0_ = misc::RandMpz32();
+  seed0_ = misc::RandH256();
 }
 
 bool Session::OnRequest(Request const& request, Response& response) {
   Tick _tick_(__FUNCTION__);
 
-  seed2_seed_ = request.seed2_seed_;
+  seed2_seed_ = request.seed2_seed;
   demand_ = request.demand;
 
   if (!demand_.count || demand_.start >= n_ || demand_.count > n_ ||

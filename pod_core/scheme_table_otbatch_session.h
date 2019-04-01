@@ -41,8 +41,8 @@ class Session {
   std::vector<Range> phantoms_;  // sizeof() = L
   std::vector<G1> ot_vi_;        // sizeof() = K
   G1 ot_v_;
-  mpz_class seed2_;
-  Fr seed2_seed_;
+  h256_t seed2_;
+  h256_t seed2_seed_;
 
  private:
   struct Mapping {
@@ -51,7 +51,7 @@ class Session {
   uint64_t phantoms_count_ = 0;
   std::vector<Mapping> mappings_;
  private:
-  mpz_class seed0_;
+  h256_t seed0_;
   std::vector<Fr> v_;  // size() is count * s_
   std::vector<Fr> w_;  // size() is count
   h256_t k_mkl_root_;

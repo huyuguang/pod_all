@@ -83,7 +83,7 @@ Client::Client(BPtr b, h256_t const& self_id, h256_t const& peer_id,
   for (auto const& i : phantoms_) phantoms_count_ += i.count;
   BuildMapping();
 
-  seed2_seed_ = FrRand();
+  seed2_seed_ = misc::RandH256();
 
   ot_self_pk_ = G1Rand();
   ot_beta_ = FrRand();

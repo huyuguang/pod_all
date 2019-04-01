@@ -39,7 +39,7 @@ Client::Client(BPtr b, h256_t const& self_id, h256_t const& peer_id,
   for (auto const& i : demands_) demands_count_ += i.count;
   BuildMapping();
 
-  seed2_seed_ = FrRand();
+  seed2_seed_ = misc::RandH256();
 }
 
 void Client::BuildMapping() {

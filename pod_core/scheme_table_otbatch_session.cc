@@ -31,7 +31,7 @@ Session::Session(APtr a, h256_t const& self_id, h256_t const& peer_id)
       peer_id_(peer_id),
       n_(a_->bulletin().n),
       s_(a_->bulletin().s) {
-  seed0_ = misc::RandMpz32();
+  seed0_ = misc::RandH256();
   ot_self_pk_ = G2Rand();
   ot_alpha_ = FrRand();
 }

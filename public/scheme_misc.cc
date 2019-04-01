@@ -245,7 +245,7 @@ bool IsElementUnique(std::vector<Fr> const v) {
   return std::adjacent_find(pv.begin(), pv.end(), compare) == pv.end();
 }
 
-void H2(mpz_class const& seed, uint64_t count, std::vector<Fr>& v) {
+void H2(h256_t const& seed, uint64_t count, std::vector<Fr>& v) {
   Tick _tick_(__FUNCTION__);
 
   v.resize(count);
@@ -284,16 +284,13 @@ void BuildK(std::vector<Fr> const& v, std::vector<G1>& k, uint64_t s) {
   }
 }
 
-mpz_class CalcSeed2(Fr const& seed, h256_t const& k_mkl_root) {
-  h256_t seed_bin;
-  FrToBin(seed, seed_bin.data());
-
-  uint8_t digest[32];
+h256_t CalcSeed2(h256_t const& seed, h256_t const& k_mkl_root) {
+  h256_t ret;
   CryptoPP::Keccak_256 hash;
-  hash.Update(seed_bin.data(), seed_bin.size());
+  hash.Update(seed.data(), seed.size());
   hash.Update(k_mkl_root.data(), k_mkl_root.size());
-  hash.Final(digest);
-  return MpzFromBE(digest, sizeof(digest));
+  hash.Final(ret.data());
+  return ret;
 }
 }  // namespace scheme
 

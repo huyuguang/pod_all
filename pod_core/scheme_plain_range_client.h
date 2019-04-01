@@ -40,13 +40,13 @@ class Client {
   uint64_t const n_;
   uint64_t const s_;
   Range const demand_;
-  Fr seed2_seed_;
+  h256_t seed2_seed_;
 
  private:
   std::vector<G1> k_;
 
  private:
-  mpz_class seed2_;
+  h256_t seed2_;
   std::vector<Fr> w_;  // size() is count
   h256_t k_mkl_root_;
   std::vector<Fr> encrypted_m_;

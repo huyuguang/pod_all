@@ -17,13 +17,13 @@ Client::Client(BPtr b, h256_t const& self_id, h256_t const& peer_id,
       n_(b_->bulletin().n),
       s_(b_->bulletin().s),
       demand_(demand) {
-  seed2_seed_ = FrRand();
+  seed2_seed_ = misc::RandH256();
   if (!demand_.count) throw std::invalid_argument("empty range");
 }
 
 void Client::GetRequest(Request& request) {
   request.demand = demand_;
-  request.seed2_seed_ = seed2_seed_;
+  request.seed2_seed = seed2_seed_;
 }
 
 bool Client::OnResponse(Response response, Receipt& receipt) {

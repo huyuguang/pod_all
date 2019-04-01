@@ -28,8 +28,8 @@ Client::Client(BPtr b, h256_t const& self_id, h256_t const& peer_id,
 
   if (phantom_.start < demand_.start || phantom_.count < demand_.count)
     throw std::invalid_argument("phantom");
-
-  seed2_seed_ = FrRand();
+  
+  seed2_seed_ = misc::RandH256();
 
   ot_self_pk_ = G1Rand();
   ot_beta_ = FrRand();
@@ -52,7 +52,7 @@ bool Client::OnNegoResponse(NegoBResponse const& response) {
 }
 
 void Client::GetRequest(Request& request) {
-  request.seed2_seed_ = seed2_seed_;
+  request.seed2_seed = seed2_seed_;
   request.phantom = phantom_;
 
   request.ot_vi.resize(demand_.count);

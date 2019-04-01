@@ -15,7 +15,7 @@ Session::Session(APtr a, h256_t const& self_id, h256_t const& peer_id)
       peer_id_(peer_id),
       n_(a_->bulletin().n),
       s_(a_->bulletin().s) {
-  seed0_ = misc::RandMpz32();
+  seed0_ = misc::RandH256();
   ot_self_pk_ = G2Rand();
   ot_alpha_ = FrRand();
 }
@@ -37,7 +37,7 @@ bool Session::OnNegoResponse(NegoAResponse const& response) {
 bool Session::OnRequest(Request request, Response& response) {
   Tick _tick_(__FUNCTION__);
 
-  seed2_seed_ = request.seed2_seed_;
+  seed2_seed_ = request.seed2_seed;
   phantom_ = request.phantom;
   ot_vi_ = std::move(request.ot_vi);
   ot_v_ = std::move(request.ot_v);

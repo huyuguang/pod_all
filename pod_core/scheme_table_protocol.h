@@ -69,7 +69,7 @@ struct Secret {
 
 namespace batch {
 struct Request {
-  Fr seed2_seed;
+  h256_t seed2_seed;
   std::vector<Range> demands;  
 };
 
@@ -79,13 +79,13 @@ struct Response {
 };
 
 struct Receipt {
-  mpz_class seed2;
+  h256_t seed2;
   h256_t k_mkl_root;
   uint64_t count;
 };
 
 struct Secret {
-  mpz_class seed0;
+  h256_t seed0;
 };
 
 struct Claim {
@@ -114,7 +114,7 @@ struct NegoBResponse {
 };
 
 struct Request {
-  Fr seed2_seed;
+  h256_t seed2_seed;
   std::vector<Range> phantoms;  // sizeof() = L
   std::vector<G1> ot_vi;        // sizeof() = K
   G1 ot_v;
@@ -127,13 +127,13 @@ struct Response {
 };
 
 struct Receipt {
-  mpz_class seed2;
+  h256_t seed2;
   h256_t k_mkl_root;
   uint64_t count;
 };
 
 struct Secret {
-  mpz_class seed0;
+  h256_t seed0;
 };
 
 struct Claim {

@@ -56,7 +56,7 @@ int main(int argc, char** argv) {
         "unique_key,u", po::value<std::vector<bool>>(&unique_key)->multitoken(),
         "Provide the flag if publish must unique the key"
         " in table mode (for example: -u 1 0 1)")(
-        "omp_thread_num,t",
+        "omp_thread_num",
         po::value<uint32_t>(&omp_thread_num)->default_value(0),
         "Provide the number of the openmp thread, 1: disable openmp, 0: "
         "default.");

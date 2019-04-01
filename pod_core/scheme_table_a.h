@@ -22,6 +22,7 @@ class A {
   vrf::Pk<> const& vrf_pk() const { return vrf_pk_; }
   vrf::Sk<> const& vrf_sk() const { return vrf_sk_; }
   std::vector<G1> const& sigmas() const { return sigmas_; }
+  std::vector<Fr> const& m() const { return m_; }
 
  public:
   VrfKeyMeta const* GetKeyMetaByName(std::string const& name);

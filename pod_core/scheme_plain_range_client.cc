@@ -18,6 +18,7 @@ Client::Client(BPtr b, h256_t const& self_id, h256_t const& peer_id,
       s_(b_->bulletin().s),
       demand_(demand) {
   seed2_ = misc::RandMpz32();
+  if (!demand_.count) throw std::invalid_argument("empty range");
 }
 
 void Client::GetRequest(Request& request) {

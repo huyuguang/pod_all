@@ -13,6 +13,17 @@ namespace scheme {
 
 enum Mode { kPlain, kTable };
 
+enum Action {
+  kRangePod,
+  kOtRangePod,
+  kVrfQuery,
+  kOtVrfQuery,
+  kVrfPod,
+  kOtVrfPod,
+  kBatchPod,
+  kOtBatchPod
+};
+
 void LoadMij(uint8_t const* data_start, uint8_t const* data_end, uint64_t i,
              uint64_t j, uint64_t s, Fr& mij);
 
@@ -42,6 +53,9 @@ bool IsElementUnique(std::vector<Fr> const v);
 
 void H2(mpz_class const& seed, uint64_t count, std::vector<Fr>& v);
 
+h256_t CalcRootOfK(std::vector<G1> const& k);
+
+void BuildK(std::vector<Fr> const& v, std::vector<G1>& k, uint64_t s);
 }  // namespace scheme
 
 namespace std {
@@ -49,4 +63,12 @@ namespace std {
 std::istream& operator>>(std::istream& in, scheme::Mode& t);
 
 std::ostream& operator<<(std::ostream& os, scheme::Mode const& t);
-}
+
+std::istream& operator>>(std::istream& in, scheme::Action& t);
+
+std::ostream& operator<<(std::ostream& os, scheme::Action const& t);
+
+std::istream& operator>>(std::istream& in, Range& t);
+
+std::ostream& operator<<(std::ostream& os, Range const& t);
+}  // namespace std

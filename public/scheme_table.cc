@@ -98,6 +98,27 @@ void RecordToBin(Record const& record, std::vector<uint8_t>& bin) {
   }
 }
 
+bool BinToRecord(std::vector<uint8_t> const& bin, Record& record) {
+  uint8_t const* p = bin.data();
+  size_t left_len = bin.size();
+  for (;;) {
+    uint32_t item_len;
+    if (left_len < sizeof(item_len)) return false;    
+    memcpy(&item_len, p, sizeof(item_len));
+    item_len = boost::endian::big_to_native(item_len);
+    if (item_len > left_len) return false;
+    p += sizeof(item_len);
+    left_len -= sizeof(item_len);    
+    record.resize(record.size() + 1);
+    auto& r = record.back();
+    r.assign((char*)p, item_len);
+    p += item_len;
+    left_len -= item_len;
+    if (left_len == 0) break;
+  }
+  return true;
+}
+
 // h(k1) h(k2) pad record
 void DataToM(Table const& table, std::vector<uint64_t> columens_index,
              uint64_t s, vrf::Sk<> const& vrf_sk, std::vector<Fr>& m) {

@@ -28,6 +28,7 @@ bool VerifyClaim(uint64_t s, Receipt const& receipt, Secret const& secret,
 namespace scheme::plain::otrange {
 bool VerifyClaim(uint64_t s, Receipt const& receipt, Secret const& secret,
                  Claim const& claim) {
+  // same with the scheme::plain::range::VerifyClaim
   h256_t k_bin = G1ToBin(claim.kij);
   if (!mkl::VerifyPath(claim.i * s + claim.j, k_bin, receipt.count * s,
                        receipt.k_mkl_root, claim.mkl_path)) {

@@ -1,5 +1,6 @@
 #include "scheme_misc.h"
 
+#include "basic_types.h"
 #include "chain.h"
 #include "ecc_pub.h"
 #include "misc.h"
@@ -255,6 +256,33 @@ void H2(mpz_class const& seed, uint64_t count, std::vector<Fr>& v) {
   }
 }
 
+h256_t CalcRootOfK(std::vector<G1> const& k) {
+  Tick _tick_(__FUNCTION__);
+  auto get_k = [&k](uint64_t i) -> h256_t {
+    assert(i < k.size());
+    return G1ToBin(k[i]);
+  };
+  return mkl::CalcRoot(std::move(get_k), k.size());
+}
+
+void BuildK(std::vector<Fr> const& v, std::vector<G1>& k, uint64_t s) {
+  Tick _tick_(__FUNCTION__);
+
+  assert(v.size() % s == 0);
+
+  auto const& ecc_pub = GetEccPub();
+  uint64_t n = v.size() / s;
+  k.resize(v.size());
+
+#pragma omp parallel for
+  for (int64_t i = 0; i < (int64_t)n; ++i) {
+    for (int64_t j = 0; j < (int64_t)s; ++j) {
+      auto offset = i * s + j;
+      k[offset] = ecc_pub.PowerU1(j, v[offset]);
+      k[offset].normalize();  // since we will serialize k (mkl root) later
+    }
+  }
+}
 }  // namespace scheme
 
 namespace std {
@@ -281,4 +309,78 @@ std::ostream& operator<<(std::ostream& os, scheme::Mode const& t) {
   }
   return os;
 }
+
+std::istream& operator>>(std::istream& in, scheme::Action& t) {
+  std::string token;
+  in >> token;
+  if (token == "range_pod") {
+    t = scheme::Action::kRangePod;
+  } else if (token == "ot_range_pod") {
+    t = scheme::Action::kOtRangePod;
+  } else if (token == "vrf_query") {
+    t = scheme::Action::kVrfQuery;
+  } else if (token == "ot_vrf_query") {
+    t = scheme::Action::kOtVrfQuery;
+  } else if (token == "vrf_pod") {
+    t = scheme::Action::kVrfPod;
+  } else if (token == "ot_vrf_pod") {
+    t = scheme::Action::kOtVrfPod;
+  } else if (token == "batch_pod") {
+    t = scheme::Action::kBatchPod;
+  } else if (token == "ot_batch_pod") {
+    t = scheme::Action::kOtBatchPod;
+  } else {
+    in.setstate(std::ios_base::failbit);
+  }
+  return in;
+}
+
+std::ostream& operator<<(std::ostream& os, scheme::Action const& t) {
+  if (t == scheme::Action::kRangePod) {
+    os << "range_pod";
+  } else if (t == scheme::Action::kOtRangePod) {
+    os << "ot_range_pod";
+  } else if (t == scheme::Action::kVrfQuery) {
+    os << "vrf_query";
+  } else if (t == scheme::Action::kOtVrfQuery) {
+    os << "ot_vrf_query";
+  } else if (t == scheme::Action::kVrfPod) {
+    os << "vrf_pod";
+  } else if (t == scheme::Action::kOtVrfPod) {
+    os << "ot_vrf_pod";
+  } else if (t == scheme::Action::kBatchPod) {
+    os << "batch_pod";
+  } else if (t == scheme::Action::kOtRangePod) {
+    os << "ot_batch_pod";
+  } else {
+    os.setstate(std::ios_base::failbit);
+  }
+  return os;
+}
+
+std::istream& operator>>(std::istream& in, Range& t) {
+  try {
+    std::string token;
+    in >> token;
+    auto pos = token.find_first_of('-');
+    if (pos != std::string::npos) {
+      std::string s1 = token.substr(0, pos);
+      std::string s2 = token.substr(pos + 1);
+      t.start = boost::lexical_cast<uint64_t>(s1);
+      t.count = boost::lexical_cast<uint64_t>(s2);
+    } else {
+      t.start = boost::lexical_cast<uint64_t>(token);
+      t.count = 1;
+    }
+  } catch (std::exception&) {
+    in.setstate(std::ios_base::failbit);
+  }
+  return in;
+}
+
+std::ostream& operator<<(std::ostream& os, Range const& t) {
+  os << t.start << "-" << t.count;
+  return os;
+}
+
 }  // namespace std

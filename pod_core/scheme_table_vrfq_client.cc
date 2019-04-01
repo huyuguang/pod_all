@@ -13,6 +13,12 @@ Client::Client(BPtr b, h256_t const& self_id, h256_t const& peer_id,
       peer_id_(peer_id),
       query_key_(query_key),
       query_values_(query_values) {
+  if (query_key_.empty()) throw std::invalid_argument("query_key empty");
+  if (query_values_.empty()) throw std::invalid_argument("query_values empty");
+  for (auto const& i : query_values_) {
+    if (i.empty()) throw std::invalid_argument("query_value empty");
+  }
+
   vrf_key_ = GetKeyMetaByName(b_->vrf_meta(), query_key);
   if (!vrf_key_) throw std::runtime_error("invalid query_key");
 

@@ -16,7 +16,4 @@ bool DataToM(std::string const& pathname, uint64_t size, uint64_t n,
 bool MToFile(std::string const& file, uint64_t size, uint64_t s, uint64_t start,
              uint64_t count, std::vector<Fr> const& part_m);
 
-void BuildK(std::vector<Fr> const& v, std::vector<G1>& k, uint64_t s);
-
-h256_t CalcRootOfK(std::vector<G1> const& k);
 }  // namespace scheme::plain

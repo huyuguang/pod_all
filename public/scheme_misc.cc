@@ -283,6 +283,18 @@ void BuildK(std::vector<Fr> const& v, std::vector<G1>& k, uint64_t s) {
     }
   }
 }
+
+mpz_class CalcSeed2(Fr const& seed, h256_t const& k_mkl_root) {
+  h256_t seed_bin;
+  FrToBin(seed, seed_bin.data());
+
+  uint8_t digest[32];
+  CryptoPP::Keccak_256 hash;
+  hash.Update(seed_bin.data(), seed_bin.size());
+  hash.Update(k_mkl_root.data(), k_mkl_root.size());
+  hash.Final(digest);
+  return MpzFromBE(digest, sizeof(digest));
+}
 }  // namespace scheme
 
 namespace std {

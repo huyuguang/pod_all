@@ -16,14 +16,12 @@ class Session {
   // The self_id and peer_id are useless now, just for later convenience.
   Session(APtr a, h256_t const& self_id, h256_t const& peer_id);
   bool OnRequest(Request const& request, Response& response);
-  bool OnChallenge(Challenge const& challenge, Reply& reply);
   bool OnReceipt(Receipt const& receipt, Secret& secret);
 
  public:
   void TestSetEvil() { evil_ = true; }
 
- private:
- private:
+  private:
   APtr a_;
   h256_t const self_id_;
   h256_t const peer_id_;
@@ -32,6 +30,7 @@ class Session {
 
  private:
   Range demand_;
+  Fr seed2_seed_;
   mpz_class seed2_;
 
  private:

@@ -21,6 +21,7 @@ Session::Session(APtr a, h256_t const& self_id, h256_t const& peer_id)
 bool Session::OnRequest(Request const& request, Response& response) {
   Tick _tick_(__FUNCTION__);
 
+  seed2_seed_ = request.seed2_seed_;
   demand_ = request.demand;
 
   if (!demand_.count || demand_.start >= n_ || demand_.count > n_ ||
@@ -40,19 +41,13 @@ bool Session::OnRequest(Request const& request, Response& response) {
 
   k_mkl_root_ = CalcRootOfK(response.k);
 
-  return true;
-}
-
-bool Session::OnChallenge(Challenge const& challenge, Reply& reply) {
-  Tick _tick_(__FUNCTION__);
-
-  seed2_ = challenge.seed2;
+  seed2_ = CalcSeed2(seed2_seed_, k_mkl_root_);
 
   H2(seed2_, demand_.count, w_);
 
   // compute mij' = vij + wi * mij
   auto const& m = a_->m();
-  reply.m.resize(demand_.count * s_);
+  response.m.resize(demand_.count * s_);
   auto offset = demand_.start * s_;
 
 #pragma omp parallel for
@@ -60,7 +55,7 @@ bool Session::OnChallenge(Challenge const& challenge, Reply& reply) {
     auto is = i * s_;
     for (uint64_t j = 0; j < s_; ++j) {
       auto ij = is + j;
-      reply.m[ij] = v_[ij] + w_[i] * m[offset + ij];
+      response.m[ij] = v_[ij] + w_[i] * m[offset + ij];
     }
   }
 

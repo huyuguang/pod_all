@@ -37,6 +37,7 @@ bool Session::OnNegoResponse(NegoAResponse const& response) {
 bool Session::OnRequest(Request request, Response& response) {
   Tick _tick_(__FUNCTION__);
 
+  seed2_seed_ = request.seed2_seed_;
   phantom_ = request.phantom;
   ot_vi_ = std::move(request.ot_vi);
   ot_v_ = std::move(request.ot_v);
@@ -72,19 +73,14 @@ bool Session::OnRequest(Request request, Response& response) {
   for (int64_t j = 0; j < (int64_t)response.ot_ui.size(); ++j) {
     response.ot_ui[j] = ot_vi_[j] * ot_rand_c_;
   }
-  return true;
-}
 
-bool Session::OnChallenge(Challenge const& challenge, Reply& reply) {
-  Tick _tick_(__FUNCTION__);
-
-  seed2_ = challenge.seed2;
+  seed2_ = CalcSeed2(seed2_seed_, k_mkl_root_);
 
   H2(seed2_, phantom_.count, w_);
 
   // compute mij' = vij + wi * mij
   auto const& m = a_->m();
-  reply.m.resize(phantom_.count * s_);
+  response.m.resize(phantom_.count * s_);
   auto offset = phantom_.start * s_;
 
 #pragma omp parallel for
@@ -104,8 +100,8 @@ bool Session::OnChallenge(Challenge const& challenge, Reply& reply) {
     auto is = i * s_;
     for (uint64_t j = 0; j < s_; ++j) {
       auto ij = is + j;
-      reply.m[ij] = v_[ij] + w_[i] * m[offset + ij];
-      reply.m[ij] += fr_e;
+      response.m[ij] = v_[ij] + w_[i] * m[offset + ij];
+      response.m[ij] += fr_e;
     }
   }
 

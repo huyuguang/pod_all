@@ -56,6 +56,7 @@ bool Session::OnRequest(Request request, Response& response) {
   for (auto const& i : request.demands) demands_count_ += i.count;
 
   demands_ = std::move(request.demands);
+  seed2_seed_ = request.seed2_seed;
 
   BuildMapping();
 
@@ -72,18 +73,13 @@ bool Session::OnRequest(Request request, Response& response) {
 
   k_mkl_root_ = CalcRootOfK(response.k);
 
-  return true;
-}
+  seed2_ = CalcSeed2(seed2_seed_, k_mkl_root_);
 
-bool Session::OnChallenge(Challenge const& challenge, Reply& reply) {
-  Tick _tick_(__FUNCTION__);
-
-  seed2_ = challenge.seed2;
   H2(seed2_, demands_count_, w_);
 
   // compute mij' = vij + wi * mij
   auto const& m = a_->m();
-  reply.m.resize(demands_count_ * s_);
+  response.m.resize(demands_count_ * s_);
 
 #pragma omp parallel for
   for (int64_t i = 0; i < (int64_t)mappings_.size(); ++i) {
@@ -93,7 +89,7 @@ bool Session::OnChallenge(Challenge const& challenge, Reply& reply) {
     for (uint64_t j = 0; j < s_; ++j) {
       auto ij = is + j;
       auto m_ij = m_is + j;
-      reply.m[ij] = v_[ij] + w_[i] * m[m_ij];
+      response.m[ij] = v_[ij] + w_[i] * m[m_ij];
     }
   }
 

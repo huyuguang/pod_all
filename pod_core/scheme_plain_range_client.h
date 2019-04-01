@@ -18,8 +18,7 @@ class Client {
 
  public:
   void GetRequest(Request& request);
-  bool OnResponse(Response response, Challenge& challenge);
-  bool OnReply(Reply reply, Receipt& receipt);
+  bool OnResponse(Response response, Receipt& receipt);
   bool OnSecret(Secret const& secret, Claim& claim);
   bool SaveDecrypted(std::string const& file);
 
@@ -41,6 +40,7 @@ class Client {
   uint64_t const n_;
   uint64_t const s_;
   Range const demand_;
+  Fr seed2_seed_;
 
  private:
   std::vector<G1> k_;

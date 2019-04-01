@@ -22,19 +22,18 @@ class Session {
 
  public:
   bool OnRequest(Request request, Response& response);
-  bool OnChallenge(Challenge const& challenge, Reply& reply);
   bool OnReceipt(Receipt const& receipt, Secret& secret);
 
  public:
   void TestSetEvil() { evil_ = true; }
 
  private:
- private:
   APtr a_;
   h256_t const self_id_;
   h256_t const peer_id_;
   uint64_t const n_;
   uint64_t const s_;
+  Fr seed2_seed_;
 
  private:
   Range phantom_;  // = L

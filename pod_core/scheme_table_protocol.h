@@ -69,18 +69,12 @@ struct Secret {
 
 namespace batch {
 struct Request {
-  std::vector<Range> demands;
+  Fr seed2_seed;
+  std::vector<Range> demands;  
 };
 
 struct Response {
   std::vector<G1> k;
-};
-
-struct Challenge {
-  mpz_class seed2;
-};
-
-struct Reply {
   std::vector<Fr> m;  // sizeof() = L
 };
 
@@ -120,6 +114,7 @@ struct NegoBResponse {
 };
 
 struct Request {
+  Fr seed2_seed;
   std::vector<Range> phantoms;  // sizeof() = L
   std::vector<G1> ot_vi;        // sizeof() = K
   G1 ot_v;
@@ -128,13 +123,6 @@ struct Request {
 struct Response {
   std::vector<G1> k;      // sizeof() = L
   std::vector<G1> ot_ui;  // sizeof() = K
-};
-
-struct Challenge {
-  mpz_class seed2;
-};
-
-struct Reply {
   std::vector<Fr> m;  // sizeof() = L
 };
 

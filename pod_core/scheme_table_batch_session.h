@@ -17,7 +17,6 @@ class Session {
 
  public:
   bool OnRequest(Request request, Response& response);
-  bool OnChallenge(Challenge const& challenge, Reply& reply);
   bool OnReceipt(Receipt const& receipt, Secret& secret);
 
  public:
@@ -35,6 +34,7 @@ class Session {
 
  private:
   std::vector<Range> demands_;
+  Fr seed2_seed_;
   mpz_class seed2_;
 
  private:

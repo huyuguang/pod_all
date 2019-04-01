@@ -22,8 +22,7 @@ class Client {
 
  public:
   void GetRequest(Request& request);
-  bool OnResponse(Response response, Challenge& challenge);
-  bool OnReply(Reply reply, Receipt& receipt);
+  bool OnResponse(Response response, Receipt& receipt);
   bool OnSecret(Secret const& secret, Claim& claim);
   bool SaveDecrypted(std::string const& file);
 
@@ -50,6 +49,7 @@ class Client {
  private:
   std::vector<G1> k_;      // sizeof() = L
   std::vector<G1> ot_ui_;  // sizeof() = K
+  Fr seed2_seed_;
 
  private:
   mpz_class seed2_;

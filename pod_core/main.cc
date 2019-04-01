@@ -69,12 +69,12 @@ int main(int argc, char** argv) {
         "Provide the phantom range(plain mode)")(
         "query_key,k", po::value<std::string>(&query_key),
         "Provide the query key name(table mode)")(
-        "key_value,ot_v",
+        "key_value,v",
         po::value<std::vector<std::string>>(&query_values)->multitoken(),
         "Provide the query key values(table mode, for example "
-        "-ot_v value_a "
+        "-v value_a "
         "value_b value_c)")(
-        "phantom_key,pk",
+        "phantom_key,n",
         po::value<std::vector<std::string>>(&phantom_values)->multitoken(),
         "Provide the query key phantoms(table mode, for example -n "
         "phantoms_a "

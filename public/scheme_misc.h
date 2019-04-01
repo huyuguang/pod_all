@@ -56,6 +56,8 @@ void H2(mpz_class const& seed, uint64_t count, std::vector<Fr>& v);
 h256_t CalcRootOfK(std::vector<G1> const& k);
 
 void BuildK(std::vector<Fr> const& v, std::vector<G1>& k, uint64_t s);
+
+mpz_class CalcSeed2(Fr const& seed, h256_t const& k_mkl_root);
 }  // namespace scheme
 
 namespace std {

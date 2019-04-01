@@ -10,18 +10,12 @@
 namespace scheme::plain {
 namespace range {
 struct Request {
-  Range demand;
+  Fr seed2_seed_;
+  Range demand;  
 };
 
 struct Response {
-  std::vector<G1> k;
-};
-
-struct Challenge {
-  mpz_class seed2;
-};
-
-struct Reply {
+  std::vector<G1> k;  
   std::vector<Fr> m;
 };
 
@@ -61,6 +55,7 @@ struct NegoBResponse {
 };
 
 struct Request {
+  Fr seed2_seed_;
   Range phantom;  // = L
   std::vector<G1> ot_vi;  // sizeof() = K
   G1 ot_v;
@@ -69,13 +64,6 @@ struct Request {
 struct Response {
   std::vector<G1> k;      // sizeof() = L
   std::vector<G1> ot_ui;  // sizeof() = K
-};
-
-struct Challenge {
-  mpz_class seed2;
-};
-
-struct Reply {
   std::vector<Fr> m;  // sizeof() = L
 };
 
@@ -99,18 +87,12 @@ struct Claim {
 
 namespace batch {
 struct Request {
+  Fr seed2_seed_;
   std::vector<Range> demands;
 };
 
 struct Response {
   std::vector<G1> k;
-};
-
-struct Challenge {
-  mpz_class seed2;
-};
-
-struct Reply {
   std::vector<Fr> m;  // sizeof() = L
 };
 
@@ -150,6 +132,7 @@ struct NegoBResponse {
 };
 
 struct Request {
+  Fr seed2_seed_;
   std::vector<Range> phantoms;  // sizeof() = L
   std::vector<G1> ot_vi;        // sizeof() = K
   G1 ot_v;
@@ -158,13 +141,6 @@ struct Request {
 struct Response {
   std::vector<G1> k;      // sizeof() = L
   std::vector<G1> ot_ui;  // sizeof() = K
-};
-
-struct Challenge {
-  mpz_class seed2;
-};
-
-struct Reply {
   std::vector<Fr> m;  // sizeof() = L
 };
 

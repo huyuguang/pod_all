@@ -29,7 +29,7 @@ Client::Client(BPtr b, h256_t const& self_id, h256_t const& peer_id,
   if (phantom_.start < demand_.start || phantom_.count < demand_.count)
     throw std::invalid_argument("phantom");
 
-  seed2_ = misc::RandMpz32();
+  seed2_seed_ = FrRand();
 
   ot_self_pk_ = G1Rand();
   ot_beta_ = FrRand();
@@ -52,6 +52,7 @@ bool Client::OnNegoResponse(NegoBResponse const& response) {
 }
 
 void Client::GetRequest(Request& request) {
+  request.seed2_seed_ = seed2_seed_;
   request.phantom = phantom_;
 
   request.ot_vi.resize(demand_.count);
@@ -62,7 +63,7 @@ void Client::GetRequest(Request& request) {
   request.ot_v = ot_self_pk_ * (ot_rand_a_ * ot_rand_b_);
 }
 
-bool Client::OnResponse(Response response, Challenge& challenge) {
+bool Client::OnResponse(Response response, Receipt& receipt) {
   Tick _tick_(__FUNCTION__);
   if (response.k.size() != phantom_.count * s_) {
     assert(false);
@@ -72,21 +73,15 @@ bool Client::OnResponse(Response response, Challenge& challenge) {
     assert(false);
     return false;
   }
-  k_ = std::move(response.k);
-  ot_ui_ = std::move(response.ot_ui);
-  challenge.seed2 = seed2_;
-  k_mkl_root_ = CalcRootOfK(k_);
-
-  return true;
-}
-
-bool Client::OnReply(Reply reply, Receipt& receipt) {
-  Tick _tick_(__FUNCTION__);
-
-  if (reply.m.size() != phantom_.count * s_) {
+  if (response.m.size() != phantom_.count * s_) {
     assert(false);
     return false;
   }
+
+  k_ = std::move(response.k);
+  ot_ui_ = std::move(response.ot_ui);
+  k_mkl_root_ = CalcRootOfK(k_);
+  seed2_ = CalcSeed2(seed2_seed_, k_mkl_root_);
 
   H2(seed2_, phantom_.count, w_);
 
@@ -106,8 +101,9 @@ bool Client::OnReply(Reply reply, Receipt& receipt) {
     }
     Fr fr_e = MapToFr(buf, sizeof(buf));
     for (size_t j = 0; j < s_; ++j) {
-      encrypted_m_[i * s_ + j] = reply.m[(phantom_offset + i) * s_ + j] - fr_e;
-    }    
+      encrypted_m_[i * s_ + j] =
+          response.m[(phantom_offset + i) * s_ + j] - fr_e;
+    }
   }
 
   if (!CheckEncryptedM()) {
@@ -319,7 +315,7 @@ void Client::DecryptM(std::vector<Fr> const& v) {
 bool Client::SaveDecrypted(std::string const& file) {
   Tick _tick_(__FUNCTION__);
 
-  return DecryptedMToFile(file, b_->bulletin().size, s_, demand_.start, demand_.count,
-                 decrypted_m_);
+  return DecryptedMToFile(file, b_->bulletin().size, s_, demand_.start,
+                          demand_.count, decrypted_m_);
 }
 }  // namespace scheme::plain::otrange

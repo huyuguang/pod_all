@@ -39,7 +39,7 @@ Client::Client(BPtr b, h256_t const& self_id, h256_t const& peer_id,
   for (auto const& i : demands_) demands_count_ += i.count;
   BuildMapping();
 
-  seed2_ = misc::RandMpz32();
+  seed2_seed_ = FrRand();
 }
 
 void Client::BuildMapping() {
@@ -55,32 +55,29 @@ void Client::BuildMapping() {
   }
 }
 
-void Client::GetRequest(Request& request) { request.demands = demands_; }
+void Client::GetRequest(Request& request) {
+  request.seed2_seed = seed2_seed_;
+  request.demands = demands_;
+}
 
-bool Client::OnResponse(Response response, Challenge& challenge) {
+bool Client::OnResponse(Response response, Receipt& receipt) {
   Tick _tick_(__FUNCTION__);
   if (response.k.size() != demands_count_ * s_) {
     assert(false);
     return false;
   }
-  k_ = std::move(response.k);
-  challenge.seed2 = seed2_;
-  k_mkl_root_ = CalcRootOfK(k_);
-
-  return true;
-}
-
-bool Client::OnReply(Reply reply, Receipt& receipt) {
-  Tick _tick_(__FUNCTION__);
-
-  if (reply.m.size() != demands_count_ * s_) {
+  if (response.m.size() != demands_count_ * s_) {
     assert(false);
     return false;
   }
 
+  k_ = std::move(response.k);
+  k_mkl_root_ = CalcRootOfK(k_);
+  seed2_ = CalcSeed2(seed2_seed_, k_mkl_root_);
+
   H2(seed2_, demands_count_, w_);
 
-  encrypted_m_ = std::move(reply.m);
+  encrypted_m_ = std::move(response.m);
 
   if (!CheckEncryptedM()) {
     assert(false);

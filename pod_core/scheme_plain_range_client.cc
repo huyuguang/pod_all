@@ -17,15 +17,16 @@ Client::Client(BPtr b, h256_t const& self_id, h256_t const& peer_id,
       n_(b_->bulletin().n),
       s_(b_->bulletin().s),
       demand_(demand) {
-  seed2_ = misc::RandMpz32();
+  seed2_seed_ = FrRand();
   if (!demand_.count) throw std::invalid_argument("empty range");
 }
 
 void Client::GetRequest(Request& request) {
   request.demand = demand_;
+  request.seed2_seed_ = seed2_seed_;
 }
 
-bool Client::OnResponse(Response response, Challenge& challenge) {
+bool Client::OnResponse(Response response, Receipt& receipt) {
   Tick _tick_(__FUNCTION__);
 
   if (response.k.size() != demand_.count * s_) {
@@ -33,23 +34,18 @@ bool Client::OnResponse(Response response, Challenge& challenge) {
     return false;
   }
 
-  k_ = std::move(response.k);
-  challenge.seed2 = seed2_;
-  k_mkl_root_ = CalcRootOfK(k_);
-  return true;
-}
-
-bool Client::OnReply(Reply reply, Receipt& receipt) {
-  Tick _tick_(__FUNCTION__);
-
-  if (reply.m.size() != demand_.count * s_) {
+  if (response.m.size() != demand_.count * s_) {
     assert(false);
     return false;
   }
 
+  k_ = std::move(response.k);
+  k_mkl_root_ = CalcRootOfK(k_);
+  seed2_ = CalcSeed2(seed2_seed_, k_mkl_root_);
+
   H2(seed2_, demand_.count, w_);
 
-  encrypted_m_ = std::move(reply.m);
+  encrypted_m_ = std::move(response.m);
 
   if (!CheckEncryptedM()) {
     assert(false);

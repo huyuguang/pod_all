@@ -22,7 +22,6 @@ class Session {
 
  public:
   bool OnRequest(Request request, Response& response);
-  bool OnChallenge(Challenge const& challenge, Reply& reply);
   bool OnReceipt(Receipt const& receipt, Secret& secret);
 
  public:
@@ -43,6 +42,7 @@ class Session {
   std::vector<G1> ot_vi_;        // sizeof() = K
   G1 ot_v_;
   mpz_class seed2_;
+  Fr seed2_seed_;
 
  private:
   struct Mapping {

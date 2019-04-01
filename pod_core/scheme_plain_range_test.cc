@@ -33,20 +33,8 @@ bool Test(std::string const& output_file, APtr a, BPtr b, Range const& demand,
     return false;
   }
 
-  Challenge challenge;
-  if (!client.OnResponse(std::move(response), challenge)) {
-    assert(false);
-    return false;
-  }
-
-  Reply reply;
-  if (!session.OnChallenge(challenge, reply)) {
-    assert(false);
-    return false;
-  }
-
   Receipt receipt;
-  if (!client.OnReply(std::move(reply), receipt)) {
+  if (!client.OnResponse(std::move(response), receipt)) {
     assert(false);
     return false;
   }

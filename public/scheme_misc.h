@@ -21,7 +21,8 @@ enum Action {
   kVrfPod,
   kOtVrfPod,
   kBatchPod,
-  kOtBatchPod
+  kOtBatchPod,
+  kBatch2Pod
 };
 
 void LoadMij(uint8_t const* data_start, uint8_t const* data_end, uint64_t i,

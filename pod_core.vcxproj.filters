@@ -47,6 +47,9 @@
     <Filter Include="local\table_batch">
       <UniqueIdentifier>{5e192798-9057-4405-9711-2fc819fd7b9a}</UniqueIdentifier>
     </Filter>
+    <Filter Include="local\table_batch2">
+      <UniqueIdentifier>{a74efd45-7646-48ed-b203-26f58c259d8c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pod_core\main.cc">
@@ -150,6 +153,15 @@
     </ClCompile>
     <ClCompile Include="pod_core\scheme_table_batch_test.cc">
       <Filter>local\table_batch</Filter>
+    </ClCompile>
+    <ClCompile Include="pod_core\scheme_table_batch2_client.cc">
+      <Filter>local\table_batch2</Filter>
+    </ClCompile>
+    <ClCompile Include="pod_core\scheme_table_batch2_session.cc">
+      <Filter>local\table_batch2</Filter>
+    </ClCompile>
+    <ClCompile Include="pod_core\scheme_table_batch2_test.cc">
+      <Filter>local\table_batch2</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -446,6 +458,15 @@
     </ClInclude>
     <ClInclude Include="pod_core\scheme_table_batch_test.h">
       <Filter>local\table_batch</Filter>
+    </ClInclude>
+    <ClInclude Include="pod_core\scheme_table_batch2_client.h">
+      <Filter>local\table_batch2</Filter>
+    </ClInclude>
+    <ClInclude Include="pod_core\scheme_table_batch2_session.h">
+      <Filter>local\table_batch2</Filter>
+    </ClInclude>
+    <ClInclude Include="pod_core\scheme_table_batch2_test.h">
+      <Filter>local\table_batch2</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -6,6 +6,8 @@
 #include "scheme_table_otbatch_test.h"
 #include "scheme_table_otvrfq_test.h"
 #include "scheme_table_vrfq_test.h"
+#include "scheme_table_batch2_test.h"
+#include "scheme_table_batch_test.h"
 
 namespace boost::program_options {
 //// Called by program_options to parse a set of Range arguments
@@ -172,10 +174,22 @@ int main(int argc, char** argv) {
                                          phantom_values)
                  ? 0
                  : -1;
+    } else if (action == Action::kBatchPod) {
+      auto output_file = output_path + "/decrypted_data";
+      return scheme::table::batch::Test(publish_path, output_file,
+                                          demand_ranges)
+                 ? 0
+                 : -1;
     } else if (action == Action::kOtBatchPod) {
       auto output_file = output_path + "/decrypted_data";
       return scheme::table::otbatch::Test(publish_path, output_file,
                                           demand_ranges, phantom_ranges)
+                 ? 0
+                 : -1;
+    } else if (action == Action::kBatch2Pod) {
+      auto output_file = output_path + "/decrypted_data";
+      return scheme::table::batch2::Test(publish_path, output_file,
+                                          demand_ranges)
                  ? 0
                  : -1;
     } else {

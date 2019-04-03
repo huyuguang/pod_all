@@ -15,19 +15,19 @@
     <ProjectGuid>{AD8D57A0-7658-48D7-B5F0-279F688D6ECE}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
     <RootNamespace>pod_setup</RootNamespace>
-    <WindowsTargetPlatformVersion>10.0.17134.0</WindowsTargetPlatformVersion>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
-    <PlatformToolset>v141</PlatformToolset>
+    <PlatformToolset>v142</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>MultiByte</CharacterSet>
   </PropertyGroup>
@@ -116,6 +116,9 @@
     <ClCompile Include="pod_core\scheme_plain_range_test.cc" />
     <ClCompile Include="pod_core\scheme_table_a.cc" />
     <ClCompile Include="pod_core\scheme_table_b.cc" />
+    <ClCompile Include="pod_core\scheme_table_batch2_client.cc" />
+    <ClCompile Include="pod_core\scheme_table_batch2_session.cc" />
+    <ClCompile Include="pod_core\scheme_table_batch2_test.cc" />
     <ClCompile Include="pod_core\scheme_table_batch_client.cc" />
     <ClCompile Include="pod_core\scheme_table_batch_session.cc" />
     <ClCompile Include="pod_core\scheme_table_batch_test.cc" />
@@ -204,6 +207,9 @@
     <ClInclude Include="pod_core\scheme_plain_range_test.h" />
     <ClInclude Include="pod_core\scheme_table_a.h" />
     <ClInclude Include="pod_core\scheme_table_b.h" />
+    <ClInclude Include="pod_core\scheme_table_batch2_client.h" />
+    <ClInclude Include="pod_core\scheme_table_batch2_session.h" />
+    <ClInclude Include="pod_core\scheme_table_batch2_test.h" />
     <ClInclude Include="pod_core\scheme_table_batch_client.h" />
     <ClInclude Include="pod_core\scheme_table_batch_session.h" />
     <ClInclude Include="pod_core\scheme_table_batch_test.h" />

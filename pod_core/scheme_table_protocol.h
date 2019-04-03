@@ -6,9 +6,7 @@
 #include "ecc.h"
 #include "vrf.h"
 
-namespace scheme::table {
-
-namespace vrfq {
+namespace scheme::table::vrfq {
 struct Request {
   std::string key_name;
   std::vector<h256_t> value_digests;
@@ -26,9 +24,9 @@ struct Receipt {
 struct Secret {
   Fr r;
 };
-}  // namespace vrfq
+}  // namespace scheme::table::vrfq
 
-namespace otvrfq {
+namespace scheme::table::otvrfq {
 struct NegoARequest {
   G2 s;
 };
@@ -65,17 +63,17 @@ struct Receipt {
 struct Secret {
   Fr r;
 };
-}  // namespace otvrfq
+}  // namespace scheme::table::otvrfq
 
-namespace batch {
+namespace scheme::table::batch {
 struct Request {
   h256_t seed2_seed;
-  std::vector<Range> demands;  
+  std::vector<Range> demands;
 };
 
 struct Response {
   std::vector<G1> k;
-  std::vector<Fr> m;  // sizeof() = L
+  std::vector<Fr> m;
 };
 
 struct Receipt {
@@ -94,9 +92,9 @@ struct Claim {
   G1 kij;
   std::vector<h256_t> mkl_path;
 };
-}  // namespace batch
+}  // namespace scheme::table::batch
 
-namespace otbatch {
+namespace scheme::table::otbatch {
 struct NegoARequest {
   G2 s;
 };
@@ -123,7 +121,7 @@ struct Request {
 struct Response {
   std::vector<G1> k;      // sizeof() = L
   std::vector<G1> ot_ui;  // sizeof() = K
-  std::vector<Fr> m;  // sizeof() = L
+  std::vector<Fr> m;      // sizeof() = L
 };
 
 struct Receipt {
@@ -142,5 +140,27 @@ struct Claim {
   G1 kij;
   std::vector<h256_t> mkl_path;
 };
-}  // namespace otbatch
-}  // namespace scheme::table
+}  // namespace scheme::table::otbatch
+
+namespace scheme::table::batch2 {
+struct Request {
+  h256_t seed2_seed;
+  std::vector<Range> demands;
+};
+
+struct Response {
+  std::vector<G1> k; // (n+1)*s
+  std::vector<Fr> m; // n*s
+  std::vector<Fr> vw; // s
+};
+
+struct Receipt {
+  h256_t seed2;
+  Fr sigma_vw;
+  uint64_t count;
+};
+
+struct Secret {
+  h256_t seed0;
+};
+}  // namespace scheme::table::batch2

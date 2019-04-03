@@ -155,3 +155,31 @@ G1 MultiExpBosCoster(std::function<G1(size_t)> const& get_g,
 bool PairingMatch(G1 const& a, G1 const& c, G2 const& d);
 
 bool PairingMatch(G1 const& a, G2 const& b, G1 const& c, G2 const& d);
+
+inline bool operator==(G1WM const& a, G1WM const& b) {
+  if (a.bitSize_ != b.bitSize_) return false;
+  if (a.winSize_ != b.winSize_) return false;
+  if (a.tbl_.size() != b.tbl_.size()) return false;
+  for (size_t i = 0; i < a.tbl_.size(); ++i) {
+    auto const& ga = a.tbl_[i];
+    auto const& gb = b.tbl_[i];
+    if (ga != gb) {
+      return false;
+    }
+  }
+  return true;
+}
+
+inline bool operator!=(G1WM const& a, G1WM const& b) { return !(a == b); }
+
+inline bool operator==(G2WM const& a, G2WM const& b) {
+  if (a.bitSize_ != b.bitSize_) return false;
+  if (a.winSize_ != b.winSize_) return false;
+  if (a.tbl_.size() != b.tbl_.size()) return false;
+  for (size_t i = 0; i < a.tbl_.size(); ++i) {
+    if (a.tbl_[i] != b.tbl_[i]) return false;
+  }
+  return true;
+}
+
+inline bool operator!=(G2WM const& a, G2WM const& b) { return !(a == b); }

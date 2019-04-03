@@ -9,23 +9,6 @@
 #include "scheme_table_batch2_test.h"
 #include "scheme_table_batch_test.h"
 
-namespace boost::program_options {
-//// Called by program_options to parse a set of Range arguments
-// void validate(boost::any& v, std::vector<std::string> const& values, Range*,
-//              int) {
-//  Range r;
-//  // Extract tokens from values string vector and populate Model struct.
-//  if (values.size() != 2) {
-//    throw po::validation_error(po::validation_error::invalid_option_value,
-//                               "start count");
-//  }
-//
-//  r.start = boost::lexical_cast<uint64_t>(values[0]);
-//  r.count = boost::lexical_cast<uint64_t>(values[1]);
-//  v = r;
-//}
-}  // namespace boost::program_options
-
 int main(int argc, char** argv) {
   setlocale(LC_ALL, "");
 
@@ -36,7 +19,6 @@ int main(int argc, char** argv) {
   std::string publish_path;
   std::string output_path;
   std::string ecc_pub_file;
-  std::pair<uint64_t, uint64_t> aaaa;
   Range demand_range;
   Range phantom_range;
   std::string query_key;
@@ -44,7 +26,7 @@ int main(int argc, char** argv) {
   std::vector<std::string> phantom_values;
   uint32_t omp_thread_num;
   std::vector<Range> demand_ranges;
-  std::vector<Range> phantom_ranges;
+  std::vector<Range> phantom_ranges;  
 
   try {
     po::options_description options("command line options");
@@ -97,37 +79,6 @@ int main(int argc, char** argv) {
       std::cerr << options << std::endl;
       return -1;
     }
-
-    if (ecc_pub_file.empty() || !fs::is_regular(ecc_pub_file)) {
-      std::cerr << "Open ecc_pub_file " << ecc_pub_file << " failed"
-                << std::endl;
-      return -1;
-    }
-
-    if (output_path.empty()) {
-      std::cerr << "Want output_path(-o)" << std::endl;
-      return -1;
-    }
-
-    if (publish_path.empty() || !fs::is_directory(publish_path)) {
-      std::cerr << "Open publish_path " << publish_path << " failed"
-                << std::endl;
-      return -1;
-    }
-
-    if (!fs::is_directory(output_path) &&
-        !fs::create_directories(output_path)) {
-      std::cerr << "Create " << output_path << " failed" << std::endl;
-      return -1;
-    }
-
-    if (mode == Mode::kPlain) {
-      if (action == Action::kVrfQuery || action == Action::kOtVrfQuery ||
-          action == Action::kVrfPod || action == Action::kOtVrfPod) {
-        std::cerr << "Plain mode does not support vrf query&pod action\n";
-        return -1;
-      }
-    }
   } catch (std::exception& e) {
     std::cerr << "Unknown parameters.\n"
               << e.what() << "\n"
@@ -140,7 +91,35 @@ int main(int argc, char** argv) {
     omp_set_num_threads(omp_thread_num);
   }
 
-  std::cout << "omp_get_max_threads: " << omp_get_max_threads() << "\n";
+  std::cout << "omp_get_max_threads: " << omp_get_max_threads() << "\n";  
+
+  if (ecc_pub_file.empty() || !fs::is_regular(ecc_pub_file)) {
+    std::cerr << "Open ecc_pub_file " << ecc_pub_file << " failed" << std::endl;
+    return -1;
+  }
+
+  if (output_path.empty()) {
+    std::cerr << "Want output_path(-o)" << std::endl;
+    return -1;
+  }
+
+  if (publish_path.empty() || !fs::is_directory(publish_path)) {
+    std::cerr << "Open publish_path " << publish_path << " failed" << std::endl;
+    return -1;
+  }
+
+  if (!fs::is_directory(output_path) && !fs::create_directories(output_path)) {
+    std::cerr << "Create " << output_path << " failed" << std::endl;
+    return -1;
+  }
+
+  if (mode == Mode::kPlain) {
+    if (action == Action::kVrfQuery || action == Action::kOtVrfQuery ||
+        action == Action::kVrfPod || action == Action::kOtVrfPod) {
+      std::cerr << "Plain mode does not support vrf query&pod action\n";
+      return -1;
+    }
+  }
 
   InitEcc();
 

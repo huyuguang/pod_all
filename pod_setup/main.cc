@@ -1,61 +1,6 @@
 #include "ecc_pub.h"
 #include "public.h"
 
-namespace {
-bool operator==(G1WM const& a, G1WM const& b) {
-  if (a.bitSize_ != b.bitSize_) return false;
-  if (a.winSize_ != b.winSize_) return false;
-  if (a.tbl_.size() != b.tbl_.size()) return false;
-  for (size_t i = 0; i < a.tbl_.size(); ++i) {
-    auto const& ga = a.tbl_[i];
-    auto const& gb = b.tbl_[i];
-    if (ga != gb) {
-      return false;
-    }
-  }
-  return true;
-}
-
-bool operator!=(G1WM const& a, G1WM const& b) { return !(a == b); }
-
-bool operator==(G2WM const& a, G2WM const& b) {
-  if (a.bitSize_ != b.bitSize_) return false;
-  if (a.winSize_ != b.winSize_) return false;
-  if (a.tbl_.size() != b.tbl_.size()) return false;
-  for (size_t i = 0; i < a.tbl_.size(); ++i) {
-    if (a.tbl_[i] != b.tbl_[i]) return false;
-  }
-  return true;
-}
-
-bool operator!=(G2WM const& a, G2WM const& b) { return !(a == b); }
-
-bool operator==(EccPub const& a, EccPub const& b) {
-  if (a.g1_wm() != b.g1_wm()) return false;
-  if (a.g2_wm() != b.g2_wm()) return false;
-  if (a.u1() != b.u1()) return false;
-  auto const& a_u1_wm = a.u1_wm();
-  auto const& b_u1_wm = b.u1_wm();
-  if (a_u1_wm.size() != b_u1_wm.size()) return false;
-  for (size_t i = 0; i < a_u1_wm.size(); ++i) {
-    if (a_u1_wm[i] != b_u1_wm[i]) return false;
-  }
-
-  if (a.u2() != b.u2()) return false;
-  auto const& a_u2_wm = a.u2_wm();
-  auto const& b_u2_wm = b.u2_wm();
-  if (a_u2_wm.size() != b_u2_wm.size()) return false;
-  for (size_t i = 0; i < a_u2_wm.size(); ++i) {
-    if (a_u2_wm[i] != b_u2_wm[i]) return false;
-  }
-
-  return true;
-}
-
-bool operator!=(EccPub const& a, EccPub const& b) { return !(a == b); }
-
-}  // namespace
-
 int main(int argc, char** argv) {
   setlocale(LC_ALL, "");
 

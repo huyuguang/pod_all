@@ -473,4 +473,7 @@
     <None Include="pod_core\README.md" />
     <None Include="pod_core\Makefile" />
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="bak.txt" />
+  </ItemGroup>
 </Project>

@@ -40,6 +40,5 @@ class Session {
   Fr ot_alpha_;
 };
 
-typedef std::unique_ptr<Session> SessionUPtr;
-
+typedef std::shared_ptr<Session> SessionPtr;
 }  // namespace scheme::table::otvrfq

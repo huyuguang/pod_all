@@ -29,6 +29,5 @@ class Session {
   G1 g_exp_r_;
 };
 
-typedef std::unique_ptr<Session> SessionUPtr;
-
+typedef std::shared_ptr<Session> SessionPtr;
 }  // namespace scheme::table::vrfq

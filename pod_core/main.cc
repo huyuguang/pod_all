@@ -1,5 +1,6 @@
 #include "capi/scheme_plain_otrange_test_capi.h"
 #include "capi/scheme_plain_range_test_capi.h"
+#include "capi/scheme_table_batch_test_capi.h"
 #include "ecc_pub.h"
 #include "public.h"
 #include "scheme_misc.h"
@@ -184,10 +185,18 @@ int main(int argc, char** argv) {
                  ? 0
                  : -1;
     } else if (action == Action::kBatchPod) {
-      return scheme::table::batch::Test(publish_path, output_path,
-                                        demand_ranges)
+      if (use_capi) {
+      return scheme::table::batch::capi::Test(publish_path, output_path,
+                                        demand_ranges, test_evil)
                  ? 0
                  : -1;
+
+      } else {
+      return scheme::table::batch::Test(publish_path, output_path,
+                                        demand_ranges, test_evil)
+                 ? 0
+                 : -1;
+      }
     } else if (action == Action::kOtBatchPod) {
       return scheme::table::otbatch::Test(publish_path, output_path,
                                           demand_ranges, phantom_ranges)

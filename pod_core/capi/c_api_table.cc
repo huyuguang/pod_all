@@ -10,21 +10,20 @@
 
 #include "../scheme_table_a.h"
 #include "../scheme_table_b.h"
-#include "../scheme_table_protocol_serialize.h"
-#include "../scheme_table_batch_client.h"
-#include "../scheme_table_batch_session.h"
 #include "../scheme_table_batch2_client.h"
 #include "../scheme_table_batch2_session.h"
+#include "../scheme_table_batch_client.h"
+#include "../scheme_table_batch_session.h"
 #include "../scheme_table_otbatch_client.h"
 #include "../scheme_table_otbatch_session.h"
 #include "../scheme_table_otvrfq_client.h"
 #include "../scheme_table_otvrfq_session.h"
+#include "../scheme_table_protocol_serialize.h"
 #include "../scheme_table_vrfq_client.h"
 #include "../scheme_table_vrfq_session.h"
 #include "ecc.h"
 #include "ecc_pub.h"
 
-#if 0
 namespace scheme::table {
 std::mutex a_set_mutex;
 std::unordered_map<void*, APtr> a_set;
@@ -114,7 +113,7 @@ bool DelClient(Client* p) {
   return client_set.erase(p) != 0;
 }
 
-}  // namespace scheme::table::range
+}  // namespace scheme::table::batch
 
 extern "C" {
 
@@ -141,27 +140,27 @@ EXPORT handle_t E_TableBNew(char const* bulletin_file,
   }
 }
 
-EXPORT bool E_TableABulletin(handle_t h, plain_bulletin_t* bulletin) {
+EXPORT bool E_TableABulletin(handle_t h, table_bulletin_t* bulletin) {
   using namespace scheme::table;
   APtr a = GetAPtr(h);
   if (!a) return false;
   Bulletin const& v = a->bulletin();
   bulletin->n = v.n;
   bulletin->s = v.s;
-  bulletin->size = v.size;
   memcpy(bulletin->sigma_mkl_root, v.sigma_mkl_root.data(), 32);
+  memcpy(bulletin->vrf_meta_digest, v.vrf_meta_digest.data(), 32);
   return true;
 }
 
-EXPORT bool E_TableBBulletin(handle_t h, plain_bulletin_t* bulletin) {
+EXPORT bool E_TableBBulletin(handle_t h, table_bulletin_t* bulletin) {
   using namespace scheme::table;
   BPtr b = GetBPtr(h);
   if (!b) return false;
   Bulletin const& v = b->bulletin();
   bulletin->n = v.n;
   bulletin->s = v.s;
-  bulletin->size = v.size;
   memcpy(bulletin->sigma_mkl_root, v.sigma_mkl_root.data(), 32);
+  memcpy(bulletin->vrf_meta_digest, v.vrf_meta_digest.data(), 32);
   return true;
 }
 
@@ -175,6 +174,10 @@ EXPORT bool E_TableBFree(handle_t h) {
   return DelB((B*)h);
 }
 
+} // extern "C"
+
+// batch
+extern "C" {
 EXPORT handle_t E_TableBatchSessionNew(handle_t c_a, uint8_t const* c_self_id,
                                        uint8_t const* c_peer_id) {
   using namespace scheme::table;
@@ -266,7 +269,8 @@ EXPORT bool E_TableBatchSessionFree(handle_t h) {
 
 EXPORT handle_t E_TableBatchClientNew(handle_t c_b, uint8_t const* c_self_id,
                                       uint8_t const* c_peer_id,
-                                      range_t c_demand) {
+                                      range_t const* c_demand,
+                                      uint64_t c_demand_count) {
   using namespace scheme::table;
   using namespace scheme::table::batch;
   BPtr b = GetBPtr(c_b);
@@ -276,10 +280,15 @@ EXPORT handle_t E_TableBatchClientNew(handle_t c_b, uint8_t const* c_self_id,
   memcpy(self_id.data(), c_self_id, std::tuple_size<h256_t>::value);
   h256_t peer_id;
   memcpy(peer_id.data(), c_peer_id, std::tuple_size<h256_t>::value);
-  Range demand(c_demand.start, c_demand.count);
+
+  std::vector<Range> demands(c_demand_count);
+  for (uint64_t i = 0; i < c_demand_count; ++i) {
+    demands[i].start = c_demand[i].start;
+    demands[i].count = c_demand[i].count;
+  }
 
   try {
-    auto p = new Client(b, self_id, peer_id, demand);
+    auto p = new Client(b, self_id, peer_id, std::move(demands));
     AddClient(p);
     return p;
   } catch (std::exception&) {
@@ -322,7 +331,7 @@ EXPORT bool E_TableBatchClientOnResponse(handle_t c_client,
     ia.serialize(response);
 
     Receipt receipt;
-    if (!client->OnResponse(response, receipt)) return false;
+    if (!client->OnResponse(std::move(response), receipt)) return false;
 
     yas::file_ostream os(receipt_file);
     yas::json_oarchive<yas::file_ostream> oa(os);
@@ -348,7 +357,7 @@ EXPORT bool E_TableBatchClientOnSecret(handle_t c_client,
     yas::json_iarchive<yas::file_istream> ia(is);
     ia.serialize(secret);
 
-    Claim claim;   
+    Claim claim;
     if (!client->OnSecret(secret, claim)) {
       yas::file_ostream os(claim_file);
       yas::json_oarchive<yas::file_ostream> oa(os);
@@ -381,5 +390,4 @@ EXPORT bool E_TableBatchClientFree(handle_t h) {
   using namespace scheme::table::batch;
   return DelClient((Client*)h);
 }
-}  // extern "C"
-#endif 
+}  // extern "C" batch

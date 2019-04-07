@@ -59,4 +59,6 @@ class Client {
   std::vector<Fr> decrypted_m_;
   std::vector<Fr> encrypted_m_;
 };
+
+typedef std::shared_ptr<Client> ClientPtr;
 }  // namespace scheme::table::batch

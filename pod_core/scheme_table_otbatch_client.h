@@ -76,4 +76,6 @@ class Client {
   Fr ot_rand_a_;
   Fr ot_rand_b_;
 };
+
+typedef std::shared_ptr<Client> ClientPtr;
 }  // namespace scheme::table::otbatch

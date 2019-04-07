@@ -57,6 +57,7 @@ class Client {
   Fr ot_rand_a_;
   Fr ot_rand_b_;
 };
-}  // namespace otvrfq
 
+typedef std::shared_ptr<Client> ClientPtr;
+}  // namespace otvrfq
 }  // namespace scheme::table

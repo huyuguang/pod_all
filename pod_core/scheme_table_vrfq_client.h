@@ -40,6 +40,8 @@ class Client {
   std::vector<vrf::Fsk> fsk_;
   G1 g_exp_r_;
 };
+
+typedef std::shared_ptr<Client> ClientPtr;
 }  // namespace vrfq
 
 }  // namespace scheme::table

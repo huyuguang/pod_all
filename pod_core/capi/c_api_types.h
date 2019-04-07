@@ -1,3 +1,5 @@
+#pragma once
+
 #include <stdint.h>
 
 extern "C" {
@@ -18,5 +20,12 @@ struct plain_bulletin_t {
   uint64_t s;
   uint64_t n;
   uint8_t sigma_mkl_root[32];
+};
+
+struct table_bulletin_t {
+  uint64_t s;
+  uint64_t n;
+  uint8_t sigma_mkl_root[32];
+  uint8_t vrf_meta_digest[32];
 };
 }

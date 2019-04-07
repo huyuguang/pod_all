@@ -58,4 +58,5 @@ class Session {
   bool evil_ = false;
 };
 
+typedef std::shared_ptr<Session> SessionPtr;
 }  // namespace scheme::plain::otrange

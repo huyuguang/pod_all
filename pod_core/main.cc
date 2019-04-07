@@ -1,14 +1,15 @@
+#include "capi/scheme_plain_otrange_test_capi.h"
+#include "capi/scheme_plain_range_test_capi.h"
 #include "ecc_pub.h"
 #include "public.h"
 #include "scheme_misc.h"
 #include "scheme_plain_otrange_test.h"
 #include "scheme_plain_range_test.h"
+#include "scheme_table_batch2_test.h"
+#include "scheme_table_batch_test.h"
 #include "scheme_table_otbatch_test.h"
 #include "scheme_table_otvrfq_test.h"
 #include "scheme_table_vrfq_test.h"
-#include "scheme_table_batch2_test.h"
-#include "scheme_table_batch_test.h"
-#include "capi/scheme_plain_range_test_capi.h"
 
 int main(int argc, char** argv) {
   setlocale(LC_ALL, "");
@@ -27,7 +28,7 @@ int main(int argc, char** argv) {
   std::vector<std::string> phantom_values;
   uint32_t omp_thread_num = 0;
   std::vector<Range> demand_ranges;
-  std::vector<Range> phantom_ranges;  
+  std::vector<Range> phantom_ranges;
   bool use_capi = false;
   bool test_evil = false;
 
@@ -67,7 +68,7 @@ int main(int argc, char** argv) {
         "phantoms_b phantoms_c)")(
         "omp_thread_num", po::value<uint32_t>(&omp_thread_num),
         "Provide the number of the openmp thread, 1: disable "
-        "openmp, 0: default.")("use_c_api,c","")("test_evil","");
+        "openmp, 0: default.")("use_c_api,c", "")("test_evil", "");
 
     boost::program_options::variables_map vmap;
 
@@ -99,7 +100,7 @@ int main(int argc, char** argv) {
     omp_set_num_threads(omp_thread_num);
   }
 
-  std::cout << "omp_get_max_threads: " << omp_get_max_threads() << "\n";  
+  std::cout << "omp_get_max_threads: " << omp_get_max_threads() << "\n";
 
   if (ecc_pub_file.empty() || !fs::is_regular(ecc_pub_file)) {
     std::cerr << "Open ecc_pub_file " << ecc_pub_file << " failed" << std::endl;
@@ -124,7 +125,7 @@ int main(int argc, char** argv) {
   for (auto& entry :
        boost::make_iterator_range(fs::directory_iterator(output_path), {})) {
     fs::remove_all(entry);
-  }            
+  }
 
   if (mode == Mode::kPlain) {
     if (action == Action::kVrfQuery || action == Action::kOtVrfQuery ||
@@ -155,10 +156,19 @@ int main(int argc, char** argv) {
                    : -1;
       }
     } else if (action == Action::kOtRangePod) {
-      return scheme::plain::otrange::Test(publish_path, output_path,
-                                          demand_range, phantom_range)
-                 ? 0
-                 : -1;
+      if (use_capi) {
+        return scheme::plain::otrange::capi::Test(publish_path, output_path,
+                                                  demand_range, phantom_range,
+                                                  test_evil)
+                   ? 0
+                   : -1;
+      } else {
+        return scheme::plain::otrange::Test(publish_path, output_path,
+                                            demand_range, phantom_range,
+                                            test_evil)
+                   ? 0
+                   : -1;
+      }
     } else {
       std::cerr << "Not implement yet.\n";
       return -1;
@@ -173,9 +183,9 @@ int main(int argc, char** argv) {
                                          phantom_values)
                  ? 0
                  : -1;
-    } else if (action == Action::kBatchPod) {      
+    } else if (action == Action::kBatchPod) {
       return scheme::table::batch::Test(publish_path, output_path,
-                                          demand_ranges)
+                                        demand_ranges)
                  ? 0
                  : -1;
     } else if (action == Action::kOtBatchPod) {
@@ -185,7 +195,7 @@ int main(int argc, char** argv) {
                  : -1;
     } else if (action == Action::kBatch2Pod) {
       return scheme::table::batch2::Test(publish_path, output_path,
-                                          demand_ranges)
+                                         demand_ranges)
                  ? 0
                  : -1;
     } else {

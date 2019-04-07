@@ -172,6 +172,15 @@
     <ClCompile Include="pod_core\capi\scheme_plain_range_test_capi.cc">
       <Filter>capi</Filter>
     </ClCompile>
+    <ClCompile Include="pod_core\capi\c_api_plain.cc">
+      <Filter>capi</Filter>
+    </ClCompile>
+    <ClCompile Include="pod_core\capi\c_api_table.cc">
+      <Filter>capi</Filter>
+    </ClCompile>
+    <ClCompile Include="pod_core\capi\scheme_plain_otrange_test_capi.cc">
+      <Filter>capi</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="mcl\include\mcl\aggregate_sig.hpp">
@@ -490,6 +499,18 @@
       <Filter>capi</Filter>
     </ClInclude>
     <ClInclude Include="pod_core\capi\scheme_plain_range_test_capi.h">
+      <Filter>capi</Filter>
+    </ClInclude>
+    <ClInclude Include="pod_core\capi\c_api_plain.h">
+      <Filter>capi</Filter>
+    </ClInclude>
+    <ClInclude Include="pod_core\capi\c_api_table.h">
+      <Filter>capi</Filter>
+    </ClInclude>
+    <ClInclude Include="pod_core\capi\c_api_types.h">
+      <Filter>capi</Filter>
+    </ClInclude>
+    <ClInclude Include="pod_core\capi\scheme_plain_otrange_test_capi.h">
       <Filter>capi</Filter>
     </ClInclude>
   </ItemGroup>

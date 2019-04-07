@@ -102,7 +102,6 @@ Fr StrHashToFr(std::string const& s);
 // because the Fr is 254bits, so we only use 31bytes
 Fr BinToFr31(void const* start, void const* end);
 
-// the buffer of start must >= 32, may throw
 // the buffer of start must >= 32
 bool BinToFr32(void const* start, Fr* fr);
 

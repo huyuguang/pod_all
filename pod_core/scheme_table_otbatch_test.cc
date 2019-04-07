@@ -16,10 +16,12 @@ const h256_t kDummyClientId = h256_t{2};
 
 namespace scheme::table::otbatch {
 
-bool Test(std::string const& output_file, APtr a, BPtr b,
+bool Test(std::string const& output_path, APtr a, BPtr b,
           std::vector<Range> const& demands, std::vector<Range> const& phantoms,
           bool evil) {
   Tick _tick_(__FUNCTION__);
+
+  auto output_file = output_path + "/decrypted_data";
 
   Session session(a, kDummySessionId, kDummyClientId);
   Client client(b, kDummyClientId, kDummySessionId, demands, phantoms);
@@ -97,7 +99,7 @@ bool Test(std::string const& output_file, APtr a, BPtr b,
   return true;
 }
 
-bool Test(std::string const& publish_path, std::string const& output_file,
+bool Test(std::string const& publish_path, std::string const& output_path,
           std::vector<Range> const& demands,
           std::vector<Range> const& phantoms) {
   try {
@@ -106,7 +108,7 @@ bool Test(std::string const& publish_path, std::string const& output_file,
     std::string bulletin_file = publish_path + "/bulletin";
     std::string public_path = publish_path + "/public";
     auto b = std::make_shared<B>(bulletin_file, public_path);
-    return Test(output_file, a, b, demands, phantoms, false);
+    return Test(output_path, a, b, demands, phantoms, false);
   } catch (std::exception& e) {
     std::cerr << __FUNCTION__ << "\t" << e.what() << "\n";
     return false;

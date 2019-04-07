@@ -605,7 +605,7 @@ inline EccPub& GetEccPub(std::string const& file = "") {
   return _instance_;
 }
 
-inline bool InitEccPub(std::string const& file) {
+inline bool LoadEccPub(std::string const& file) {
   try {
     GetEccPub(file);
     return true;

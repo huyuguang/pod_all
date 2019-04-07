@@ -260,10 +260,23 @@ bool BinToFr32(void const* start, Fr* fr) {
   return ret;
 }
 
+Fr BinToFr32(void const* start) {
+  Fr r;
+  if (BinToFr32(start, &r)) return r;
+  throw std::runtime_error("");
+}
+
 // buf must 32 bytes, if the fr comes from BinToFr31(), the buf[31] will be 0
 void FrToBin(Fr const& fr, uint8_t* buf) {
   omemstream out((char*)buf, 32);
   fr.save(out, mcl::IoMode::IoSerialize);
+}
+
+h256_t FrToBin(Fr const& fr) {
+  h256_t ret;
+  omemstream out((char*)ret.data(), 32);
+  fr.save(out, mcl::IoMode::IoSerialize);
+  return ret;
 }
 
 bool StrToFr(std::string const& s, Fr* fr) {

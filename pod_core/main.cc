@@ -8,6 +8,7 @@
 #include "scheme_table_vrfq_test.h"
 #include "scheme_table_batch2_test.h"
 #include "scheme_table_batch_test.h"
+#include "capi/scheme_plain_range_test_capi.h"
 
 int main(int argc, char** argv) {
   setlocale(LC_ALL, "");
@@ -24,15 +25,16 @@ int main(int argc, char** argv) {
   std::string query_key;
   std::vector<std::string> query_values;
   std::vector<std::string> phantom_values;
-  uint32_t omp_thread_num;
+  uint32_t omp_thread_num = 0;
   std::vector<Range> demand_ranges;
   std::vector<Range> phantom_ranges;  
+  bool use_capi = false;
+  bool test_evil = false;
 
   try {
     po::options_description options("command line options");
     options.add_options()("help,h", "Use -h or --help to list all arguments")(
-        "ecc_pub_file,e",
-        po::value<std::string>(&ecc_pub_file)->default_value(""),
+        "ecc_pub_file,e", po::value<std::string>(&ecc_pub_file),
         "Provide the ecc pub file")("mode,m", po::value<Mode>(&mode),
                                     "Provide pod mode (plain, table)")(
         "action,a", po::value<Action>(&action),
@@ -63,11 +65,9 @@ int main(int argc, char** argv) {
         "Provide the query key phantoms(table mode, for example -n "
         "phantoms_a "
         "phantoms_b phantoms_c)")(
-        "omp_thread_num",
-        po::value<uint32_t>(&omp_thread_num)->default_value(0),
+        "omp_thread_num", po::value<uint32_t>(&omp_thread_num),
         "Provide the number of the openmp thread, 1: disable "
-        "openmp, 0: "
-        "default.");
+        "openmp, 0: default.")("use_c_api,c","")("test_evil","");
 
     boost::program_options::variables_map vmap;
 
@@ -78,6 +78,14 @@ int main(int argc, char** argv) {
     if (vmap.count("help")) {
       std::cerr << options << std::endl;
       return -1;
+    }
+
+    if (vmap.count("use_c_api")) {
+      use_capi = true;
+    }
+
+    if (vmap.count("test_evil")) {
+      test_evil = true;
     }
   } catch (std::exception& e) {
     std::cerr << "Unknown parameters.\n"
@@ -112,6 +120,11 @@ int main(int argc, char** argv) {
     std::cerr << "Create " << output_path << " failed" << std::endl;
     return -1;
   }
+  // clean the output_path
+  for (auto& entry :
+       boost::make_iterator_range(fs::directory_iterator(output_path), {})) {
+    fs::remove_all(entry);
+  }            
 
   if (mode == Mode::kPlain) {
     if (action == Action::kVrfQuery || action == Action::kOtVrfQuery ||
@@ -123,19 +136,26 @@ int main(int argc, char** argv) {
 
   InitEcc();
 
-  if (!InitEccPub(ecc_pub_file)) {
+  if (!LoadEccPub(ecc_pub_file)) {
     std::cerr << "Open ecc pub file " << ecc_pub_file << " failed" << std::endl;
     return -1;
   }
 
   if (mode == Mode::kPlain) {
-    auto output_file = output_path + "/decrypted_data";
     if (action == Action::kRangePod) {
-      return scheme::plain::range::Test(publish_path, output_file, demand_range)
-                 ? 0
-                 : -1;
+      if (use_capi) {
+        return scheme::plain::range::capi::Test(publish_path, output_path,
+                                                demand_range, test_evil)
+                   ? 0
+                   : -1;
+      } else {
+        return scheme::plain::range::Test(publish_path, output_path,
+                                          demand_range, test_evil)
+                   ? 0
+                   : -1;
+      }
     } else if (action == Action::kOtRangePod) {
-      return scheme::plain::otrange::Test(publish_path, output_file,
+      return scheme::plain::otrange::Test(publish_path, output_path,
                                           demand_range, phantom_range)
                  ? 0
                  : -1;
@@ -153,21 +173,18 @@ int main(int argc, char** argv) {
                                          phantom_values)
                  ? 0
                  : -1;
-    } else if (action == Action::kBatchPod) {
-      auto output_file = output_path + "/decrypted_data";
-      return scheme::table::batch::Test(publish_path, output_file,
+    } else if (action == Action::kBatchPod) {      
+      return scheme::table::batch::Test(publish_path, output_path,
                                           demand_ranges)
                  ? 0
                  : -1;
     } else if (action == Action::kOtBatchPod) {
-      auto output_file = output_path + "/decrypted_data";
-      return scheme::table::otbatch::Test(publish_path, output_file,
+      return scheme::table::otbatch::Test(publish_path, output_path,
                                           demand_ranges, phantom_ranges)
                  ? 0
                  : -1;
     } else if (action == Action::kBatch2Pod) {
-      auto output_file = output_path + "/decrypted_data";
-      return scheme::table::batch2::Test(publish_path, output_file,
+      return scheme::table::batch2::Test(publish_path, output_path,
                                           demand_ranges)
                  ? 0
                  : -1;

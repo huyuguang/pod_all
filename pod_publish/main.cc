@@ -136,7 +136,7 @@ int main(int argc, char** argv) {
 
   InitEcc();
 
-  if (!InitEccPub(ecc_pub_file)) {
+  if (!LoadEccPub(ecc_pub_file)) {
     std::cerr << "Open ecc pub file " << ecc_pub_file << " failed" << std::endl;
     return -1;
   }

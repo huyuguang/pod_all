@@ -6,12 +6,13 @@ CXX11_HOME = /usr
 
 MCL_HOME = ../mcl/include
 PUB_HOME = ../public
+YAS_HOME = ../yas/include
 
 CXXFLAGS := \
  -g3 \
  -fPIC \
  -fopenmp \
- -std=c++14 \
+ -std=c++17 \
  -Wall \
  -Wextra \
  -gdwarf-2 \
@@ -22,6 +23,7 @@ CXXFLAGS := \
  -I $(CXX11_HOME)/include \
  -I $(MCL_HOME) \
  -I $(PUB_HOME) \
+ -I $(YAS_HOME) \
  -I. \
  -I.. \
 
@@ -60,10 +62,12 @@ LIBS := \
 
 BUILD := ./build/self
 BUILDPUB := ./build/public
+BUILDCAPI := ./build/self/capi
 $(shell mkdir -p $(BUILD))
 $(shell mkdir -p $(BUILDPUB))
+$(shell mkdir -p $(BUILDCAPI))
 
-DIR := . ../public
+DIR := . ../public capi
 
 SRC := $(foreach d, $(DIR), $(wildcard $(d)/*.cc))
 

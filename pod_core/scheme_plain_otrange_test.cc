@@ -16,9 +16,11 @@ const h256_t kDummyClientId = h256_t{2};
 
 namespace scheme::plain::otrange {
 
-bool Test(std::string const& output_file, APtr a, BPtr b, Range const& demand,
+bool Test(std::string const& output_path, APtr a, BPtr b, Range const& demand,
           Range const& phantom, bool evil) {
   Tick _tick_(__FUNCTION__);
+
+  auto output_file = output_path + "/decrypted_data";
 
   Session session(a, kDummySessionId, kDummyClientId);
   Client client(b, kDummyClientId, kDummySessionId, demand, phantom);

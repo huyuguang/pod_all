@@ -43,6 +43,7 @@ class Session {
   bool evil_ = false;
 };
 
+typedef std::shared_ptr<Session> SessionPtr;
 }  // namespace range
 
 }  // namespace scheme::plain

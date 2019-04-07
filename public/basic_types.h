@@ -10,3 +10,11 @@ struct Range {
   uint64_t start;
   uint64_t count;
 };
+
+inline bool operator==(Range const& a, Range const& b) {
+  return a.start == b.start && a.count == b.count;
+}
+
+inline bool operator!=(Range const& a, Range const& b) {
+  return a.start != b.start || a.count != b.count;
+}

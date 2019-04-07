@@ -5,5 +5,5 @@
 
 namespace scheme::plain::range {
 bool Test(std::string const& publish_path, std::string const& output_path,
-          Range const& demand);
+          Range const& demand, bool test_evil);
 }  // namespace scheme::plain::range

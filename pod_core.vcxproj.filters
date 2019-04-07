@@ -50,6 +50,9 @@
     <Filter Include="local\table_batch2">
       <UniqueIdentifier>{a74efd45-7646-48ed-b203-26f58c259d8c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="capi">
+      <UniqueIdentifier>{00526257-6438-48d8-bfec-63210254558b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pod_core\main.cc">
@@ -162,6 +165,12 @@
     </ClCompile>
     <ClCompile Include="pod_core\scheme_table_batch2_test.cc">
       <Filter>local\table_batch2</Filter>
+    </ClCompile>
+    <ClCompile Include="pod_core\capi\c_api.cc">
+      <Filter>capi</Filter>
+    </ClCompile>
+    <ClCompile Include="pod_core\capi\scheme_plain_range_test_capi.cc">
+      <Filter>capi</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -467,6 +476,21 @@
     </ClInclude>
     <ClInclude Include="pod_core\scheme_table_batch2_test.h">
       <Filter>local\table_batch2</Filter>
+    </ClInclude>
+    <ClInclude Include="pod_core\scheme_plain_protocol_serialize.h">
+      <Filter>local</Filter>
+    </ClInclude>
+    <ClInclude Include="pod_core\scheme_table_protocol_serialize.h">
+      <Filter>local</Filter>
+    </ClInclude>
+    <ClInclude Include="pod_core\basic_types_serialize.h">
+      <Filter>local</Filter>
+    </ClInclude>
+    <ClInclude Include="pod_core\capi\c_api.h">
+      <Filter>capi</Filter>
+    </ClInclude>
+    <ClInclude Include="pod_core\capi\scheme_plain_range_test_capi.h">
+      <Filter>capi</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

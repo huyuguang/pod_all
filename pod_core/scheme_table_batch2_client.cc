@@ -182,7 +182,7 @@ bool Client::OnSecret(Secret const& secret) {
   H2(secret.seed0, (demands_count_ + 1) * s_, v);
 
   if (!VerifyProof(s_, demands_count_, sigma_vw_, v, w_)) {
-    assert(false);
+    // assert(false);
     return false;
   }
 

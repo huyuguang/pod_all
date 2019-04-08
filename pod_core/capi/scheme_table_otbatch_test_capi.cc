@@ -68,7 +68,7 @@ class WrapperClient {
                 uint64_t c_demand_count, range_t const* c_phantom,
                 uint64_t c_phantom_count) {
     h_ = E_TableOtBatchClientNew(c_b, c_self_id, c_peer_id, c_demand,
-                               c_demand_count, c_phantom, c_phantom_count);
+                                 c_demand_count, c_phantom, c_phantom_count);
     if (!h_) throw std::runtime_error("");
   }
   ~WrapperClient() {
@@ -101,11 +101,11 @@ bool Test(std::string const& output_path, WrapperA const& a, WrapperB const& b,
   }
 
   WrapperClient client(b.h(), kDummyClientId.data(), kDummySessionId.data(),
-                       c_demand.data(), c_demand.size(),
-                       c_phantom.data(), c_phantom.size());
+                       c_demand.data(), c_demand.size(), c_phantom.data(),
+                       c_phantom.size());
 
   if (evil) E_TableOtBatchSessionSetEvil(session.h());
-  
+
   std::string negoa_request_file = output_path + "/negoa_request";
   std::string negob_request_file = output_path + "/negob_request";
   std::string negoa_response_file = output_path + "/negoa_response";
@@ -116,7 +116,7 @@ bool Test(std::string const& output_path, WrapperA const& a, WrapperB const& b,
   std::string secret_file = output_path + "/secret";
   std::string claim_file = output_path + "/claim";
   std::string output_file = output_path + "/decrypted_data";
-  
+
   if (!E_TableOtBatchClientGetNegoRequest(client.h(),
                                           negob_request_file.c_str())) {
     assert(false);
@@ -137,13 +137,12 @@ bool Test(std::string const& output_path, WrapperA const& a, WrapperB const& b,
   }
 
   if (!E_TableOtBatchSessionGetNegoRequest(session.h(),
-                                          negoa_request_file.c_str())) {
+                                           negoa_request_file.c_str())) {
     assert(false);
     return false;
   }
 
-  if (!E_TableOtBatchClientOnNegoRequest(client.h(),
-                                         negoa_request_file.c_str(),
+  if (!E_TableOtBatchClientOnNegoRequest(client.h(), negoa_request_file.c_str(),
                                          negoa_response_file.c_str())) {
     assert(false);
     return false;
@@ -161,26 +160,26 @@ bool Test(std::string const& output_path, WrapperA const& a, WrapperB const& b,
   }
 
   if (!E_TableOtBatchSessionOnRequest(session.h(), request_file.c_str(),
-                                    response_file.c_str())) {
+                                      response_file.c_str())) {
     assert(false);
     return false;
   }
 
   if (!E_TableOtBatchClientOnResponse(client.h(), response_file.c_str(),
-                                    receipt_file.c_str())) {
+                                      receipt_file.c_str())) {
     assert(false);
     return false;
   }
 
   if (!E_TableOtBatchSessionOnReceipt(session.h(), receipt_file.c_str(),
-                                    secret_file.c_str())) {
+                                      secret_file.c_str())) {
     assert(false);
     return false;
   }
 
   if (!evil) {
     if (!E_TableOtBatchClientOnSecret(client.h(), secret_file.c_str(),
-                                    claim_file.c_str())) {
+                                      claim_file.c_str())) {
       assert(false);
       return false;
     }
@@ -191,7 +190,7 @@ bool Test(std::string const& output_path, WrapperA const& a, WrapperB const& b,
     }
   } else {
     if (E_TableOtBatchClientOnSecret(client.h(), secret_file.c_str(),
-                                   claim_file.c_str())) {
+                                     claim_file.c_str())) {
       assert(false);
       return false;
     }
@@ -253,4 +252,4 @@ bool Test(std::string const& publish_path, std::string const& output_path,
   }
 }
 
-}  // namespace scheme::table::batch::capi
+}  // namespace scheme::table::otbatch::capi

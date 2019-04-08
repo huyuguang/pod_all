@@ -68,14 +68,14 @@ bool Test(std::string const& output_path, APtr a, BPtr b,
 }
 
 bool Test(std::string const& publish_path, std::string const& output_path,
-          std::vector<Range> const& demands) {
+          std::vector<Range> const& demands, bool test_evil) {
   try {
     auto a = std::make_shared<A>(publish_path);
 
     std::string bulletin_file = publish_path + "/bulletin";
     std::string public_path = publish_path + "/public";
     auto b = std::make_shared<B>(bulletin_file, public_path);
-    return Test(output_path, a, b, demands, false);
+    return Test(output_path, a, b, demands, test_evil);
   } catch (std::exception& e) {
     std::cerr << __FUNCTION__ << "\t" << e.what() << "\n";
     return false;

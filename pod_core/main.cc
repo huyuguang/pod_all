@@ -1,5 +1,6 @@
 #include "capi/scheme_plain_otrange_test_capi.h"
 #include "capi/scheme_plain_range_test_capi.h"
+#include "capi/scheme_table_batch2_test_capi.h"
 #include "capi/scheme_table_batch_test_capi.h"
 #include "capi/scheme_table_otbatch_test_capi.h"
 #include "ecc_pub.h"
@@ -186,7 +187,6 @@ int main(int argc, char** argv) {
         using scheme::table::batch::capi::Test;
         return Test(publish_path, output_path, demand_ranges, test_evil) ? 0
                                                                          : -1;
-
       } else {
         using scheme::table::batch::Test;
         return Test(publish_path, output_path, demand_ranges, test_evil) ? 0
@@ -207,8 +207,15 @@ int main(int argc, char** argv) {
                    : -1;
       }
     } else if (action == Action::kBatch2Pod) {
-      using scheme::table::batch2::Test;
-      return Test(publish_path, output_path, demand_ranges) ? 0 : -1;
+      if (use_capi) {
+        using scheme::table::batch2::capi::Test;
+        return Test(publish_path, output_path, demand_ranges, test_evil) ? 0
+                                                                         : -1;
+      } else {
+        using scheme::table::batch2::Test;
+        return Test(publish_path, output_path, demand_ranges, test_evil) ? 0
+                                                                         : -1;
+      }
     } else {
       std::cerr << "Not implement yet.\n";
       return -1;

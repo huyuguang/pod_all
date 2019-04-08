@@ -1,6 +1,7 @@
 #include "capi/scheme_plain_otrange_test_capi.h"
 #include "capi/scheme_plain_range_test_capi.h"
 #include "capi/scheme_table_batch_test_capi.h"
+#include "capi/scheme_table_otbatch_test_capi.h"
 #include "ecc_pub.h"
 #include "public.h"
 #include "scheme_misc.h"
@@ -146,27 +147,25 @@ int main(int argc, char** argv) {
   if (mode == Mode::kPlain) {
     if (action == Action::kRangePod) {
       if (use_capi) {
-        return scheme::plain::range::capi::Test(publish_path, output_path,
-                                                demand_range, test_evil)
-                   ? 0
-                   : -1;
+        using scheme::plain::range::capi::Test;
+        return Test(publish_path, output_path, demand_range, test_evil) ? 0
+                                                                        : -1;
       } else {
-        return scheme::plain::range::Test(publish_path, output_path,
-                                          demand_range, test_evil)
-                   ? 0
-                   : -1;
+        using scheme::plain::range::Test;
+        return Test(publish_path, output_path, demand_range, test_evil) ? 0
+                                                                        : -1;
       }
     } else if (action == Action::kOtRangePod) {
       if (use_capi) {
-        return scheme::plain::otrange::capi::Test(publish_path, output_path,
-                                                  demand_range, phantom_range,
-                                                  test_evil)
+        using scheme::plain::otrange::capi::Test;
+        return Test(publish_path, output_path, demand_range, phantom_range,
+                    test_evil)
                    ? 0
                    : -1;
       } else {
-        return scheme::plain::otrange::Test(publish_path, output_path,
-                                            demand_range, phantom_range,
-                                            test_evil)
+        using scheme::plain::otrange::Test;
+        return Test(publish_path, output_path, demand_range, phantom_range,
+                    test_evil)
                    ? 0
                    : -1;
       }
@@ -176,37 +175,40 @@ int main(int argc, char** argv) {
     }
   } else {
     if (action == Action::kVrfQuery) {
-      return scheme::table::vrfq::Test(publish_path, query_key, query_values)
-                 ? 0
-                 : -1;
+      using scheme::table::vrfq::Test;
+      return Test(publish_path, query_key, query_values) ? 0 : -1;
     } else if (action == Action::kOtVrfQuery) {
-      return scheme::table::otvrfq::Test(publish_path, query_key, query_values,
-                                         phantom_values)
-                 ? 0
-                 : -1;
+      using scheme::table::otvrfq::Test;
+      return Test(publish_path, query_key, query_values, phantom_values) ? 0
+                                                                         : -1;
     } else if (action == Action::kBatchPod) {
       if (use_capi) {
-      return scheme::table::batch::capi::Test(publish_path, output_path,
-                                        demand_ranges, test_evil)
-                 ? 0
-                 : -1;
+        using scheme::table::batch::capi::Test;
+        return Test(publish_path, output_path, demand_ranges, test_evil) ? 0
+                                                                         : -1;
 
       } else {
-      return scheme::table::batch::Test(publish_path, output_path,
-                                        demand_ranges, test_evil)
-                 ? 0
-                 : -1;
+        using scheme::table::batch::Test;
+        return Test(publish_path, output_path, demand_ranges, test_evil) ? 0
+                                                                         : -1;
       }
     } else if (action == Action::kOtBatchPod) {
-      return scheme::table::otbatch::Test(publish_path, output_path,
-                                          demand_ranges, phantom_ranges)
-                 ? 0
-                 : -1;
+      if (use_capi) {
+        using scheme::table::otbatch::capi::Test;
+        return Test(publish_path, output_path, demand_ranges, phantom_ranges,
+                    test_evil)
+                   ? 0
+                   : -1;
+      } else {
+        using scheme::table::otbatch::Test;
+        return Test(publish_path, output_path, demand_ranges, phantom_ranges,
+                    test_evil)
+                   ? 0
+                   : -1;
+      }
     } else if (action == Action::kBatch2Pod) {
-      return scheme::table::batch2::Test(publish_path, output_path,
-                                         demand_ranges)
-                 ? 0
-                 : -1;
+      using scheme::table::batch2::Test;
+      return Test(publish_path, output_path, demand_ranges) ? 0 : -1;
     } else {
       std::cerr << "Not implement yet.\n";
       return -1;

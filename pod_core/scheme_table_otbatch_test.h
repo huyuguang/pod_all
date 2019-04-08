@@ -6,5 +6,5 @@
 namespace scheme::table::otbatch {
 bool Test(std::string const& publish_path, std::string const& output_path,
           std::vector<Range> const& demands,
-          std::vector<Range> const& phantoms);
+          std::vector<Range> const& phantoms, bool test_evil);
 }  // namespace scheme::table::otbatch

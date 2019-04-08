@@ -10,148 +10,17 @@
 
 #include "../scheme_plain_a.h"
 #include "../scheme_plain_b.h"
+#include "../scheme_plain_otrange_client.h"
+#include "../scheme_plain_otrange_session.h"
 #include "../scheme_plain_protocol_serialize.h"
 #include "../scheme_plain_range_client.h"
 #include "../scheme_plain_range_session.h"
-#include "../scheme_plain_otrange_client.h"
-#include "../scheme_plain_otrange_session.h"
 #include "ecc.h"
 #include "ecc_pub.h"
 
-namespace scheme::plain {
-std::mutex a_set_mutex;
-std::unordered_map<void*, APtr> a_set;
-std::mutex b_set_mutex;
-std::unordered_map<void*, BPtr> b_set;
-
-APtr GetAPtr(handle_t h) {
-  APtr ret;
-  std::scoped_lock<std::mutex> lock(a_set_mutex);
-  auto it = a_set.find(h);
-  if (it != a_set.end()) ret = it->second;
-  return ret;
-}
-
-scheme::plain::BPtr GetBPtr(handle_t h) {
-  scheme::plain::BPtr ret;
-  std::scoped_lock<std::mutex> lock(b_set_mutex);
-  auto it = b_set.find(h);
-  if (it != b_set.end()) ret = it->second;
-  return ret;
-}
-
-void AddA(A* p) {
-  APtr ptr(p);
-  std::scoped_lock<std::mutex> lock(a_set_mutex);
-  a_set.insert(std::make_pair(p, ptr));
-}
-
-void AddB(B* p) {
-  BPtr ptr(p);
-  std::scoped_lock<std::mutex> lock(b_set_mutex);
-  b_set.insert(std::make_pair(p, ptr));
-}
-
-bool DelA(A* p) {
-  std::scoped_lock<std::mutex> lock(a_set_mutex);
-  return a_set.erase(p) != 0;
-}
-
-bool DelB(B* p) {
-  std::scoped_lock<std::mutex> lock(b_set_mutex);
-  return b_set.erase(p) != 0;
-}
-}  // namespace scheme::plain
-
-namespace scheme::plain::range {
-std::mutex session_set_mutex;
-std::unordered_map<void*, SessionPtr> session_set;
-std::mutex client_set_mutex;
-std::unordered_map<void*, ClientPtr> client_set;
-
-void AddSession(Session* p) {
-  SessionPtr ptr(p);
-  std::scoped_lock<std::mutex> lock(session_set_mutex);
-  session_set.insert(std::make_pair(p, ptr));
-}
-
-SessionPtr GetSessionPtr(handle_t h) {
-  SessionPtr ret;
-  std::scoped_lock<std::mutex> lock(session_set_mutex);
-  auto it = session_set.find(h);
-  if (it != session_set.end()) ret = it->second;
-  return ret;
-}
-
-bool DelSession(Session* p) {
-  std::scoped_lock<std::mutex> lock(session_set_mutex);
-  return session_set.erase(p) != 0;
-}
-
-void AddClient(Client* p) {
-  ClientPtr ptr(p);
-  std::scoped_lock<std::mutex> lock(client_set_mutex);
-  client_set.insert(std::make_pair(p, ptr));
-}
-
-ClientPtr GetClientPtr(handle_t h) {
-  ClientPtr ret;
-  std::scoped_lock<std::mutex> lock(client_set_mutex);
-  auto it = client_set.find(h);
-  if (it != client_set.end()) ret = it->second;
-  return ret;
-}
-
-bool DelClient(Client* p) {
-  std::scoped_lock<std::mutex> lock(client_set_mutex);
-  return client_set.erase(p) != 0;
-}
-}  // namespace scheme::plain::range
-
-namespace scheme::plain::otrange {
-std::mutex session_set_mutex;
-std::unordered_map<void*, SessionPtr> session_set;
-std::mutex client_set_mutex;
-std::unordered_map<void*, ClientPtr> client_set;
-
-void AddSession(Session* p) {
-  SessionPtr ptr(p);
-  std::scoped_lock<std::mutex> lock(session_set_mutex);
-  session_set.insert(std::make_pair(p, ptr));
-}
-
-SessionPtr GetSessionPtr(handle_t h) {
-  SessionPtr ret;
-  std::scoped_lock<std::mutex> lock(session_set_mutex);
-  auto it = session_set.find(h);
-  if (it != session_set.end()) ret = it->second;
-  return ret;
-}
-
-bool DelSession(Session* p) {
-  std::scoped_lock<std::mutex> lock(session_set_mutex);
-  return session_set.erase(p) != 0;
-}
-
-void AddClient(Client* p) {
-  ClientPtr ptr(p);
-  std::scoped_lock<std::mutex> lock(client_set_mutex);
-  client_set.insert(std::make_pair(p, ptr));
-}
-
-ClientPtr GetClientPtr(handle_t h) {
-  ClientPtr ret;
-  std::scoped_lock<std::mutex> lock(client_set_mutex);
-  auto it = client_set.find(h);
-  if (it != client_set.end()) ret = it->second;
-  return ret;
-}
-
-bool DelClient(Client* p) {
-  std::scoped_lock<std::mutex> lock(client_set_mutex);
-  return client_set.erase(p) != 0;
-}
-}  // namespace scheme::plain::otrange
+#include "scheme_plain.inc"
+#include "scheme_plain_range.inc"
+#include "scheme_plain_otrange.inc"
 
 extern "C" {
 EXPORT handle_t E_PlainANew(char const* publish_path) {
@@ -210,7 +79,7 @@ EXPORT bool E_PlainBFree(handle_t h) {
   using namespace scheme::plain;
   return DelB((B*)h);
 }
-} // extern "C"
+}  // extern "C"
 
 // range
 extern "C" {
@@ -420,12 +289,12 @@ EXPORT bool E_PlainRangeClientFree(handle_t h) {
   using namespace scheme::plain::range;
   return DelClient((Client*)h);
 }
-} // extern "C"
+}  // extern "C" range
 
 // otrange
 extern "C" {
 EXPORT handle_t E_PlainOtRangeSessionNew(handle_t c_a, uint8_t const* c_self_id,
-                                       uint8_t const* c_peer_id) {
+                                         uint8_t const* c_peer_id) {
   using namespace scheme::plain;
   using namespace scheme::plain::otrange;
   APtr a = GetAPtr(c_a);
@@ -514,8 +383,8 @@ EXPORT bool E_PlainOtRangeSessionOnNegoResponse(handle_t c_session,
 }
 
 EXPORT bool E_PlainOtRangeSessionOnRequest(handle_t c_session,
-                                         char const* request_file,
-                                         char const* response_file) {
+                                           char const* request_file,
+                                           char const* response_file) {
   using namespace scheme::plain;
   using namespace scheme::plain::otrange;
   SessionPtr session = GetSessionPtr(c_session);
@@ -541,8 +410,8 @@ EXPORT bool E_PlainOtRangeSessionOnRequest(handle_t c_session,
 }
 
 EXPORT bool E_PlainOtRangeSessionOnReceipt(handle_t c_session,
-                                         char const* receipt_file,
-                                         char const* secret_file) {
+                                           char const* receipt_file,
+                                           char const* secret_file) {
   using namespace scheme::plain;
   using namespace scheme::plain::otrange;
   SessionPtr session = GetSessionPtr(c_session);
@@ -582,8 +451,8 @@ EXPORT bool E_PlainOtRangeSessionFree(handle_t h) {
 }
 
 EXPORT handle_t E_PlainOtRangeClientNew(handle_t c_b, uint8_t const* c_self_id,
-                                      uint8_t const* c_peer_id,
-                                      range_t c_demand, range_t c_phantom) {
+                                        uint8_t const* c_peer_id,
+                                        range_t c_demand, range_t c_phantom) {
   using namespace scheme::plain;
   using namespace scheme::plain::otrange;
   BPtr b = GetBPtr(c_b);
@@ -643,7 +512,7 @@ EXPORT bool E_PlainOtRangeClientOnNegoRequest(handle_t c_client,
     if (!client->OnNegoRequest(request, response)) return false;
 
     yas::file_ostream os(response_file);
-    yas::json_oarchive<yas::file_ostream> oa(os);
+    yas::binary_oarchive<yas::file_ostream> oa(os);
     oa.serialize(response);
   } catch (std::exception&) {
     return false;
@@ -662,7 +531,7 @@ EXPORT bool E_PlainOtRangeClientOnNegoResponse(handle_t c_client,
   try {
     NegoBResponse response;
     yas::file_istream is(response_file);
-    yas::json_iarchive<yas::file_istream> ia(is);
+    yas::binary_iarchive<yas::file_istream> ia(is);
     ia.serialize(response);
     return client->OnNegoResponse(response);
   } catch (std::exception&) {
@@ -673,7 +542,7 @@ EXPORT bool E_PlainOtRangeClientOnNegoResponse(handle_t c_client,
 }
 
 EXPORT bool E_PlainOtRangeClientGetRequest(handle_t c_client,
-                                         char const* request_file) {
+                                           char const* request_file) {
   using namespace scheme::plain;
   using namespace scheme::plain::otrange;
   ClientPtr client = GetClientPtr(c_client);
@@ -693,8 +562,8 @@ EXPORT bool E_PlainOtRangeClientGetRequest(handle_t c_client,
 }
 
 EXPORT bool E_PlainOtRangeClientOnResponse(handle_t c_client,
-                                         char const* response_file,
-                                         char const* receipt_file) {
+                                           char const* response_file,
+                                           char const* receipt_file) {
   using namespace scheme::plain;
   using namespace scheme::plain::otrange;
   ClientPtr client = GetClientPtr(c_client);
@@ -720,8 +589,8 @@ EXPORT bool E_PlainOtRangeClientOnResponse(handle_t c_client,
 }
 
 EXPORT bool E_PlainOtRangeClientOnSecret(handle_t c_client,
-                                       char const* secret_file,
-                                       char const* claim_file) {
+                                         char const* secret_file,
+                                         char const* claim_file) {
   using namespace scheme::plain;
   using namespace scheme::plain::otrange;
   ClientPtr client = GetClientPtr(c_client);
@@ -733,7 +602,7 @@ EXPORT bool E_PlainOtRangeClientOnSecret(handle_t c_client,
     yas::json_iarchive<yas::file_istream> ia(is);
     ia.serialize(secret);
 
-    Claim claim;   
+    Claim claim;
     if (!client->OnSecret(secret, claim)) {
       yas::file_ostream os(claim_file);
       yas::json_oarchive<yas::file_ostream> oa(os);
@@ -749,7 +618,7 @@ EXPORT bool E_PlainOtRangeClientOnSecret(handle_t c_client,
 }
 
 EXPORT bool E_PlainOtRangeClientSaveDecrypted(handle_t c_client,
-                                            char const* file) {
+                                              char const* file) {
   using namespace scheme::plain;
   using namespace scheme::plain::otrange;
   ClientPtr client = GetClientPtr(c_client);
@@ -767,4 +636,4 @@ EXPORT bool E_PlainOtRangeClientFree(handle_t h) {
   return DelClient((Client*)h);
 }
 
-}  // extern "C"
+}  // extern "C" otrange

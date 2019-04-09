@@ -254,12 +254,7 @@ void Client::BuildClaim(uint64_t i, uint64_t j, Claim& claim) {
   claim.j = j;
   auto ij = i * s_ + j;
   claim.kij = k_[ij];
-  auto root = mkl::CalcPath(
-      [this](uint64_t i) -> h256_t {
-        assert(i < k_.size());
-        return G1ToBin(k_[i]);
-      },
-      phantom_.count * s_, ij, &claim.mkl_path);
+  auto root = CalcPathOfK(k_, ij, claim.mkl_path);
   if (root != k_mkl_root_) {
     assert(false);
     throw std::runtime_error("oops, mkl root mismatch");

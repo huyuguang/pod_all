@@ -16,6 +16,24 @@
 #include "scheme_table_otvrfq_test.h"
 #include "scheme_table_vrfq_test.h"
 
+namespace {
+void DumpEccPub() {
+  auto const& ecc_pub = GetEccPub();
+  std::cout << "g1: " << G1ToStr(G1One()) << "\n";
+  std::cout << "g2: " << G1ToStr(G1One()) << "\n";
+  std::cout << "u1 size: " << ecc_pub.u1().size() << "\n";
+  std::cout << "u2 size: " << ecc_pub.u2().size() << "\n";
+  std::cout << "\nu1 list(z,x,y):";
+  for (auto const& i : ecc_pub.u1()) {
+    std::cout << G1ToStr(i) << "\n";
+  }
+  std::cout << "\nu2 list(z,x,y):";
+  for (auto const& i : ecc_pub.u2()) {
+    std::cout << G2ToStr(i) << "\n";
+  }
+  std::cout << "\n";
+}
+}
 int main(int argc, char** argv) {
   setlocale(LC_ALL, "");
 
@@ -36,6 +54,7 @@ int main(int argc, char** argv) {
   std::vector<Range> phantom_ranges;
   bool use_capi = false;
   bool test_evil = false;
+  bool dump_ecc_pub = false;
 
   try {
     po::options_description options("command line options");
@@ -64,16 +83,15 @@ int main(int argc, char** argv) {
         "key_value,v",
         po::value<std::vector<std::string>>(&query_values)->multitoken(),
         "Provide the query key values(table mode, for example "
-        "-v value_a "
-        "value_b value_c)")(
+        "-v value_a value_b value_c)")(
         "phantom_key,n",
         po::value<std::vector<std::string>>(&phantom_values)->multitoken(),
         "Provide the query key phantoms(table mode, for example -n "
-        "phantoms_a "
-        "phantoms_b phantoms_c)")(
+        "phantoms_a phantoms_b phantoms_c)")(
         "omp_thread_num", po::value<uint32_t>(&omp_thread_num),
         "Provide the number of the openmp thread, 1: disable "
-        "openmp, 0: default.")("use_c_api,c", "")("test_evil", "");
+        "openmp, 0: default.")("use_c_api,c", "")("test_evil", "")
+          ("dump_ecc_pub", "");
 
     boost::program_options::variables_map vmap;
 
@@ -92,6 +110,10 @@ int main(int argc, char** argv) {
 
     if (vmap.count("test_evil")) {
       test_evil = true;
+    }
+
+    if (vmap.count("dump_ecc_pub")) {
+      dump_ecc_pub = true;
     }
   } catch (std::exception& e) {
     std::cerr << "Unknown parameters.\n"
@@ -112,6 +134,18 @@ int main(int argc, char** argv) {
     return -1;
   }
 
+  InitEcc();
+
+  if (!LoadEccPub(ecc_pub_file)) {
+    std::cerr << "Open ecc pub file " << ecc_pub_file << " failed" << std::endl;
+    return -1;
+  }
+
+  if (dump_ecc_pub) {
+    DumpEccPub();
+    return 0;
+  }
+
   if (output_path.empty()) {
     std::cerr << "Want output_path(-o)" << std::endl;
     return -1;
@@ -126,6 +160,7 @@ int main(int argc, char** argv) {
     std::cerr << "Create " << output_path << " failed" << std::endl;
     return -1;
   }
+
   // clean the output_path
   for (auto& entry :
        boost::make_iterator_range(fs::directory_iterator(output_path), {})) {
@@ -138,13 +173,6 @@ int main(int argc, char** argv) {
       std::cerr << "Plain mode does not support vrf query&pod action\n";
       return -1;
     }
-  }
-
-  InitEcc();
-
-  if (!LoadEccPub(ecc_pub_file)) {
-    std::cerr << "Open ecc pub file " << ecc_pub_file << " failed" << std::endl;
-    return -1;
   }
 
   if (mode == Mode::kPlain) {

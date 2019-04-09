@@ -1,13 +1,13 @@
 #include "scheme_plain_notary.h"
 #include "chain.h"
 #include "mkl_tree.h"
+#include "scheme_misc.h"
 
 namespace scheme::plain::range {
 bool VerifyClaim(uint64_t s, Receipt const& receipt, Secret const& secret,
                  Claim const& claim) {
-  h256_t k_bin = G1ToBin(claim.kij);
-  if (!mkl::VerifyPath(claim.i * s + claim.j, k_bin, receipt.count * s,
-                       receipt.k_mkl_root, claim.mkl_path)) {
+  if (!VerifyPathOfK(claim.kij, claim.i * s + claim.j, receipt.count * s,
+                     receipt.k_mkl_root, claim.mkl_path)) {
     assert(false);
     return false;
   }
@@ -29,11 +29,10 @@ namespace scheme::plain::otrange {
 bool VerifyClaim(uint64_t s, Receipt const& receipt, Secret const& secret,
                  Claim const& claim) {
   // same with the scheme::plain::range::VerifyClaim
-  h256_t k_bin = G1ToBin(claim.kij);
-  if (!mkl::VerifyPath(claim.i * s + claim.j, k_bin, receipt.count * s,
-                       receipt.k_mkl_root, claim.mkl_path)) {
+  if (!VerifyPathOfK(claim.kij, claim.i * s + claim.j, receipt.count * s,
+                     receipt.k_mkl_root, claim.mkl_path)) {
     assert(false);
-    return false;
+    return false;  
   }
 
   // NOTE: Blockchain vm does not have ecc pub, must call u^v directly

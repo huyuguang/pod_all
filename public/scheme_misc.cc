@@ -256,13 +256,56 @@ void H2(h256_t const& seed, uint64_t count, std::vector<Fr>& v) {
   }
 }
 
+namespace {
+h256_t KToH256(G1 const& g) {
+  assert(g.isNormalized());
+  assert(g.z == 1);
+  const size_t kFpBufSize = 32;
+
+  uint8_t x[32];
+  size_t xlen = g.x.serialize(x, kFpBufSize);
+  assert(xlen == kFpBufSize);
+
+  uint8_t y[32];
+  size_t ylen = g.y.serialize(y, kFpBufSize);
+  assert(ylen == kFpBufSize);
+
+  h256_t digest;
+  CryptoPP::Keccak_256 hash;
+  hash.Update(x, sizeof(x));
+  hash.Update(y, sizeof(y));
+  hash.Final(digest.data());
+  return digest;
+}
+}  // namespace
+
+// since we need to verify the mkl path in contract, we use plain G1
 h256_t CalcRootOfK(std::vector<G1> const& k) {
   Tick _tick_(__FUNCTION__);
   auto get_k = [&k](uint64_t i) -> h256_t {
     assert(i < k.size());
-    return G1ToBin(k[i]);
+    return KToH256(k[i]);
   };
   return mkl::CalcRoot(std::move(get_k), k.size());
+}
+
+// since we need to verify the mkl path in contract, we use plain G1
+h256_t CalcPathOfK(std::vector<G1> const& k, uint64_t ij,
+                   std::vector<h256_t>& path) {
+  auto root = mkl::CalcPath(
+      [&k](uint64_t i) -> h256_t {
+        assert(i < k.size());
+        return KToH256(k[i]);
+      },
+      k.size(), ij, &path);
+  return root;
+}
+
+// since we need to verify the mkl path in contract, we use plain G1
+bool VerifyPathOfK(G1 const& kij, uint64_t ij, uint64_t ns, h256_t const& root,
+                   std::vector<h256_t> const& path) {
+  h256_t k_bin = KToH256(kij);
+  return mkl::VerifyPath(ij, k_bin, ns, root, path);
 }
 
 void BuildK(std::vector<Fr> const& v, std::vector<G1>& k, uint64_t s) {

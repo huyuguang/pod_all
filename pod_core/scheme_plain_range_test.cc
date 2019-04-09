@@ -72,6 +72,7 @@ bool Test(std::string const& output_path, APtr a, BPtr b, Range const& demand,
       assert(false);
       return false;
     }
+    std::cout << "verify claim success\n";
   }
 
   return true;

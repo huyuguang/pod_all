@@ -57,6 +57,12 @@ void H2(h256_t const& seed, uint64_t count, std::vector<Fr>& v);
 
 h256_t CalcRootOfK(std::vector<G1> const& k);
 
+h256_t CalcPathOfK(std::vector<G1> const& k, uint64_t ij,
+                   std::vector<h256_t>& path);
+
+bool VerifyPathOfK(G1 const& kij, uint64_t ij, uint64_t ns, h256_t const& root,
+                   std::vector<h256_t> const& path);
+
 void BuildK(std::vector<Fr> const& v, std::vector<G1>& k, uint64_t s);
 
 h256_t CalcSeed2(h256_t const& seed, h256_t const& k_mkl_root);

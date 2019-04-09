@@ -97,6 +97,7 @@ bool Test(std::string const& output_path, APtr a, BPtr b,
       assert(false);
       return false;
     }
+    std::cout << "verify claim success\n";
   }
 
   return true;

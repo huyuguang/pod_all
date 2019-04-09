@@ -228,6 +228,7 @@ bool Test(std::string const& output_path, WrapperA const& a, WrapperB const& b,
       assert(false);
       return false;
     }
+    std::cout << "verify claim success\n";
   }
 
   return true;

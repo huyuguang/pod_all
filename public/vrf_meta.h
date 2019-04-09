@@ -28,7 +28,6 @@ struct VrfMeta {
   bool valid() const;
   bool operator==(VrfMeta const& v) const;
   bool operator!=(VrfMeta const& v) const;
-  // TODO: serialize,deserialize
 };
 
 bool SaveVrfMeta(std::string const& output, VrfMeta const& data);

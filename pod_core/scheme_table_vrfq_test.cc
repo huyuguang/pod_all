@@ -80,13 +80,14 @@ bool Test(APtr a, BPtr b, std::string const& query_key,
   if (unique) {
     auto left_values = query_values;
     for (uint64_t i = 0;; ++i) {
-      std::vector<std::string> values;
+      std::vector<std::string> values_with_suffix;
       for (auto const& value : left_values) {
         std::string value_with_suffix = value + "_" + std::to_string(i);
-        values.emplace_back(std::move(value_with_suffix));
+        values_with_suffix.emplace_back(std::move(value_with_suffix));
       }
       std::vector<std::vector<uint64_t>> positions;
-      if (!QueryInternal(a, b, query_key, values, positions)) return false;
+      if (!QueryInternal(a, b, query_key, values_with_suffix, positions))
+        return false;
       DumpPositions(query_key, left_values, positions);
 
       for (uint64_t j = 0; j < positions.size(); ++j) {
@@ -106,7 +107,8 @@ bool Test(APtr a, BPtr b, std::string const& query_key,
   return true;
 }
 
-bool Test(std::string const& publish_path, std::string const& query_key,
+bool Test(std::string const& publish_path, std::string const& /*output_path*/,
+          std::string const& query_key,
           std::vector<std::string> const& query_values) {
   try {
     auto a = std::make_shared<A>(publish_path);

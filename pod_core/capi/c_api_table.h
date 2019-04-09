@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stdint.h>
+#include "c_api_ec.h"
 #include "c_api_types.h"
 
 #ifdef _WIN32
@@ -18,6 +19,9 @@ EXPORT bool E_TableBFree(handle_t h);
 
 EXPORT bool E_TableABulletin(handle_t h, table_bulletin_t* bulletin);
 EXPORT bool E_TableBBulletin(handle_t h, table_bulletin_t* bulletin);
+
+EXPORT bool E_TableBIsKeyUnique(handle_t h, char const* query_key,
+                                bool* unique);
 }
 
 // batch
@@ -248,4 +252,4 @@ EXPORT bool E_TableVrfqClientOnSecret(handle_t c_client,
                                       char const* positions_file);
 
 EXPORT bool E_TableVrfqClientFree(handle_t h);
-} // extern "C" vrfq
+}  // extern "C" vrfq

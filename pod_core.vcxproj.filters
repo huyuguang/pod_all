@@ -190,6 +190,12 @@
     <ClCompile Include="pod_core\capi\scheme_table_batch2_test_capi.cc">
       <Filter>capi</Filter>
     </ClCompile>
+    <ClCompile Include="pod_core\capi\scheme_table_otvrfq_test_capi.cc">
+      <Filter>capi</Filter>
+    </ClCompile>
+    <ClCompile Include="pod_core\capi\scheme_table_vrfq_test_capi.cc">
+      <Filter>capi</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="mcl\include\mcl\aggregate_sig.hpp">
@@ -529,6 +535,15 @@
       <Filter>capi</Filter>
     </ClInclude>
     <ClInclude Include="pod_core\capi\scheme_table_batch2_test_capi.h">
+      <Filter>capi</Filter>
+    </ClInclude>
+    <ClInclude Include="pod_core\capi\scheme_table_otvrfq_test_capi.h">
+      <Filter>capi</Filter>
+    </ClInclude>
+    <ClInclude Include="pod_core\capi\scheme_table_vrfq_test_capi.h">
+      <Filter>capi</Filter>
+    </ClInclude>
+    <ClInclude Include="pod_core\capi\c_api_ec.h">
       <Filter>capi</Filter>
     </ClInclude>
   </ItemGroup>

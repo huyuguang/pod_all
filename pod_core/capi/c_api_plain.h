@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stdint.h>
+#include "c_api_ec.h"
 #include "c_api_types.h"
 
 #ifdef _WIN32
@@ -56,7 +57,7 @@ EXPORT bool E_PlainRangeClientSaveDecrypted(handle_t c_client,
                                             char const* file);
 
 EXPORT bool E_PlainRangeClientFree(handle_t h);
-} // extern "C" range
+}  // extern "C" range
 
 // otrange
 extern "C" {
@@ -114,4 +115,4 @@ EXPORT bool E_PlainOtRangeClientSaveDecrypted(handle_t c_client,
                                               char const* file);
 
 EXPORT bool E_PlainOtRangeClientFree(handle_t h);
-} // extern "C" otrange
+}  // extern "C" otrange

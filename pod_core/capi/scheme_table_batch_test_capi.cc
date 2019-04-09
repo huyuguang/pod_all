@@ -143,7 +143,7 @@ bool Test(std::string const& output_path, WrapperA const& a, WrapperB const& b,
       return false;
     }
 
-    scheme::table::batch::Claim claim;
+    Claim claim;
     try {
       yas::file_istream is(claim_file.c_str());
       yas::json_iarchive<yas::file_istream> ia(is);
@@ -153,7 +153,7 @@ bool Test(std::string const& output_path, WrapperA const& a, WrapperB const& b,
       return false;
     }
 
-    scheme::table::batch::Receipt receipt;
+    Receipt receipt;
     try {
       yas::file_istream is(receipt_file.c_str());
       yas::json_iarchive<yas::file_istream> ia(is);
@@ -163,7 +163,7 @@ bool Test(std::string const& output_path, WrapperA const& a, WrapperB const& b,
       return false;
     }
 
-    scheme::table::batch::Secret secret;
+    Secret secret;
     try {
       yas::file_istream is(secret_file.c_str());
       yas::json_iarchive<yas::file_istream> ia(is);

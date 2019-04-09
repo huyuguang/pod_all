@@ -21,6 +21,7 @@
 #include "../scheme_table_protocol_serialize.h"
 #include "../scheme_table_vrfq_client.h"
 #include "../scheme_table_vrfq_session.h"
+#include "../../public/scheme_table.h"
 #include "ecc.h"
 #include "ecc_pub.h"
 
@@ -77,6 +78,17 @@ EXPORT bool E_TableBBulletin(handle_t h, table_bulletin_t* bulletin) {
   bulletin->s = v.s;
   memcpy(bulletin->sigma_mkl_root, v.sigma_mkl_root.data(), 32);
   memcpy(bulletin->vrf_meta_digest, v.vrf_meta_digest.data(), 32);
+  return true;
+}
+
+EXPORT bool E_TableBIsKeyUnique(handle_t h, char const* query_key,
+                                bool* unique) {
+  using namespace scheme::table;
+  BPtr b = GetBPtr(h);
+  if (!b) return false;
+  auto vrf_key = GetKeyMetaByName(b->vrf_meta(), query_key);
+  if (!vrf_key) return false;
+  *unique = vrf_key->unique;
   return true;
 }
 

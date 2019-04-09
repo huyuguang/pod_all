@@ -112,6 +112,8 @@
     <ClCompile Include="pod_core\capi\scheme_table_batch2_test_capi.cc" />
     <ClCompile Include="pod_core\capi\scheme_table_batch_test_capi.cc" />
     <ClCompile Include="pod_core\capi\scheme_table_otbatch_test_capi.cc" />
+    <ClCompile Include="pod_core\capi\scheme_table_otvrfq_test_capi.cc" />
+    <ClCompile Include="pod_core\capi\scheme_table_vrfq_test_capi.cc" />
     <ClCompile Include="pod_core\main.cc" />
     <ClCompile Include="pod_core\scheme_plain_a.cc" />
     <ClCompile Include="pod_core\scheme_plain_b.cc" />
@@ -205,6 +207,7 @@
     <ClInclude Include="mcl\include\mcl\window_method.hpp" />
     <ClInclude Include="pod_core\basic_types_serialize.h" />
     <ClInclude Include="pod_core\capi\c_api.h" />
+    <ClInclude Include="pod_core\capi\c_api_ec.h" />
     <ClInclude Include="pod_core\capi\c_api_plain.h" />
     <ClInclude Include="pod_core\capi\c_api_table.h" />
     <ClInclude Include="pod_core\capi\c_api_types.h" />
@@ -213,6 +216,8 @@
     <ClInclude Include="pod_core\capi\scheme_table_batch2_test_capi.h" />
     <ClInclude Include="pod_core\capi\scheme_table_batch_test_capi.h" />
     <ClInclude Include="pod_core\capi\scheme_table_otbatch_test_capi.h" />
+    <ClInclude Include="pod_core\capi\scheme_table_otvrfq_test_capi.h" />
+    <ClInclude Include="pod_core\capi\scheme_table_vrfq_test_capi.h" />
     <ClInclude Include="pod_core\scheme_plain_a.h" />
     <ClInclude Include="pod_core\scheme_plain_b.h" />
     <ClInclude Include="pod_core\scheme_plain_otrange_client.h" />

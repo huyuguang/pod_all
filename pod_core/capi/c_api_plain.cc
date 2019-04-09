@@ -243,8 +243,7 @@ EXPORT bool E_PlainRangeClientOnResponse(handle_t c_client,
 }
 
 EXPORT bool E_PlainRangeClientOnSecret(handle_t c_client,
-                                       char const* secret_file,
-                                       char const* claim_file) {
+                                       char const* secret_file) {
   using namespace scheme::plain;
   using namespace scheme::plain::range;
   ClientPtr client = GetClientPtr(c_client);
@@ -255,15 +254,28 @@ EXPORT bool E_PlainRangeClientOnSecret(handle_t c_client,
     yas::file_istream is(secret_file);
     yas::json_iarchive<yas::file_istream> ia(is);
     ia.serialize(secret);
+    return client->OnSecret(secret);
+  } catch (std::exception&) {
+    return false;
+  }
 
+  return true;
+}
+
+EXPORT bool E_PlainRangeClientGenerateClaim(handle_t c_client,
+                                            char const* claim_file) {
+  using namespace scheme::plain;
+  using namespace scheme::plain::range;
+  ClientPtr client = GetClientPtr(c_client);
+  if (!client) return false;
+
+  try {
     Claim claim;
-    if (!client->OnSecret(secret, claim)) {
-      yas::file_ostream os(claim_file);
-      yas::json_oarchive<yas::file_ostream> oa(os);
-      oa.serialize(claim);
-      return false;
-    }
-    return true;
+    if (!client->GenerateClaim(claim)) return false;
+    
+    yas::file_ostream os(claim_file);
+    yas::json_oarchive<yas::file_ostream> oa(os);
+    oa.serialize(claim);
   } catch (std::exception&) {
     return false;
   }
@@ -589,8 +601,7 @@ EXPORT bool E_PlainOtRangeClientOnResponse(handle_t c_client,
 }
 
 EXPORT bool E_PlainOtRangeClientOnSecret(handle_t c_client,
-                                         char const* secret_file,
-                                         char const* claim_file) {
+                                         char const* secret_file) {
   using namespace scheme::plain;
   using namespace scheme::plain::otrange;
   ClientPtr client = GetClientPtr(c_client);
@@ -601,15 +612,28 @@ EXPORT bool E_PlainOtRangeClientOnSecret(handle_t c_client,
     yas::file_istream is(secret_file);
     yas::json_iarchive<yas::file_istream> ia(is);
     ia.serialize(secret);
+    return client->OnSecret(secret);
+  } catch (std::exception&) {
+    return false;
+  }
 
+  return true;
+}
+
+EXPORT bool E_PlainOtRangeClientGenerateClaim(handle_t c_client,
+                                              char const* claim_file) {
+  using namespace scheme::plain;
+  using namespace scheme::plain::otrange;
+  ClientPtr client = GetClientPtr(c_client);
+  if (!client) return false;
+
+  try {
     Claim claim;
-    if (!client->OnSecret(secret, claim)) {
-      yas::file_ostream os(claim_file);
-      yas::json_oarchive<yas::file_ostream> oa(os);
-      oa.serialize(claim);
-      return false;
-    }
-    return true;
+    if (!client->GenerateClaim(claim)) return false;
+    
+    yas::file_ostream os(claim_file);
+    yas::json_oarchive<yas::file_ostream> oa(os);
+    oa.serialize(claim);
   } catch (std::exception&) {
     return false;
   }

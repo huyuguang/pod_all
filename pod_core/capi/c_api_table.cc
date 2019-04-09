@@ -8,6 +8,7 @@
 #include <unordered_map>
 #include <vector>
 
+#include "../../public/scheme_table.h"
 #include "../scheme_table_a.h"
 #include "../scheme_table_b.h"
 #include "../scheme_table_batch2_client.h"
@@ -21,7 +22,6 @@
 #include "../scheme_table_protocol_serialize.h"
 #include "../scheme_table_vrfq_client.h"
 #include "../scheme_table_vrfq_session.h"
-#include "../../public/scheme_table.h"
 #include "ecc.h"
 #include "ecc_pub.h"
 
@@ -272,8 +272,7 @@ EXPORT bool E_TableBatchClientOnResponse(handle_t c_client,
 }
 
 EXPORT bool E_TableBatchClientOnSecret(handle_t c_client,
-                                       char const* secret_file,
-                                       char const* claim_file) {
+                                       char const* secret_file) {
   using namespace scheme::table;
   using namespace scheme::table::batch;
   ClientPtr client = GetClientPtr(c_client);
@@ -284,15 +283,28 @@ EXPORT bool E_TableBatchClientOnSecret(handle_t c_client,
     yas::file_istream is(secret_file);
     yas::json_iarchive<yas::file_istream> ia(is);
     ia.serialize(secret);
+    return client->OnSecret(secret);
+  } catch (std::exception&) {
+    return false;
+  }
 
+  return true;
+}
+
+EXPORT bool E_TableBatchClientGenerateClaim(handle_t c_client,
+                                            char const* claim_file) {
+  using namespace scheme::table;
+  using namespace scheme::table::batch;
+  ClientPtr client = GetClientPtr(c_client);
+  if (!client) return false;
+
+  try {
     Claim claim;
-    if (!client->OnSecret(secret, claim)) {
-      yas::file_ostream os(claim_file);
-      yas::json_oarchive<yas::file_ostream> oa(os);
-      oa.serialize(claim);
-      return false;
-    }
-    return true;
+    if (!client->GenerateClaim(claim)) return false;
+
+    yas::file_ostream os(claim_file);
+    yas::json_oarchive<yas::file_ostream> oa(os);
+    oa.serialize(claim);
   } catch (std::exception&) {
     return false;
   }
@@ -839,8 +851,7 @@ EXPORT bool E_TableOtBatchClientOnResponse(handle_t c_client,
 }
 
 EXPORT bool E_TableOtBatchClientOnSecret(handle_t c_client,
-                                         char const* secret_file,
-                                         char const* claim_file) {
+                                         char const* secret_file) {
   using namespace scheme::table;
   using namespace scheme::table::otbatch;
   ClientPtr client = GetClientPtr(c_client);
@@ -851,15 +862,28 @@ EXPORT bool E_TableOtBatchClientOnSecret(handle_t c_client,
     yas::file_istream is(secret_file);
     yas::json_iarchive<yas::file_istream> ia(is);
     ia.serialize(secret);
+    return client->OnSecret(secret);
+  } catch (std::exception&) {
+    return false;
+  }
 
+  return true;
+}
+
+EXPORT bool E_TableOtBatchClientGenerateClaim(handle_t c_client,
+                                              char const* claim_file) {
+  using namespace scheme::table;
+  using namespace scheme::table::otbatch;
+  ClientPtr client = GetClientPtr(c_client);
+  if (!client) return false;
+
+  try {
     Claim claim;
-    if (!client->OnSecret(secret, claim)) {
-      yas::file_ostream os(claim_file);
-      yas::json_oarchive<yas::file_ostream> oa(os);
-      oa.serialize(claim);
-      return false;
-    }
-    return true;
+    if (!client->GenerateClaim(claim)) return false;
+
+    yas::file_ostream os(claim_file);
+    yas::json_oarchive<yas::file_ostream> oa(os);
+    oa.serialize(claim);
   } catch (std::exception&) {
     return false;
   }
@@ -1204,11 +1228,13 @@ EXPORT bool E_TableOtVrfqClientOnSecret(handle_t c_client,
 
     std::vector<std::vector<uint64_t>> positions;
     if (!client->OnSecret(secret, positions)) {
-      yas::file_ostream os(positions_file);
-      yas::json_oarchive<yas::file_ostream> oa(os);
-      oa.serialize(positions);
+      assert(false);
       return false;
     }
+
+    yas::file_ostream os(positions_file);
+    yas::json_oarchive<yas::file_ostream> oa(os);
+    oa.serialize(positions);
     return true;
   } catch (std::exception&) {
     return false;
@@ -1397,11 +1423,13 @@ EXPORT bool E_TableVrfqClientOnSecret(handle_t c_client,
 
     std::vector<std::vector<uint64_t>> positions;
     if (!client->OnSecret(secret, positions)) {
-      yas::file_ostream os(positions_file);
-      yas::json_oarchive<yas::file_ostream> oa(os);
-      oa.serialize(positions);
+      assert(false);
       return false;
     }
+
+    yas::file_ostream os(positions_file);
+    yas::json_oarchive<yas::file_ostream> oa(os);
+    oa.serialize(positions);
     return true;
   } catch (std::exception&) {
     return false;

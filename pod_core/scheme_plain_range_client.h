@@ -19,14 +19,15 @@ class Client {
  public:
   void GetRequest(Request& request);
   bool OnResponse(Response response, Receipt& receipt);
-  bool OnSecret(Secret const& secret, Claim& claim);
+  bool OnSecret(Secret const& secret);
+  bool GenerateClaim(Claim& claim);
   bool SaveDecrypted(std::string const& file);
 
  private:
   bool CheckEncryptedM();
-  bool CheckK(std::vector<Fr> const& v, Claim& claim);
-  bool CheckKDirect(std::vector<Fr> const& v, Claim& claim);
-  bool CheckKMultiExp(std::vector<Fr> const& v, Claim& claim);
+  bool CheckK(std::vector<Fr> const& v);
+  bool CheckKDirect(std::vector<Fr> const& v);
+  bool CheckKMultiExp(std::vector<Fr> const& v);
   void DecryptM(std::vector<Fr> const& v);
   uint64_t FindMismatchI(uint64_t mismatch_j,
                          std::vector<G1 const*> const& k_col,
@@ -51,6 +52,8 @@ class Client {
   h256_t k_mkl_root_;
   std::vector<Fr> encrypted_m_;
   std::vector<Fr> decrypted_m_;
+  int64_t claim_i_ = -1;
+  int64_t claim_j_ = -1;
 };
 
 typedef std::shared_ptr<Client> ClientPtr;

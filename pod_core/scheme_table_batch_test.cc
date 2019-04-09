@@ -48,8 +48,7 @@ bool Test(std::string const& output_path, APtr a, BPtr b,
   }
 
   if (!evil) {
-    Claim claim;
-    if (!client.OnSecret(secret, claim)) {
+    if (!client.OnSecret(secret)) {
       assert(false);
       return false;
     }
@@ -58,9 +57,13 @@ bool Test(std::string const& output_path, APtr a, BPtr b,
       assert(false);
       return false;
     }
-  } else {
+  } else {    
+    if (client.OnSecret(secret)) {
+      assert(false);
+      return false;
+    }
     Claim claim;
-    if (client.OnSecret(secret, claim)) {
+    if (!client.GenerateClaim(claim)) {
       assert(false);
       return false;
     }

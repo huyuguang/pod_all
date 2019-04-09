@@ -196,6 +196,9 @@
     <ClCompile Include="pod_core\capi\scheme_table_vrfq_test_capi.cc">
       <Filter>capi</Filter>
     </ClCompile>
+    <ClCompile Include="public\scheme_error.cc">
+      <Filter>public</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="mcl\include\mcl\aggregate_sig.hpp">
@@ -543,8 +546,8 @@
     <ClInclude Include="pod_core\capi\scheme_table_vrfq_test_capi.h">
       <Filter>capi</Filter>
     </ClInclude>
-    <ClInclude Include="pod_core\capi\c_api_ec.h">
-      <Filter>capi</Filter>
+    <ClInclude Include="public\scheme_error.h">
+      <Filter>public</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

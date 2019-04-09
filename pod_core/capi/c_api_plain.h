@@ -1,7 +1,6 @@
 #pragma once
 
 #include <stdint.h>
-#include "c_api_ec.h"
 #include "c_api_types.h"
 
 #ifdef _WIN32
@@ -50,8 +49,10 @@ EXPORT bool E_PlainRangeClientOnResponse(handle_t c_client,
                                          char const* receipt_file);
 
 EXPORT bool E_PlainRangeClientOnSecret(handle_t c_client,
-                                       char const* secret_file,
-                                       char const* claim_file);
+                                       char const* secret_file);
+
+EXPORT bool E_PlainRangeClientGenerateClaim(handle_t c_client,
+                                            char const* claim_file);
 
 EXPORT bool E_PlainRangeClientSaveDecrypted(handle_t c_client,
                                             char const* file);
@@ -108,8 +109,10 @@ EXPORT bool E_PlainOtRangeClientOnResponse(handle_t c_client,
                                            char const* receipt_file);
 
 EXPORT bool E_PlainOtRangeClientOnSecret(handle_t c_client,
-                                         char const* secret_file,
-                                         char const* claim_file);
+                                         char const* secret_file);
+
+EXPORT bool E_PlainOtRangeClientGenerateClaim(handle_t c_client,
+                                              char const* claim_file);
 
 EXPORT bool E_PlainOtRangeClientSaveDecrypted(handle_t c_client,
                                               char const* file);

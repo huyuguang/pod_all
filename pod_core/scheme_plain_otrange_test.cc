@@ -3,9 +3,9 @@
 #include "scheme_plain_a.h"
 #include "scheme_plain_b.h"
 #include "scheme_plain_notary.h"
-#include "scheme_plain_protocol.h"
 #include "scheme_plain_otrange_client.h"
 #include "scheme_plain_otrange_session.h"
+#include "scheme_plain_protocol.h"
 
 namespace {
 // The session id must be hash(addr_A), and the client id must be hash(addr_B).
@@ -72,8 +72,7 @@ bool Test(std::string const& output_path, APtr a, BPtr b, Range const& demand,
   }
 
   if (!evil) {
-    Claim claim;
-    if (!client.OnSecret(secret, claim)) {
+    if (!client.OnSecret(secret)) {
       assert(false);
       return false;
     }
@@ -83,8 +82,12 @@ bool Test(std::string const& output_path, APtr a, BPtr b, Range const& demand,
       return false;
     }
   } else {
+    if (client.OnSecret(secret)) {
+      assert(false);
+      return false;
+    }
     Claim claim;
-    if (client.OnSecret(secret, claim)) {
+    if (!client.GenerateClaim(claim)) {
       assert(false);
       return false;
     }

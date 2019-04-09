@@ -116,6 +116,7 @@
     <ClCompile Include="public\ecc.cc" />
     <ClCompile Include="public\fp.cc" />
     <ClCompile Include="public\mkl_tree.cc" />
+    <ClCompile Include="public\scheme_error.cc" />
     <ClCompile Include="public\scheme_misc.cc" />
     <ClCompile Include="public\scheme_plain.cc" />
     <ClCompile Include="public\scheme_table.cc" />
@@ -193,6 +194,7 @@
     <ClInclude Include="public\msvc_hack.h" />
     <ClInclude Include="public\multiexp.h" />
     <ClInclude Include="public\public.h" />
+    <ClInclude Include="public\scheme_error.h" />
     <ClInclude Include="public\scheme_misc.h" />
     <ClInclude Include="public\scheme_plain.h" />
     <ClInclude Include="public\scheme_table.h" />

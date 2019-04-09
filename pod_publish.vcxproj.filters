@@ -76,6 +76,9 @@
     <ClCompile Include="public\vrf_meta.cc">
       <Filter>public</Filter>
     </ClCompile>
+    <ClCompile Include="public\scheme_error.cc">
+      <Filter>public</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="mcl\include\mcl\aggregate_sig.hpp">
@@ -310,6 +313,9 @@
       <Filter>public</Filter>
     </ClInclude>
     <ClInclude Include="public\vrf_meta.h">
+      <Filter>public</Filter>
+    </ClInclude>
+    <ClInclude Include="public\scheme_error.h">
       <Filter>public</Filter>
     </ClInclude>
   </ItemGroup>

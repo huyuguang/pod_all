@@ -222,29 +222,40 @@ bool Client::CheckEncryptedM() {
   return true;
 }
 
-bool Client::OnSecret(Secret const& secret, Claim& claim) {
+bool Client::OnSecret(Secret const& secret) {
   Tick _tick_(__FUNCTION__);
 
   // compute v
   std::vector<Fr> v;
   H2(secret.seed0, phantoms_count_ * s_, v);
 
-  if (!CheckK(v, claim)) return false;
-
-  DecryptM(v);
-
-  return true;
-}
-
-bool Client::CheckK(std::vector<Fr> const& v, Claim& claim) {
-  if (v.size() > (1024 * 1024) && omp_get_max_threads() < 3) {
-    return CheckKMultiExp(v, claim);
+  if (!CheckK(v)) {
+    assert(claim_i_ >= 0 && claim_j_ >= 0);
+    return false;
   } else {
-    return CheckKDirect(v, claim);
+    DecryptM(v);
+    return true;
   }
 }
 
-bool Client::CheckKDirect(std::vector<Fr> const& v, Claim& claim) {
+bool Client::GenerateClaim(Claim& claim) {
+  if (claim_i_ == -1 || claim_j_ == -1) {
+    assert(false);
+    return false;
+  }
+  BuildClaim(claim_i_, claim_j_, claim);
+  return true;
+}
+
+bool Client::CheckK(std::vector<Fr> const& v) {
+  if (v.size() > (1024 * 1024) && omp_get_max_threads() < 3) {
+    return CheckKMultiExp(v);
+  } else {
+    return CheckKDirect(v);
+  }
+}
+
+bool Client::CheckKDirect(std::vector<Fr> const& v) {
   Tick _tick_(__FUNCTION__);
 
   // compute k
@@ -256,14 +267,15 @@ bool Client::CheckKDirect(std::vector<Fr> const& v, Claim& claim) {
     for (uint64_t j = 0; j < s_; ++j) {
       auto offset = i * s_ + j;
       if (k[offset] == k_[offset]) continue;
-      BuildClaim(i, j, claim);
+      claim_i_ = i;
+      claim_j_ = j;
       return false;
     }
   }
   return true;
 }
 
-bool Client::CheckKMultiExp(std::vector<Fr> const& v, Claim& claim) {
+bool Client::CheckKMultiExp(std::vector<Fr> const& v) {
   Tick _tick_(__FUNCTION__);
 
   auto const& ecc_pub = GetEccPub();
@@ -300,7 +312,8 @@ bool Client::CheckKMultiExp(std::vector<Fr> const& v, Claim& claim) {
     throw std::runtime_error("oops! FindMismatchI failed to find mismatch i");
   }
 
-  BuildClaim(mismatch_i, mismatch_j, claim);
+  claim_i_ = mismatch_i;
+  claim_j_ = mismatch_j;
 
   return false;
 }

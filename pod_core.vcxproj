@@ -147,6 +147,7 @@
     <ClCompile Include="public\ecc.cc" />
     <ClCompile Include="public\fp.cc" />
     <ClCompile Include="public\mkl_tree.cc" />
+    <ClCompile Include="public\scheme_error.cc" />
     <ClCompile Include="public\scheme_misc.cc" />
     <ClCompile Include="public\scheme_plain.cc" />
     <ClCompile Include="public\scheme_table.cc" />
@@ -207,7 +208,6 @@
     <ClInclude Include="mcl\include\mcl\window_method.hpp" />
     <ClInclude Include="pod_core\basic_types_serialize.h" />
     <ClInclude Include="pod_core\capi\c_api.h" />
-    <ClInclude Include="pod_core\capi\c_api_ec.h" />
     <ClInclude Include="pod_core\capi\c_api_plain.h" />
     <ClInclude Include="pod_core\capi\c_api_table.h" />
     <ClInclude Include="pod_core\capi\c_api_types.h" />
@@ -262,6 +262,7 @@
     <ClInclude Include="public\msvc_hack.h" />
     <ClInclude Include="public\multiexp.h" />
     <ClInclude Include="public\public.h" />
+    <ClInclude Include="public\scheme_error.h" />
     <ClInclude Include="public\scheme_misc.h" />
     <ClInclude Include="public\scheme_plain.h" />
     <ClInclude Include="public\scheme_table.h" />

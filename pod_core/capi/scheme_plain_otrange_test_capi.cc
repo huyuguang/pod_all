@@ -171,8 +171,7 @@ bool Test(std::string const& output_path, WrapperA const& a, WrapperB const& b,
   }
 
   if (!evil) {
-    if (!E_PlainOtRangeClientOnSecret(client.h(), secret_file.c_str(),
-                                      claim_file.c_str())) {
+    if (!E_PlainOtRangeClientOnSecret(client.h(), secret_file.c_str())) {
       assert(false);
       return false;
     }
@@ -182,8 +181,12 @@ bool Test(std::string const& output_path, WrapperA const& a, WrapperB const& b,
       return false;
     }
   } else {
-    if (E_PlainOtRangeClientOnSecret(client.h(), secret_file.c_str(),
-                                     claim_file.c_str())) {
+    if (E_PlainOtRangeClientOnSecret(client.h(), secret_file.c_str())) {
+      assert(false);
+      return false;
+    }
+
+    if (!E_PlainOtRangeClientGenerateClaim(client.h(), claim_file.c_str())) {
       assert(false);
       return false;
     }

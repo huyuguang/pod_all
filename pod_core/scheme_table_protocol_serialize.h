@@ -40,7 +40,7 @@ void serialize(Ar &ar, Receipt const &t) {
 template <typename Ar>
 void serialize(Ar &ar, Receipt &t) {
   std::string g_exp_r_str;
-  ar &YAS_OBJECT_NVP("stv::Receipt", ("s", g_exp_r_str));
+  ar &YAS_OBJECT_NVP("stv::Receipt", ("g", g_exp_r_str));
   t.g_exp_r = StrToG1(g_exp_r_str);
 }
 
@@ -150,7 +150,7 @@ void serialize(Ar &ar, Receipt const &t) {
 template <typename Ar>
 void serialize(Ar &ar, Receipt &t) {
   std::string g_exp_r_str;
-  ar &YAS_OBJECT_NVP("stov::Receipt", ("s", g_exp_r_str));
+  ar &YAS_OBJECT_NVP("stov::Receipt", ("g", g_exp_r_str));
   t.g_exp_r = StrToG1(g_exp_r_str);
 }
 

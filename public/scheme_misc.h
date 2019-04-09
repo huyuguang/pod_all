@@ -8,6 +8,7 @@
 #include "ecc.h"
 #include "mpz.h"
 #include "vrf.h"
+#include "scheme_error.h"
 
 namespace scheme {
 

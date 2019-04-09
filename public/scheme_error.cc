@@ -1,4 +1,3 @@
-#pragma once
 
 #include "scheme_error.h"
 

@@ -77,7 +77,7 @@ DEBUG_OBJ := $(patsubst %.cc, %.d.o, $(SRC))
 
 CXX := export LD_LIBRARY_PATH=${CXX11_HOME}/lib; ${CXX11_HOME}/bin/g++
 
-all: pod_setupd pod_setup
+all: pod_cored pod_core
 
 %.o : %.cc
 	$(CXX) -c $^ $(CXXFLAGS) $(RELEASE_FLAGS) $(MCL_FLAGS) $(BOOST_FLAGS) -o $(BUILD)/$@
@@ -88,10 +88,10 @@ all: pod_setupd pod_setup
 
 
 
-pod_setupd : $(DEBUG_OBJ)
+pod_cored : $(DEBUG_OBJ)
 	$(CXX) $(addprefix $(BUILD)/, $^) -o $@.exe $(LDFLAGS) $(LIBS)
 
-pod_setup : $(RELEASE_OBJ)
+pod_core : $(RELEASE_OBJ)
 	$(CXX) $(addprefix $(BUILD)/, $^) -o $@.exe $(LDFLAGS) $(LIBS)
 
 clean:

@@ -259,16 +259,14 @@ void H2(h256_t const& seed, uint64_t count, std::vector<Fr>& v) {
 namespace {
 h256_t KToH256(G1 const& g) {
   assert(g.isNormalized());
-  assert(g.z == 1);
+
   const size_t kFpBufSize = 32;
 
-  uint8_t x[32];
-  size_t xlen = g.x.serialize(x, kFpBufSize);
-  assert(xlen == kFpBufSize);
+  uint8_t x[32] = {0};
+  if (g.z == 1) g.x.serialize(x, kFpBufSize);
 
-  uint8_t y[32];
-  size_t ylen = g.y.serialize(y, kFpBufSize);
-  assert(ylen == kFpBufSize);
+  uint8_t y[32] = {0};
+  if (g.z == 1) g.y.serialize(y, kFpBufSize);
 
   h256_t digest;
   CryptoPP::Keccak_256 hash;

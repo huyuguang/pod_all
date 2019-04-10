@@ -64,7 +64,7 @@
       <PreprocessorDefinitions>BOOST_SPIRIT_THREADSAFE;MCL_DONT_USE_OPENSSL;MCL_NO_AUTOLINK;_WIN32_WINNT=0x0600;WIN32_LEAN_AND_MEAN;NOMINMAX;_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_WARNINGS;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(SolutionDir)/csv;$(SolutionDir)/mcl/include;$(SolutionDir);$(SolutionDir)/public</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)/thirdparty/csv;$(SolutionDir)/thirdparty/mcl/include;$(SolutionDir)/thirdparty;$(SolutionDir)/public</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <AdditionalOptions>/utf-8 /Zc:twoPhase- %(AdditionalOptions)</AdditionalOptions>
       <OpenMPSupport>true</OpenMPSupport>
@@ -88,7 +88,7 @@
       <PreprocessorDefinitions>MULTICORE;BOOST_SPIRIT_THREADSAFE;MCL_DONT_USE_OPENSSL;MCL_NO_AUTOLINK;_WIN32_WINNT=0x0600;WIN32_LEAN_AND_MEAN;NOMINMAX;_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_WARNINGS;;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(SolutionDir)/csv;$(SolutionDir)/mcl/include;$(SolutionDir);$(SolutionDir)/public</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)/thirdparty/csv;$(SolutionDir)/thirdparty/mcl/include;$(SolutionDir)/thirdparty;$(SolutionDir)/public</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <AdditionalOptions>/utf-8 /Zc:twoPhase- %(AdditionalOptions)</AdditionalOptions>
       <OpenMPSupport>true</OpenMPSupport>
@@ -106,11 +106,6 @@
   <ItemGroup>
     <ClCompile Include="pod_publish\main.cc" />
     <ClCompile Include="pod_publish\publish.cc" />
-    <ClCompile Include="csv\csv_reader.cc" />
-    <ClCompile Include="csv\csv_reader_iterator.cc" />
-    <ClCompile Include="csv\csv_row.cc" />
-    <ClCompile Include="csv\csv_stat.cc" />
-    <ClCompile Include="csv\data_type.cc" />
     <ClCompile Include="public\bulletin_plain.cc" />
     <ClCompile Include="public\bulletin_table.cc" />
     <ClCompile Include="public\ecc.cc" />
@@ -121,14 +116,14 @@
     <ClCompile Include="public\scheme_plain.cc" />
     <ClCompile Include="public\scheme_table.cc" />
     <ClCompile Include="public\vrf_meta.cc" />
+    <ClCompile Include="thirdparty\csv\csv_reader.cc" />
+    <ClCompile Include="thirdparty\csv\csv_reader_iterator.cc" />
+    <ClCompile Include="thirdparty\csv\csv_row.cc" />
+    <ClCompile Include="thirdparty\csv\csv_stat.cc" />
+    <ClCompile Include="thirdparty\csv\data_type.cc" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pod_publish\publish.h" />
-    <ClInclude Include="csv\csv_parser.h" />
-    <ClInclude Include="csv\csv_row.h" />
-    <ClInclude Include="csv\csv_writer.h" />
-    <ClInclude Include="csv\data_type.h" />
-    <ClInclude Include="csv\memory.h" />
     <ClInclude Include="mcl\include\cybozu\array.hpp" />
     <ClInclude Include="mcl\include\cybozu\atoi.hpp" />
     <ClInclude Include="mcl\include\cybozu\benchmark.hpp" />
@@ -202,6 +197,11 @@
     <ClInclude Include="public\tick.h" />
     <ClInclude Include="public\vrf.h" />
     <ClInclude Include="public\vrf_meta.h" />
+    <ClInclude Include="thirdparty\csv\csv_parser.h" />
+    <ClInclude Include="thirdparty\csv\csv_row.h" />
+    <ClInclude Include="thirdparty\csv\csv_writer.h" />
+    <ClInclude Include="thirdparty\csv\data_type.h" />
+    <ClInclude Include="thirdparty\csv\memory.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="pod_publish\Makefile" />

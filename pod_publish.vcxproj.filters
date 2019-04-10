@@ -28,21 +28,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="csv\csv_reader.cc">
-      <Filter>cvs</Filter>
-    </ClCompile>
-    <ClCompile Include="csv\csv_reader_iterator.cc">
-      <Filter>cvs</Filter>
-    </ClCompile>
-    <ClCompile Include="csv\csv_row.cc">
-      <Filter>cvs</Filter>
-    </ClCompile>
-    <ClCompile Include="csv\csv_stat.cc">
-      <Filter>cvs</Filter>
-    </ClCompile>
-    <ClCompile Include="csv\data_type.cc">
-      <Filter>cvs</Filter>
-    </ClCompile>
     <ClCompile Include="pod_publish\main.cc">
       <Filter>local</Filter>
     </ClCompile>
@@ -78,6 +63,21 @@
     </ClCompile>
     <ClCompile Include="public\scheme_error.cc">
       <Filter>public</Filter>
+    </ClCompile>
+    <ClCompile Include="thirdparty\csv\csv_reader.cc">
+      <Filter>cvs</Filter>
+    </ClCompile>
+    <ClCompile Include="thirdparty\csv\csv_reader_iterator.cc">
+      <Filter>cvs</Filter>
+    </ClCompile>
+    <ClCompile Include="thirdparty\csv\csv_row.cc">
+      <Filter>cvs</Filter>
+    </ClCompile>
+    <ClCompile Include="thirdparty\csv\csv_stat.cc">
+      <Filter>cvs</Filter>
+    </ClCompile>
+    <ClCompile Include="thirdparty\csv\data_type.cc">
+      <Filter>cvs</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -237,21 +237,6 @@
     <ClInclude Include="mcl\include\cybozu\xorshift.hpp">
       <Filter>libmcl\include\cybozu</Filter>
     </ClInclude>
-    <ClInclude Include="csv\data_type.h">
-      <Filter>cvs</Filter>
-    </ClInclude>
-    <ClInclude Include="csv\csv_parser.h">
-      <Filter>cvs</Filter>
-    </ClInclude>
-    <ClInclude Include="csv\csv_row.h">
-      <Filter>cvs</Filter>
-    </ClInclude>
-    <ClInclude Include="csv\csv_writer.h">
-      <Filter>cvs</Filter>
-    </ClInclude>
-    <ClInclude Include="csv\memory.h">
-      <Filter>cvs</Filter>
-    </ClInclude>
     <ClInclude Include="pod_publish\publish.h">
       <Filter>local</Filter>
     </ClInclude>
@@ -317,6 +302,21 @@
     </ClInclude>
     <ClInclude Include="public\scheme_error.h">
       <Filter>public</Filter>
+    </ClInclude>
+    <ClInclude Include="thirdparty\csv\csv_parser.h">
+      <Filter>cvs</Filter>
+    </ClInclude>
+    <ClInclude Include="thirdparty\csv\csv_row.h">
+      <Filter>cvs</Filter>
+    </ClInclude>
+    <ClInclude Include="thirdparty\csv\csv_writer.h">
+      <Filter>cvs</Filter>
+    </ClInclude>
+    <ClInclude Include="thirdparty\csv\data_type.h">
+      <Filter>cvs</Filter>
+    </ClInclude>
+    <ClInclude Include="thirdparty\csv\memory.h">
+      <Filter>cvs</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

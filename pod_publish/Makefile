@@ -5,9 +5,10 @@
 
 CXX11_HOME = /usr
 
-MCL_HOME = ../mcl/include
+THIRD_PARTY_HOME = ../thirdparty
+MCL_HOME = ../thirdparty/mcl/include
+CSV_HOME = ../thirdparty/csv
 PUB_HOME = ../public
-CSV_HOME = ../csv
 
 CXXFLAGS := \
  -g3 \
@@ -24,9 +25,9 @@ CXXFLAGS := \
  -I $(CXX11_HOME)/include \
  -I $(MCL_HOME) \
  -I $(CSV_HOME) \
+ -I $(THIRD_PARTY_HOME) \
  -I $(PUB_HOME) \
  -I. \
- -I.. \
 
 MCL_FLAGS := \
  -DMCL_DONT_USE_OPENSSL
@@ -63,9 +64,11 @@ LIBS := \
 
 BUILD := ./build/self
 BUILDPUB := ./build/public
-BUILDCSV := ./build/csv
+BUILD3RD := ./build/thirdparty
+BUILDCSV := ./build/thirdparty/csv
 $(shell mkdir -p $(BUILD))
 $(shell mkdir -p $(BUILDPUB))
+$(shell mkdir -p $(BUILD3RD))
 $(shell mkdir -p $(BUILDCSV))
 
 DIR := . $(CSV_HOME) ../public

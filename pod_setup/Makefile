@@ -4,7 +4,8 @@
 
 CXX11_HOME = /usr
 
-MCL_HOME = ../mcl/include
+THIRD_PARTY_HOME = ../thirdparty
+MCL_HOME = ../thirdparty/mcl/include
 PUB_HOME = ../public
 
 CXXFLAGS := \
@@ -21,9 +22,9 @@ CXXFLAGS := \
  -fmerge-all-constants  \
  -I $(CXX11_HOME)/include \
  -I $(MCL_HOME) \
+ -I $(THIRD_PARTY_HOME) \
  -I $(PUB_HOME) \
  -I. \
- -I.. \
 
 MCL_FLAGS := \
  -DMCL_DONT_USE_OPENSSL

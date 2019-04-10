@@ -4,9 +4,10 @@
 
 CXX11_HOME = /usr
 
-MCL_HOME = ../mcl/include
+THIRD_PARTY_HOME = ../thirdparty
+MCL_HOME = ../thirdparty/mcl/include
+YAS_HOME = ../thirdparty/yas/include
 PUB_HOME = ../public
-YAS_HOME = ../yas/include
 
 CXXFLAGS := \
  -g3 \
@@ -22,10 +23,10 @@ CXXFLAGS := \
  -fmerge-all-constants  \
  -I $(CXX11_HOME)/include \
  -I $(MCL_HOME) \
- -I $(PUB_HOME) \
  -I $(YAS_HOME) \
+ -I $(THIRD_PARTY_HOME) \
+ -I $(PUB_HOME) \
  -I. \
- -I.. \
 
 MCL_FLAGS := \
  -DMCL_DONT_USE_OPENSSL
@@ -63,9 +64,11 @@ LIBS := \
 BUILD := ./build/self
 BUILDPUB := ./build/public
 BUILDCAPI := ./build/self/capi
+BUILD3RD := ./build/thirdparty
 $(shell mkdir -p $(BUILD))
 $(shell mkdir -p $(BUILDPUB))
 $(shell mkdir -p $(BUILDCAPI))
+$(shell mkdir -p $(BUILD3RD))
 
 DIR := . ../public capi
 

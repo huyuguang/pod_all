@@ -84,5 +84,3 @@ void serialize(Ar &ar, Fr &t) {
   t = BinToFr32(bin.data()); // throw
 }
 }
-
-// TODO: vrf::Psk<>

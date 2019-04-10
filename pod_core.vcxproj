@@ -64,11 +64,12 @@
       <PreprocessorDefinitions>BOOST_SPIRIT_THREADSAFE;MCL_DONT_USE_OPENSSL;MCL_NO_AUTOLINK;_WIN32_WINNT=0x0600;WIN32_LEAN_AND_MEAN;NOMINMAX;_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_WARNINGS;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(SolutionDir)/csv;$(SolutionDir)/mcl/include;$(SolutionDir)/yas/include;$(SolutionDir);$(SolutionDir)/public</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)/thirdparty/csv;$(SolutionDir)/thirdparty/mcl/include;$(SolutionDir)/thirdparty/yas/include;$(SolutionDir)/thirdparty/eigen;$(SolutionDir)/thirdparty;$(SolutionDir)/public</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
       <AdditionalOptions>/utf-8 /Zc:twoPhase- /Zc:__cplusplus %(AdditionalOptions)</AdditionalOptions>
       <OpenMPSupport>true</OpenMPSupport>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -88,11 +89,12 @@
       <PreprocessorDefinitions>MULTICORE;BOOST_SPIRIT_THREADSAFE;MCL_DONT_USE_OPENSSL;MCL_NO_AUTOLINK;_WIN32_WINNT=0x0600;WIN32_LEAN_AND_MEAN;NOMINMAX;_CRT_NONSTDC_NO_DEPRECATE;_CRT_SECURE_NO_WARNINGS;;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(SolutionDir)/csv;$(SolutionDir)/mcl/include;$(SolutionDir)/yas/include;$(SolutionDir);$(SolutionDir)/public</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SolutionDir)/thirdparty/csv;$(SolutionDir)/thirdparty/mcl/include;$(SolutionDir)/thirdparty/yas/include;$(SolutionDir)/thirdparty/eigen;$(SolutionDir)/thirdparty;$(SolutionDir)/public</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <AdditionalOptions>/utf-8 /Zc:twoPhase- /Zc:__cplusplus %(AdditionalOptions)</AdditionalOptions>
       <OpenMPSupport>true</OpenMPSupport>
       <LanguageStandard>stdcpp17</LanguageStandard>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

@@ -16,8 +16,6 @@
 #include "scheme_table_otvrfq_test.h"
 #include "scheme_table_vrfq_test.h"
 
-//#include <Eigen/Dense>
-
 namespace {
 void DumpEccPub() {
   auto const& ecc_pub = GetEccPub();
@@ -35,18 +33,6 @@ void DumpEccPub() {
   }
   std::cout << "\n";
 }
-
-//
-// void TestEigen() {
-//  using Eigen::MatrixXd;
-//  MatrixXd m(2, 2);
-//  m(0, 0) = 3;
-//  m(1, 0) = 2.5;
-//  m(0, 1) = -1;
-//  m(1, 1) = m(1, 0) + m(0, 1);
-//  std::cout << m << std::endl;
-//}
-
 }  // namespace
 
 int main(int argc, char** argv) {

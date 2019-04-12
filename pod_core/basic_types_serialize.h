@@ -24,6 +24,7 @@
 
 #include "basic_types.h"
 #include "ecc.h"
+#include "misc.h"
 
 inline constexpr size_t YasBinF() {
   return yas::options::binary | yas::options::ebig | yas::options::compacted;

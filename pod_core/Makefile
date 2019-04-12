@@ -7,6 +7,7 @@ CXX11_HOME = /usr
 THIRD_PARTY_HOME = ../thirdparty
 MCL_HOME = ../thirdparty/mcl/include
 YAS_HOME = ../thirdparty/yas/include
+EIGEN_HOME = ../thirdparty/eigen
 PUB_HOME = ../public
 
 CXXFLAGS := \
@@ -24,6 +25,7 @@ CXXFLAGS := \
  -I $(CXX11_HOME)/include \
  -I $(MCL_HOME) \
  -I $(YAS_HOME) \
+ -I $(EIGEN_HOME) \
  -I $(THIRD_PARTY_HOME) \
  -I $(PUB_HOME) \
  -I. \

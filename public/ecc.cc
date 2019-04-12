@@ -1,6 +1,7 @@
 #include "ecc.h"
 
 #include <cryptopp/sha.h>
+#include <cryptopp/keccak.h>
 #include "msvc_hack.h"
 #include "ecc_pub.h"
 
@@ -535,7 +536,7 @@ Fr FrPower(Fr const& base, mpz_class const& exp) {
 }
 
 Fr MapToFr(void const* b, size_t n) {
-  CryptoPP::SHA256 hash;
+  CryptoPP::Keccak_256 hash;
   h256_t digest;
   hash.Update((uint8_t const*)b, n);
   hash.Final(digest.data());

@@ -3,11 +3,11 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LocalDebuggerWorkingDirectory>$(OutDir)</LocalDebuggerWorkingDirectory>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
-    <LocalDebuggerCommandArguments>-e ecc_pub.bin -m table -f test.csv -o table_data -t csv -k 0 1</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>-e ecc_pub.bin -m table -f test100000.csv -o table_data -t csv -k 0 1</LocalDebuggerCommandArguments>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LocalDebuggerWorkingDirectory>$(OutDir)</LocalDebuggerWorkingDirectory>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
-    <LocalDebuggerCommandArguments>-e ecc_pub.bin -m table -f test.csv -o data -t csv -k 0 1</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>-e ecc_pub.bin -m table -f test100000.csv -o table_data -t csv -k 0 1</LocalDebuggerCommandArguments>
   </PropertyGroup>
 </Project>

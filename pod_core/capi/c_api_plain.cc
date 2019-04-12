@@ -660,4 +660,21 @@ EXPORT bool E_PlainOtRangeClientFree(handle_t h) {
   return DelClient((Client*)h);
 }
 
+//bool E_Test() {
+//  try {
+//    using namespace Eigen;
+//    Matrix<Fr, Dynamic, Dynamic> m(2, 3);
+//    m(0, 0) = Fr(0);
+//    m(0, 1) = Fr(1);
+//    m(0, 2) = Fr(2);
+//    m(1, 0) = Fr(0);
+//    m(1, 1) = Fr(0);
+//    m(1, 2) = Fr(0);
+//    yas::file_ostream os("abc");
+//    yas::json_oarchive<yas::file_ostream> oa(os);
+//    oa.serialize(m);
+//  } catch (std::exception&) {
+//    return false;
+//  }
+//}
 }  // extern "C" otrange

@@ -42,7 +42,7 @@ using Fsk = Fp12;
 
 template <size_t N = 32>
 void Generate(Pk<N>& pk, Sk<N>& sk) {
-  Tick tick(__FUNCTION__);
+  //Tick tick(__FUNCTION__);
   auto& ecc_pub = GetEccPub();
   for (size_t i = 0; i < N; ++i) {
     sk[i] = FrRand();
@@ -52,7 +52,7 @@ void Generate(Pk<N>& pk, Sk<N>& sk) {
 
 template <size_t N = 32>
 Fsk Vrf(Sk<N> const& sk, uint8_t const* x) {
-  Tick tick(__FUNCTION__);
+  //Tick tick(__FUNCTION__);
   auto& ecc_pub = GetEccPub();
   Fr a = FrOne();
   for (size_t i = 0; i < N; ++i) {

@@ -156,6 +156,8 @@
     <ClCompile Include="public\vrf_meta.cc" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="pod_core\matrix_fr_serialize.h" />
+    <ClInclude Include="public\matrix_fr.h" />
     <ClInclude Include="thirdparty\mcl\include\cybozu\array.hpp" />
     <ClInclude Include="thirdparty\mcl\include\cybozu\atoi.hpp" />
     <ClInclude Include="thirdparty\mcl\include\cybozu\benchmark.hpp" />

@@ -26,6 +26,7 @@ std::ostream& operator<<(std::ostream& os, Type const& t) {
 }
 
 void UniqueRecords(Table& table, std::vector<uint64_t> const& vrf_key_colnums) {
+  Tick _tick_(__FUNCTION__);
   auto unique = [&table](uint64_t pos) {
     std::map<std::string, size_t> count;
     for (auto& record : table) {
@@ -48,16 +49,26 @@ uint64_t GetRecordSize(Record const& record) {
 
 uint64_t GetMaxRecordSize(Table const& table) {
   uint64_t max_record_len = 0;
+  Record const* r = nullptr;
   for (auto const& i : table) {
     auto len = GetRecordSize(i);
-    max_record_len = std::max(max_record_len, len);
+    if (len > max_record_len) {
+      max_record_len = len;
+      r = &i;
+    }
+  }
+  if (r) {
+    std::cout << "max long record: " << max_record_len << "\n";
+    for (auto const& i : *r) {
+      std::cout << i << ";";
+    }
   }
   return max_record_len;
 }
 
 // hash(fsk(sk, hash(key)))
 h256_t HashVrfKey(std::string const& k, vrf::Sk<> const& vrf_sk) {
-  CryptoPP::SHA256 hash;
+  CryptoPP::Keccak_256 hash;
   h256_t h_key;
   hash.Update((uint8_t*)k.data(), k.size());
   hash.Final(h_key.data());
@@ -81,6 +92,7 @@ Fr GetPadFr(uint32_t len) {
   return BinToFr31(bin, bin + sizeof(bin));
 }
 
+// NOTE: maybe should use some more efficient serialize solution
 void RecordToBin(Record const& record, std::vector<uint8_t>& bin) {
   assert(bin.size() >= GetRecordSize(record));
 
@@ -122,10 +134,13 @@ bool BinToRecord(std::vector<uint8_t> const& bin, Record& record) {
 // h(k1) h(k2) pad record
 void DataToM(Table const& table, std::vector<uint64_t> columens_index,
              uint64_t s, vrf::Sk<> const& vrf_sk, std::vector<Fr>& m) {
+  Tick _tick_(__FUNCTION__);
   auto record_fr_num = s - 1 - columens_index.size();
   auto n = table.size();
 
   std::vector<uint8_t> bin(31 * record_fr_num);
+
+#pragma omp parallel for
   for (uint64_t i = 0; i < n; ++i) {
     auto const& record = table[i];
     auto record_size = GetRecordSize(record);

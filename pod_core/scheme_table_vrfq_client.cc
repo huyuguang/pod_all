@@ -22,7 +22,7 @@ Client::Client(BPtr b, h256_t const& self_id, h256_t const& peer_id,
   vrf_key_ = GetKeyMetaByName(b_->vrf_meta(), query_key);
   if (!vrf_key_) throw std::runtime_error("invalid query_key");
 
-  CryptoPP::SHA256 hash;
+  CryptoPP::Keccak_256 hash;
   value_digests_.resize(query_values_.size());
   for (size_t i = 0; i < query_values_.size(); ++i) {
     auto const& value = query_values_[i];
@@ -77,7 +77,7 @@ bool Client::OnSecret(Secret const& query_secret,
     uint8_t fsk_bin[12 * 32];
     fsk_[i].serialize(fsk_bin, sizeof(fsk_bin), mcl::IoMode::IoSerialize);
 
-    CryptoPP::SHA256 hash;
+    CryptoPP::Keccak_256 hash;
     h256_t digest;
     hash.Update(fsk_bin, sizeof(fsk_bin));
     hash.Final(digest.data());

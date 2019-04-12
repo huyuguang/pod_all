@@ -20,7 +20,7 @@ Client::Client(BPtr b, h256_t const& self_id, h256_t const& peer_id,
   vrf_key_ = GetKeyMetaByName(b_->vrf_meta(), query_key);
   if (!vrf_key_) throw std::runtime_error("invalid query_key");
 
-  CryptoPP::SHA256 hash;
+  CryptoPP::Keccak_256 hash;
   value_digests_.resize(query_values_.size());
   shuffled_value_digests_.resize(query_values_.size() + phantoms.size());
   for (size_t i = 0; i < query_values.size(); ++i) {

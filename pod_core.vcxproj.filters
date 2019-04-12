@@ -552,6 +552,12 @@
     <ClInclude Include="public\scheme_error.h">
       <Filter>public</Filter>
     </ClInclude>
+    <ClInclude Include="public\matrix_fr.h">
+      <Filter>public</Filter>
+    </ClInclude>
+    <ClInclude Include="pod_core\matrix_fr_serialize.h">
+      <Filter>local</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="pod_core\README.md" />

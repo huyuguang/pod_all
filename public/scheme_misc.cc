@@ -134,6 +134,7 @@ std::vector<G1> CalcSigma(std::vector<Fr> const& m, uint64_t n, uint64_t s) {
 }
 
 bool SaveSigma(std::string const& output, std::vector<G1> const& sigma) {
+  Tick _tick_(__FUNCTION__);
   try {
     io::mapped_file_params params;
     params.path = output;
@@ -186,6 +187,7 @@ bool LoadSigma(std::string const& input, uint64_t n, h256_t const* root,
 }
 
 bool SaveMatrix(std::string const& output, std::vector<Fr> const& m) {
+  Tick _tick_(__FUNCTION__);
   try {
     io::mapped_file_params params;
     params.path = output;

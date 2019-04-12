@@ -20,6 +20,7 @@ namespace {
 using namespace scheme;
 bool LoadCsvTable(std::string const& file, std::vector<std::string>& col_names,
                   table::Table& table) {
+  Tick _tick_(__FUNCTION__);
   using namespace csv;
   try {
     CSVReader reader(file);
@@ -51,6 +52,7 @@ bool LoadTable(std::string const& file, table::Type table_type,
 }
 
 void PadRubbishRow(table::Table& table) {
+  Tick _tick_(__FUNCTION__);
   table::Record record(table[0].size());
   for (auto& i : record) {
     i = "PAD";

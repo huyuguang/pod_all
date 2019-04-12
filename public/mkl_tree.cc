@@ -28,7 +28,7 @@ uint64_t Pow2UB(uint64_t v) {
 }
 
 void TwoToOne(h256_t const& a, h256_t const& b, h256_t* r) {
-  CryptoPP::SHA256 hash;
+  CryptoPP::Keccak_256 hash;
   hash.Update(a.data(), 32);
   hash.Update(b.data(), 32);
   hash.Final(r->data());

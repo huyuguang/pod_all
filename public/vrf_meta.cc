@@ -119,6 +119,7 @@ bool LoadVrfMeta(std::string const& input, h256_t const* digest,
 }
 
 bool SaveVrfPk(std::string const& output, vrf::Pk<> const& pk) {
+  Tick _tick_(__FUNCTION__);
   const uint64_t kG2BufSize = 64;
   try {
     io::mapped_file_params params;

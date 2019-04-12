@@ -3,6 +3,7 @@
 #include "basic_types_serialize.h"
 #include "misc.h"
 #include "scheme_plain_protocol.h"
+#include "matrix_fr_serialize.h"
 
 namespace scheme::plain::range {
 // save to bin

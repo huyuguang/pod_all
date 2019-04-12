@@ -114,9 +114,9 @@ EXPORT handle_t E_TableBatchSessionNew(handle_t c_a, uint8_t const* c_self_id,
   if (!a) return nullptr;
 
   h256_t self_id;
-  memcpy(self_id.data(), c_self_id, std::tuple_size<h256_t>::value);
+  memcpy(self_id.data(), c_self_id, h256_t::size_value);
   h256_t peer_id;
-  memcpy(peer_id.data(), c_peer_id, std::tuple_size<h256_t>::value);
+  memcpy(peer_id.data(), c_peer_id, h256_t::size_value);
 
   try {
     auto p = new Session(a, self_id, peer_id);
@@ -138,14 +138,14 @@ EXPORT bool E_TableBatchSessionOnRequest(handle_t c_session,
   try {
     Request request;
     yas::file_istream is(request_file);
-    yas::binary_iarchive<yas::file_istream> ia(is);
+    yas::binary_iarchive<yas::file_istream, YasBinF()> ia(is);
     ia.serialize(request);
 
     Response response;
     if (!session->OnRequest(request, response)) return false;
 
     yas::file_ostream os(response_file);
-    yas::binary_oarchive<yas::file_ostream> oa(os);
+    yas::binary_oarchive<yas::file_ostream, YasBinF()> oa(os);
     oa.serialize(response);
   } catch (std::exception&) {
     return false;
@@ -205,9 +205,9 @@ EXPORT handle_t E_TableBatchClientNew(handle_t c_b, uint8_t const* c_self_id,
   if (!b) return nullptr;
 
   h256_t self_id;
-  memcpy(self_id.data(), c_self_id, std::tuple_size<h256_t>::value);
+  memcpy(self_id.data(), c_self_id, h256_t::size_value);
   h256_t peer_id;
-  memcpy(peer_id.data(), c_peer_id, std::tuple_size<h256_t>::value);
+  memcpy(peer_id.data(), c_peer_id, h256_t::size_value);
 
   std::vector<Range> demands(c_demand_count);
   for (uint64_t i = 0; i < c_demand_count; ++i) {
@@ -235,7 +235,7 @@ EXPORT bool E_TableBatchClientGetRequest(handle_t c_client,
     Request request;
     client->GetRequest(request);
     yas::file_ostream os(request_file);
-    yas::binary_oarchive<yas::file_ostream> oa(os);
+    yas::binary_oarchive<yas::file_ostream, YasBinF()> oa(os);
     oa.serialize(request);
   } catch (std::exception&) {
     return false;
@@ -255,7 +255,7 @@ EXPORT bool E_TableBatchClientOnResponse(handle_t c_client,
   try {
     Response response;
     yas::file_istream is(response_file);
-    yas::binary_iarchive<yas::file_istream> ia(is);
+    yas::binary_iarchive<yas::file_istream, YasBinF()> ia(is);
     ia.serialize(response);
 
     Receipt receipt;
@@ -342,9 +342,9 @@ EXPORT handle_t E_TableBatch2SessionNew(handle_t c_a, uint8_t const* c_self_id,
   if (!a) return nullptr;
 
   h256_t self_id;
-  memcpy(self_id.data(), c_self_id, std::tuple_size<h256_t>::value);
+  memcpy(self_id.data(), c_self_id, h256_t::size_value);
   h256_t peer_id;
-  memcpy(peer_id.data(), c_peer_id, std::tuple_size<h256_t>::value);
+  memcpy(peer_id.data(), c_peer_id, h256_t::size_value);
 
   try {
     auto p = new Session(a, self_id, peer_id);
@@ -366,14 +366,14 @@ EXPORT bool E_TableBatch2SessionOnRequest(handle_t c_session,
   try {
     Request request;
     yas::file_istream is(request_file);
-    yas::binary_iarchive<yas::file_istream> ia(is);
+    yas::binary_iarchive<yas::file_istream, YasBinF()> ia(is);
     ia.serialize(request);
 
     Response response;
     if (!session->OnRequest(request, response)) return false;
 
     yas::file_ostream os(response_file);
-    yas::binary_oarchive<yas::file_ostream> oa(os);
+    yas::binary_oarchive<yas::file_ostream, YasBinF()> oa(os);
     oa.serialize(response);
   } catch (std::exception&) {
     return false;
@@ -433,9 +433,9 @@ EXPORT handle_t E_TableBatch2ClientNew(handle_t c_b, uint8_t const* c_self_id,
   if (!b) return nullptr;
 
   h256_t self_id;
-  memcpy(self_id.data(), c_self_id, std::tuple_size<h256_t>::value);
+  memcpy(self_id.data(), c_self_id, h256_t::size_value);
   h256_t peer_id;
-  memcpy(peer_id.data(), c_peer_id, std::tuple_size<h256_t>::value);
+  memcpy(peer_id.data(), c_peer_id, h256_t::size_value);
 
   std::vector<Range> demands(c_demand_count);
   for (uint64_t i = 0; i < c_demand_count; ++i) {
@@ -463,7 +463,7 @@ EXPORT bool E_TableBatch2ClientGetRequest(handle_t c_client,
     Request request;
     client->GetRequest(request);
     yas::file_ostream os(request_file);
-    yas::binary_oarchive<yas::file_ostream> oa(os);
+    yas::binary_oarchive<yas::file_ostream, YasBinF()> oa(os);
     oa.serialize(request);
   } catch (std::exception&) {
     return false;
@@ -483,7 +483,7 @@ EXPORT bool E_TableBatch2ClientOnResponse(handle_t c_client,
   try {
     Response response;
     yas::file_istream is(response_file);
-    yas::binary_iarchive<yas::file_istream> ia(is);
+    yas::binary_iarchive<yas::file_istream, YasBinF()> ia(is);
     ia.serialize(response);
 
     Receipt receipt;
@@ -549,9 +549,9 @@ EXPORT handle_t E_TableOtBatchSessionNew(handle_t c_a, uint8_t const* c_self_id,
   if (!a) return nullptr;
 
   h256_t self_id;
-  memcpy(self_id.data(), c_self_id, std::tuple_size<h256_t>::value);
+  memcpy(self_id.data(), c_self_id, h256_t::size_value);
   h256_t peer_id;
-  memcpy(peer_id.data(), c_peer_id, std::tuple_size<h256_t>::value);
+  memcpy(peer_id.data(), c_peer_id, h256_t::size_value);
 
   try {
     auto p = new Session(a, self_id, peer_id);
@@ -573,7 +573,7 @@ EXPORT bool E_TableOtBatchSessionGetNegoRequest(handle_t c_session,
     NegoARequest request;
     session->GetNegoReqeust(request);
     yas::file_ostream os(request_file);
-    yas::binary_oarchive<yas::file_ostream> oa(os);
+    yas::binary_oarchive<yas::file_ostream, YasBinF()> oa(os);
     oa.serialize(request);
   } catch (std::exception&) {
     return false;
@@ -593,14 +593,14 @@ EXPORT bool E_TableOtBatchSessionOnNegoRequest(handle_t c_session,
   try {
     NegoBRequest request;
     yas::file_istream is(request_file);
-    yas::binary_iarchive<yas::file_istream> ia(is);
+    yas::binary_iarchive<yas::file_istream, YasBinF()> ia(is);
     ia.serialize(request);
 
     NegoBResponse response;
     if (!session->OnNegoRequest(request, response)) return false;
 
     yas::file_ostream os(response_file);
-    yas::binary_oarchive<yas::file_ostream> oa(os);
+    yas::binary_oarchive<yas::file_ostream, YasBinF()> oa(os);
     oa.serialize(response);
   } catch (std::exception&) {
     return false;
@@ -619,7 +619,7 @@ EXPORT bool E_TableOtBatchSessionOnNegoResponse(handle_t c_session,
   try {
     NegoAResponse response;
     yas::file_istream is(response_file);
-    yas::binary_iarchive<yas::file_istream> ia(is);
+    yas::binary_iarchive<yas::file_istream, YasBinF()> ia(is);
     ia.serialize(response);
 
     if (!session->OnNegoResponse(response)) return false;
@@ -641,14 +641,14 @@ EXPORT bool E_TableOtBatchSessionOnRequest(handle_t c_session,
   try {
     Request request;
     yas::file_istream is(request_file);
-    yas::binary_iarchive<yas::file_istream> ia(is);
+    yas::binary_iarchive<yas::file_istream, YasBinF()> ia(is);
     ia.serialize(request);
 
     Response response;
     if (!session->OnRequest(request, response)) return false;
 
     yas::file_ostream os(response_file);
-    yas::binary_oarchive<yas::file_ostream> oa(os);
+    yas::binary_oarchive<yas::file_ostream, YasBinF()> oa(os);
     oa.serialize(response);
   } catch (std::exception&) {
     return false;
@@ -710,9 +710,9 @@ EXPORT handle_t E_TableOtBatchClientNew(handle_t c_b, uint8_t const* c_self_id,
   if (!b) return nullptr;
 
   h256_t self_id;
-  memcpy(self_id.data(), c_self_id, std::tuple_size<h256_t>::value);
+  memcpy(self_id.data(), c_self_id, h256_t::size_value);
   h256_t peer_id;
-  memcpy(peer_id.data(), c_peer_id, std::tuple_size<h256_t>::value);
+  memcpy(peer_id.data(), c_peer_id, h256_t::size_value);
 
   std::vector<Range> demands(c_demand_count);
   for (uint64_t i = 0; i < c_demand_count; ++i) {
@@ -747,7 +747,7 @@ EXPORT bool E_TableOtBatchClientGetNegoRequest(handle_t c_client,
     NegoBRequest request;
     client->GetNegoReqeust(request);
     yas::file_ostream os(request_file);
-    yas::binary_oarchive<yas::file_ostream> oa(os);
+    yas::binary_oarchive<yas::file_ostream, YasBinF()> oa(os);
     oa.serialize(request);
   } catch (std::exception&) {
     return false;
@@ -767,14 +767,14 @@ EXPORT bool E_TableOtBatchClientOnNegoRequest(handle_t c_client,
   try {
     NegoARequest request;
     yas::file_istream is(request_file);
-    yas::binary_iarchive<yas::file_istream> ia(is);
+    yas::binary_iarchive<yas::file_istream, YasBinF()> ia(is);
     ia.serialize(request);
 
     NegoAResponse response;
     if (!client->OnNegoRequest(request, response)) return false;
 
     yas::file_ostream os(response_file);
-    yas::binary_oarchive<yas::file_ostream> oa(os);
+    yas::binary_oarchive<yas::file_ostream, YasBinF()> oa(os);
     oa.serialize(response);
   } catch (std::exception&) {
     return false;
@@ -793,7 +793,7 @@ EXPORT bool E_TableOtBatchClientOnNegoResponse(handle_t c_client,
   try {
     NegoBResponse response;
     yas::file_istream is(response_file);
-    yas::binary_iarchive<yas::file_istream> ia(is);
+    yas::binary_iarchive<yas::file_istream, YasBinF()> ia(is);
     ia.serialize(response);
     return client->OnNegoResponse(response);
   } catch (std::exception&) {
@@ -814,7 +814,7 @@ EXPORT bool E_TableOtBatchClientGetRequest(handle_t c_client,
     Request request;
     client->GetRequest(request);
     yas::file_ostream os(request_file);
-    yas::binary_oarchive<yas::file_ostream> oa(os);
+    yas::binary_oarchive<yas::file_ostream, YasBinF()> oa(os);
     oa.serialize(request);
   } catch (std::exception&) {
     return false;
@@ -834,7 +834,7 @@ EXPORT bool E_TableOtBatchClientOnResponse(handle_t c_client,
   try {
     Response response;
     yas::file_istream is(response_file);
-    yas::binary_iarchive<yas::file_istream> ia(is);
+    yas::binary_iarchive<yas::file_istream, YasBinF()> ia(is);
     ia.serialize(response);
 
     Receipt receipt;
@@ -921,9 +921,9 @@ EXPORT handle_t E_TableOtVrfqSessionNew(handle_t c_a, uint8_t const* c_self_id,
   if (!a) return nullptr;
 
   h256_t self_id;
-  memcpy(self_id.data(), c_self_id, std::tuple_size<h256_t>::value);
+  memcpy(self_id.data(), c_self_id, h256_t::size_value);
   h256_t peer_id;
-  memcpy(peer_id.data(), c_peer_id, std::tuple_size<h256_t>::value);
+  memcpy(peer_id.data(), c_peer_id, h256_t::size_value);
 
   try {
     auto p = new Session(a, self_id, peer_id);
@@ -945,7 +945,7 @@ EXPORT bool E_TableOtVrfqSessionGetNegoRequest(handle_t c_session,
     NegoARequest request;
     session->GetNegoReqeust(request);
     yas::file_ostream os(request_file);
-    yas::binary_oarchive<yas::file_ostream> oa(os);
+    yas::binary_oarchive<yas::file_ostream, YasBinF()> oa(os);
     oa.serialize(request);
   } catch (std::exception&) {
     return false;
@@ -965,14 +965,14 @@ EXPORT bool E_TableOtVrfqSessionOnNegoRequest(handle_t c_session,
   try {
     NegoBRequest request;
     yas::file_istream is(request_file);
-    yas::binary_iarchive<yas::file_istream> ia(is);
+    yas::binary_iarchive<yas::file_istream, YasBinF()> ia(is);
     ia.serialize(request);
 
     NegoBResponse response;
     if (!session->OnNegoRequest(request, response)) return false;
 
     yas::file_ostream os(response_file);
-    yas::binary_oarchive<yas::file_ostream> oa(os);
+    yas::binary_oarchive<yas::file_ostream, YasBinF()> oa(os);
     oa.serialize(response);
   } catch (std::exception&) {
     return false;
@@ -991,7 +991,7 @@ EXPORT bool E_TableOtVrfqSessionOnNegoResponse(handle_t c_session,
   try {
     NegoAResponse response;
     yas::file_istream is(response_file);
-    yas::binary_iarchive<yas::file_istream> ia(is);
+    yas::binary_iarchive<yas::file_istream, YasBinF()> ia(is);
     ia.serialize(response);
 
     if (!session->OnNegoResponse(response)) return false;
@@ -1013,14 +1013,14 @@ EXPORT bool E_TableOtVrfqSessionOnRequest(handle_t c_session,
   try {
     Request request;
     yas::file_istream is(request_file);
-    yas::binary_iarchive<yas::file_istream> ia(is);
+    yas::binary_iarchive<yas::file_istream, YasBinF()> ia(is);
     ia.serialize(request);
 
     Response response;
     if (!session->OnRequest(request, response)) return false;
 
     yas::file_ostream os(response_file);
-    yas::binary_oarchive<yas::file_ostream> oa(os);
+    yas::binary_oarchive<yas::file_ostream, YasBinF()> oa(os);
     oa.serialize(response);
   } catch (std::exception&) {
     return false;
@@ -1074,9 +1074,9 @@ EXPORT handle_t E_TableOtVrfqClientNew(handle_t c_b, uint8_t const* c_self_id,
   if (!b) return nullptr;
 
   h256_t self_id;
-  memcpy(self_id.data(), c_self_id, std::tuple_size<h256_t>::value);
+  memcpy(self_id.data(), c_self_id, h256_t::size_value);
   h256_t peer_id;
-  memcpy(peer_id.data(), c_peer_id, std::tuple_size<h256_t>::value);
+  memcpy(peer_id.data(), c_peer_id, h256_t::size_value);
 
   std::vector<std::string> query_values(c_query_value_count);
   for (uint64_t i = 0; i < c_query_value_count; ++i) {
@@ -1109,7 +1109,7 @@ EXPORT bool E_TableOtVrfqClientGetNegoRequest(handle_t c_client,
     NegoBRequest request;
     client->GetNegoReqeust(request);
     yas::file_ostream os(request_file);
-    yas::binary_oarchive<yas::file_ostream> oa(os);
+    yas::binary_oarchive<yas::file_ostream, YasBinF()> oa(os);
     oa.serialize(request);
   } catch (std::exception&) {
     return false;
@@ -1129,14 +1129,14 @@ EXPORT bool E_TableOtVrfqClientOnNegoRequest(handle_t c_client,
   try {
     NegoARequest request;
     yas::file_istream is(request_file);
-    yas::binary_iarchive<yas::file_istream> ia(is);
+    yas::binary_iarchive<yas::file_istream, YasBinF()> ia(is);
     ia.serialize(request);
 
     NegoAResponse response;
     if (!client->OnNegoRequest(request, response)) return false;
 
     yas::file_ostream os(response_file);
-    yas::binary_oarchive<yas::file_ostream> oa(os);
+    yas::binary_oarchive<yas::file_ostream, YasBinF()> oa(os);
     oa.serialize(response);
   } catch (std::exception&) {
     return false;
@@ -1155,7 +1155,7 @@ EXPORT bool E_TableOtVrfqClientOnNegoResponse(handle_t c_client,
   try {
     NegoBResponse response;
     yas::file_istream is(response_file);
-    yas::binary_iarchive<yas::file_istream> ia(is);
+    yas::binary_iarchive<yas::file_istream, YasBinF()> ia(is);
     ia.serialize(response);
     return client->OnNegoResponse(response);
   } catch (std::exception&) {
@@ -1176,7 +1176,7 @@ EXPORT bool E_TableOtVrfqClientGetRequest(handle_t c_client,
     Request request;
     client->GetRequest(request);
     yas::file_ostream os(request_file);
-    yas::binary_oarchive<yas::file_ostream> oa(os);
+    yas::binary_oarchive<yas::file_ostream, YasBinF()> oa(os);
     oa.serialize(request);
   } catch (std::exception&) {
     return false;
@@ -1196,7 +1196,7 @@ EXPORT bool E_TableOtVrfqClientOnResponse(handle_t c_client,
   try {
     Response response;
     yas::file_istream is(response_file);
-    yas::binary_iarchive<yas::file_istream> ia(is);
+    yas::binary_iarchive<yas::file_istream, YasBinF()> ia(is);
     ia.serialize(response);
 
     Receipt receipt;
@@ -1259,9 +1259,9 @@ EXPORT handle_t E_TableVrfqSessionNew(handle_t c_a, uint8_t const* c_self_id,
   if (!a) return nullptr;
 
   h256_t self_id;
-  memcpy(self_id.data(), c_self_id, std::tuple_size<h256_t>::value);
+  memcpy(self_id.data(), c_self_id, h256_t::size_value);
   h256_t peer_id;
-  memcpy(peer_id.data(), c_peer_id, std::tuple_size<h256_t>::value);
+  memcpy(peer_id.data(), c_peer_id, h256_t::size_value);
 
   try {
     auto p = new Session(a, self_id, peer_id);
@@ -1283,14 +1283,14 @@ EXPORT bool E_TableVrfqSessionOnRequest(handle_t c_session,
   try {
     Request request;
     yas::file_istream is(request_file);
-    yas::binary_iarchive<yas::file_istream> ia(is);
+    yas::binary_iarchive<yas::file_istream, YasBinF()> ia(is);
     ia.serialize(request);
 
     Response response;
     if (!session->OnRequest(request, response)) return false;
 
     yas::file_ostream os(response_file);
-    yas::binary_oarchive<yas::file_ostream> oa(os);
+    yas::binary_oarchive<yas::file_ostream, YasBinF()> oa(os);
     oa.serialize(response);
   } catch (std::exception&) {
     return false;
@@ -1342,9 +1342,9 @@ EXPORT handle_t E_TableVrfqClientNew(handle_t c_b, uint8_t const* c_self_id,
   if (!b) return nullptr;
 
   h256_t self_id;
-  memcpy(self_id.data(), c_self_id, std::tuple_size<h256_t>::value);
+  memcpy(self_id.data(), c_self_id, h256_t::size_value);
   h256_t peer_id;
-  memcpy(peer_id.data(), c_peer_id, std::tuple_size<h256_t>::value);
+  memcpy(peer_id.data(), c_peer_id, h256_t::size_value);
 
   std::vector<std::string> query_values(c_query_value_count);
   for (uint64_t i = 0; i < c_query_value_count; ++i) {
@@ -1371,7 +1371,7 @@ EXPORT bool E_TableVrfqClientGetRequest(handle_t c_client,
     Request request;
     client->GetRequest(request);
     yas::file_ostream os(request_file);
-    yas::binary_oarchive<yas::file_ostream> oa(os);
+    yas::binary_oarchive<yas::file_ostream, YasBinF()> oa(os);
     oa.serialize(request);
   } catch (std::exception&) {
     return false;
@@ -1391,7 +1391,7 @@ EXPORT bool E_TableVrfqClientOnResponse(handle_t c_client,
   try {
     Response response;
     yas::file_istream is(response_file);
-    yas::binary_iarchive<yas::file_istream> ia(is);
+    yas::binary_iarchive<yas::file_istream, YasBinF()> ia(is);
     ia.serialize(response);
 
     Receipt receipt;

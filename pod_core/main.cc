@@ -23,11 +23,11 @@ void DumpEccPub() {
   std::cout << "g2: " << G1ToStr(G1One()) << "\n";
   std::cout << "u1 size: " << ecc_pub.u1().size() << "\n";
   std::cout << "u2 size: " << ecc_pub.u2().size() << "\n";
-  std::cout << "\nu1 list(z,x,y):";
+  std::cout << "\nu1 list(z,x,y):\n";
   for (auto const& i : ecc_pub.u1()) {
     std::cout << G1ToStr(i) << "\n";
   }
-  std::cout << "\nu2 list(z,x,y):";
+  std::cout << "\nu2 list(z,x,y):\n";
   for (auto const& i : ecc_pub.u2()) {
     std::cout << G2ToStr(i) << "\n";
   }

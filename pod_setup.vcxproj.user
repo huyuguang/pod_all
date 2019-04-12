@@ -3,11 +3,11 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LocalDebuggerWorkingDirectory>$(OutDir)</LocalDebuggerWorkingDirectory>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
-    <LocalDebuggerCommandArguments>ecc_pub.bin 1024 8</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>-o ecc_pub.bin</LocalDebuggerCommandArguments>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LocalDebuggerWorkingDirectory>$(OutDir)</LocalDebuggerWorkingDirectory>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
-    <LocalDebuggerCommandArguments>ecc_pub.bin 1024 8</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>-o ecc_pub.bin</LocalDebuggerCommandArguments>
   </PropertyGroup>
 </Project>

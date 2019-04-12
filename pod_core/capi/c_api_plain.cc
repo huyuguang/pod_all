@@ -91,9 +91,9 @@ EXPORT handle_t E_PlainRangeSessionNew(handle_t c_a, uint8_t const* c_self_id,
   if (!a) return nullptr;
 
   h256_t self_id;
-  memcpy(self_id.data(), c_self_id, std::tuple_size<h256_t>::value);
+  memcpy(self_id.data(), c_self_id, h256_t::size_value);
   h256_t peer_id;
-  memcpy(peer_id.data(), c_peer_id, std::tuple_size<h256_t>::value);
+  memcpy(peer_id.data(), c_peer_id, h256_t::size_value);
 
   try {
     auto p = new Session(a, self_id, peer_id);
@@ -115,14 +115,14 @@ EXPORT bool E_PlainRangeSessionOnRequest(handle_t c_session,
   try {
     Request request;
     yas::file_istream is(request_file);
-    yas::binary_iarchive<yas::file_istream> ia(is);
+    yas::binary_iarchive<yas::file_istream, YasBinF()> ia(is);
     ia.serialize(request);
 
     Response response;
     if (!session->OnRequest(request, response)) return false;
 
     yas::file_ostream os(response_file);
-    yas::binary_oarchive<yas::file_ostream> oa(os);
+    yas::binary_oarchive<yas::file_ostream, YasBinF()> oa(os);
     oa.serialize(response);
   } catch (std::exception&) {
     return false;
@@ -181,9 +181,9 @@ EXPORT handle_t E_PlainRangeClientNew(handle_t c_b, uint8_t const* c_self_id,
   if (!b) return nullptr;
 
   h256_t self_id;
-  memcpy(self_id.data(), c_self_id, std::tuple_size<h256_t>::value);
+  memcpy(self_id.data(), c_self_id, h256_t::size_value);
   h256_t peer_id;
-  memcpy(peer_id.data(), c_peer_id, std::tuple_size<h256_t>::value);
+  memcpy(peer_id.data(), c_peer_id, h256_t::size_value);
   Range demand(c_demand.start, c_demand.count);
 
   try {
@@ -206,7 +206,7 @@ EXPORT bool E_PlainRangeClientGetRequest(handle_t c_client,
     Request request;
     client->GetRequest(request);
     yas::file_ostream os(request_file);
-    yas::binary_oarchive<yas::file_ostream> oa(os);
+    yas::binary_oarchive<yas::file_ostream, YasBinF()> oa(os);
     oa.serialize(request);
   } catch (std::exception&) {
     return false;
@@ -226,7 +226,7 @@ EXPORT bool E_PlainRangeClientOnResponse(handle_t c_client,
   try {
     Response response;
     yas::file_istream is(response_file);
-    yas::binary_iarchive<yas::file_istream> ia(is);
+    yas::binary_iarchive<yas::file_istream, YasBinF()> ia(is);
     ia.serialize(response);
 
     Receipt receipt;
@@ -313,9 +313,9 @@ EXPORT handle_t E_PlainOtRangeSessionNew(handle_t c_a, uint8_t const* c_self_id,
   if (!a) return nullptr;
 
   h256_t self_id;
-  memcpy(self_id.data(), c_self_id, std::tuple_size<h256_t>::value);
+  memcpy(self_id.data(), c_self_id, h256_t::size_value);
   h256_t peer_id;
-  memcpy(peer_id.data(), c_peer_id, std::tuple_size<h256_t>::value);
+  memcpy(peer_id.data(), c_peer_id, h256_t::size_value);
 
   try {
     auto p = new Session(a, self_id, peer_id);
@@ -337,7 +337,7 @@ EXPORT bool E_PlainOtRangeSessionGetNegoRequest(handle_t c_session,
     NegoARequest request;
     session->GetNegoReqeust(request);
     yas::file_ostream os(request_file);
-    yas::binary_oarchive<yas::file_ostream> oa(os);
+    yas::binary_oarchive<yas::file_ostream, YasBinF()> oa(os);
     oa.serialize(request);
   } catch (std::exception&) {
     return false;
@@ -357,14 +357,14 @@ EXPORT bool E_PlainOtRangeSessionOnNegoRequest(handle_t c_session,
   try {
     NegoBRequest request;
     yas::file_istream is(request_file);
-    yas::binary_iarchive<yas::file_istream> ia(is);
+    yas::binary_iarchive<yas::file_istream, YasBinF()> ia(is);
     ia.serialize(request);
 
     NegoBResponse response;
     if (!session->OnNegoRequest(request, response)) return false;
 
     yas::file_ostream os(response_file);
-    yas::binary_oarchive<yas::file_ostream> oa(os);
+    yas::binary_oarchive<yas::file_ostream, YasBinF()> oa(os);
     oa.serialize(response);
   } catch (std::exception&) {
     return false;
@@ -383,7 +383,7 @@ EXPORT bool E_PlainOtRangeSessionOnNegoResponse(handle_t c_session,
   try {
     NegoAResponse response;
     yas::file_istream is(response_file);
-    yas::binary_iarchive<yas::file_istream> ia(is);
+    yas::binary_iarchive<yas::file_istream, YasBinF()> ia(is);
     ia.serialize(response);
 
     if (!session->OnNegoResponse(response)) return false;
@@ -405,14 +405,14 @@ EXPORT bool E_PlainOtRangeSessionOnRequest(handle_t c_session,
   try {
     Request request;
     yas::file_istream is(request_file);
-    yas::binary_iarchive<yas::file_istream> ia(is);
+    yas::binary_iarchive<yas::file_istream, YasBinF()> ia(is);
     ia.serialize(request);
 
     Response response;
     if (!session->OnRequest(request, response)) return false;
 
     yas::file_ostream os(response_file);
-    yas::binary_oarchive<yas::file_ostream> oa(os);
+    yas::binary_oarchive<yas::file_ostream, YasBinF()> oa(os);
     oa.serialize(response);
   } catch (std::exception&) {
     return false;
@@ -471,9 +471,9 @@ EXPORT handle_t E_PlainOtRangeClientNew(handle_t c_b, uint8_t const* c_self_id,
   if (!b) return nullptr;
 
   h256_t self_id;
-  memcpy(self_id.data(), c_self_id, std::tuple_size<h256_t>::value);
+  memcpy(self_id.data(), c_self_id, h256_t::size_value);
   h256_t peer_id;
-  memcpy(peer_id.data(), c_peer_id, std::tuple_size<h256_t>::value);
+  memcpy(peer_id.data(), c_peer_id, h256_t::size_value);
   Range demand(c_demand.start, c_demand.count);
   Range phantom(c_phantom.start, c_phantom.count);
 
@@ -497,7 +497,7 @@ EXPORT bool E_PlainOtRangeClientGetNegoRequest(handle_t c_client,
     NegoBRequest request;
     client->GetNegoReqeust(request);
     yas::file_ostream os(request_file);
-    yas::binary_oarchive<yas::file_ostream> oa(os);
+    yas::binary_oarchive<yas::file_ostream, YasBinF()> oa(os);
     oa.serialize(request);
   } catch (std::exception&) {
     return false;
@@ -517,14 +517,14 @@ EXPORT bool E_PlainOtRangeClientOnNegoRequest(handle_t c_client,
   try {
     NegoARequest request;
     yas::file_istream is(request_file);
-    yas::binary_iarchive<yas::file_istream> ia(is);
+    yas::binary_iarchive<yas::file_istream, YasBinF()> ia(is);
     ia.serialize(request);
 
     NegoAResponse response;
     if (!client->OnNegoRequest(request, response)) return false;
 
     yas::file_ostream os(response_file);
-    yas::binary_oarchive<yas::file_ostream> oa(os);
+    yas::binary_oarchive<yas::file_ostream, YasBinF()> oa(os);
     oa.serialize(response);
   } catch (std::exception&) {
     return false;
@@ -543,7 +543,7 @@ EXPORT bool E_PlainOtRangeClientOnNegoResponse(handle_t c_client,
   try {
     NegoBResponse response;
     yas::file_istream is(response_file);
-    yas::binary_iarchive<yas::file_istream> ia(is);
+    yas::binary_iarchive<yas::file_istream, YasBinF()> ia(is);
     ia.serialize(response);
     return client->OnNegoResponse(response);
   } catch (std::exception&) {
@@ -564,7 +564,7 @@ EXPORT bool E_PlainOtRangeClientGetRequest(handle_t c_client,
     Request request;
     client->GetRequest(request);
     yas::file_ostream os(request_file);
-    yas::binary_oarchive<yas::file_ostream> oa(os);
+    yas::binary_oarchive<yas::file_ostream, YasBinF()> oa(os);
     oa.serialize(request);
   } catch (std::exception&) {
     return false;
@@ -584,7 +584,7 @@ EXPORT bool E_PlainOtRangeClientOnResponse(handle_t c_client,
   try {
     Response response;
     yas::file_istream is(response_file);
-    yas::binary_iarchive<yas::file_istream> ia(is);
+    yas::binary_iarchive<yas::file_istream, YasBinF()> ia(is);
     ia.serialize(response);
 
     Receipt receipt;

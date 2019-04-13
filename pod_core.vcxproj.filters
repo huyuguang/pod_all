@@ -56,6 +56,9 @@
     <Filter Include="thirdparty\mcl\include\mcl">
       <UniqueIdentifier>{05e30be5-3541-4681-9b73-59b2fc219638}</UniqueIdentifier>
     </Filter>
+    <Filter Include="local\table_batch3">
+      <UniqueIdentifier>{2490e28c-e28c-4b85-86ec-c1a338b48ccb}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pod_core\main.cc">
@@ -201,6 +204,18 @@
     </ClCompile>
     <ClCompile Include="public\scheme_error.cc">
       <Filter>public</Filter>
+    </ClCompile>
+    <ClCompile Include="pod_core\scheme_table_batch3_client.cc">
+      <Filter>local\table_batch3</Filter>
+    </ClCompile>
+    <ClCompile Include="pod_core\scheme_table_batch3_session.cc">
+      <Filter>local\table_batch3</Filter>
+    </ClCompile>
+    <ClCompile Include="pod_core\scheme_table_batch3_test.cc">
+      <Filter>local\table_batch3</Filter>
+    </ClCompile>
+    <ClCompile Include="pod_core\capi\scheme_table_batch3_test_capi.cc">
+      <Filter>capi</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -558,6 +573,18 @@
     <ClInclude Include="pod_core\matrix_fr_serialize.h">
       <Filter>local</Filter>
     </ClInclude>
+    <ClInclude Include="pod_core\scheme_table_batch3_client.h">
+      <Filter>local\table_batch3</Filter>
+    </ClInclude>
+    <ClInclude Include="pod_core\scheme_table_batch3_session.h">
+      <Filter>local\table_batch3</Filter>
+    </ClInclude>
+    <ClInclude Include="pod_core\scheme_table_batch3_test.h">
+      <Filter>local\table_batch3</Filter>
+    </ClInclude>
+    <ClInclude Include="pod_core\capi\scheme_table_batch3_test_capi.h">
+      <Filter>capi</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="pod_core\README.md" />
@@ -587,6 +614,9 @@
       <Filter>capi</Filter>
     </None>
     <None Include="pod_core\capi\scheme_plain.inc">
+      <Filter>capi</Filter>
+    </None>
+    <None Include="pod_core\capi\scheme_table_batch3.inc">
       <Filter>capi</Filter>
     </None>
   </ItemGroup>

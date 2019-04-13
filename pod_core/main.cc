@@ -1,6 +1,7 @@
 #include "capi/scheme_plain_otrange_test_capi.h"
 #include "capi/scheme_plain_range_test_capi.h"
 #include "capi/scheme_table_batch2_test_capi.h"
+#include "capi/scheme_table_batch3_test_capi.h"
 #include "capi/scheme_table_batch_test_capi.h"
 #include "capi/scheme_table_otbatch_test_capi.h"
 #include "capi/scheme_table_otvrfq_test_capi.h"
@@ -11,6 +12,7 @@
 #include "scheme_plain_otrange_test.h"
 #include "scheme_plain_range_test.h"
 #include "scheme_table_batch2_test.h"
+#include "scheme_table_batch3_test.h"
 #include "scheme_table_batch_test.h"
 #include "scheme_table_otbatch_test.h"
 #include "scheme_table_otvrfq_test.h"
@@ -221,6 +223,10 @@ int main(int argc, char** argv) {
     } else if (action == Action::kBatch2Pod) {
       auto func = use_capi ? scheme::table::batch2::capi::Test
                            : scheme::table::batch2::Test;
+      return func(publish_path, output_path, demand_ranges, test_evil) ? 0 : -1;
+    } else if (action == Action::kBatch3Pod) {
+      auto func = use_capi ? scheme::table::batch3::capi::Test
+                           : scheme::table::batch3::Test;
       return func(publish_path, output_path, demand_ranges, test_evil) ? 0 : -1;
     } else {
       std::cerr << "Not implement yet.\n";

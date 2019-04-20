@@ -2,10 +2,10 @@
 #include "scheme_table.h"
 #include "scheme_table_a.h"
 #include "scheme_table_b.h"
-#include "scheme_table_notary.h"
+#include "scheme_table_otbatch_notary.h"
 #include "scheme_table_otbatch_client.h"
 #include "scheme_table_otbatch_session.h"
-#include "scheme_table_protocol.h"
+#include "scheme_table_otbatch_protocol.h"
 
 namespace {
 // The session id must be hash(addr_A), and the client id must be hash(addr_B).

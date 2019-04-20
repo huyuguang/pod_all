@@ -383,6 +383,8 @@ std::istream& operator>>(std::istream& in, scheme::Action& t) {
     t = scheme::Action::kOtBatchPod;
   } else if (token == "batch2_pod") {
     t = scheme::Action::kBatch2Pod;
+  } else if (token == "batch3_pod") {
+    t = scheme::Action::kBatch3Pod;
   } else {
     in.setstate(std::ios_base::failbit);
   }
@@ -408,6 +410,8 @@ std::ostream& operator<<(std::ostream& os, scheme::Action const& t) {
     os << "ot_batch_pod";
   } else if (t == scheme::Action::kBatch2Pod) {
     os << "batch2_pod";
+  } else if (t == scheme::Action::kBatch3Pod) {
+    os << "batch3_pod";
   } else {
     os.setstate(std::ios_base::failbit);
   }

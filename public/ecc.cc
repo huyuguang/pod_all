@@ -66,7 +66,7 @@ void FrRand(Fr* r, size_t n) {
   }
 }
 
-Fr FrInv(Fr r) {
+Fr FrInv(Fr const& r) {
   Fr r_inv;
   Fr::inv(r_inv, r);
   return r_inv;

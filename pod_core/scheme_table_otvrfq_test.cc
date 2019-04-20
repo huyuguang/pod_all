@@ -2,7 +2,7 @@
 #include "scheme_table.h"
 #include "scheme_table_a.h"
 #include "scheme_table_b.h"
-#include "scheme_table_protocol.h"
+#include "scheme_table_otvrfq_protocol.h"
 #include "scheme_table_otvrfq_client.h"
 #include "scheme_table_otvrfq_session.h"
 

@@ -4,8 +4,8 @@
 #include "scheme_table_b.h"
 #include "scheme_table_batch_client.h"
 #include "scheme_table_batch_session.h"
-#include "scheme_table_notary.h"
-#include "scheme_table_protocol.h"
+#include "scheme_table_batch_notary.h"
+#include "scheme_table_batch_protocol.h"
 
 namespace {
 // The session id must be hash(addr_A), and the client id must be hash(addr_B).

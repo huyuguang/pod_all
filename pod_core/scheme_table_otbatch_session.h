@@ -6,7 +6,7 @@
 
 #include "ecc.h"
 #include "scheme_table_a.h"
-#include "scheme_table_protocol.h"
+#include "scheme_table_otbatch_protocol.h"
 
 namespace scheme::table::otbatch {
 

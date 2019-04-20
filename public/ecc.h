@@ -44,7 +44,7 @@ Fr FrRand();
 
 void FrRand(Fr* r, size_t n);
 
-Fr FrInv(Fr r);
+Fr FrInv(Fr const& r);
 
 G1 G1Rand();
 

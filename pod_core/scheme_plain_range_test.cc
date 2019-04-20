@@ -2,9 +2,9 @@
 #include "scheme_plain.h"
 #include "scheme_plain_a.h"
 #include "scheme_plain_b.h"
-#include "scheme_plain_notary.h"
-#include "scheme_plain_protocol.h"
 #include "scheme_plain_range_client.h"
+#include "scheme_plain_range_notary.h"
+#include "scheme_plain_range_protocol.h"
 #include "scheme_plain_range_session.h"
 
 namespace {
@@ -57,7 +57,7 @@ bool Test(std::string const& output_path, APtr a, BPtr b, Range const& demand,
       assert(false);
       return false;
     }
-  } else {    
+  } else {
     if (client.OnSecret(secret)) {
       assert(false);
       return false;

@@ -4,7 +4,6 @@
 #include "scheme_misc.h"
 #include "scheme_plain.h"
 #include "scheme_plain_a.h"
-#include "scheme_plain_protocol.h"
 #include "tick.h"
 
 namespace scheme::plain::range {

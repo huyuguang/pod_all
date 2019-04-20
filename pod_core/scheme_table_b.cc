@@ -1,6 +1,5 @@
 #include "scheme_table_b.h"
 #include "misc.h"
-#include "scheme_table_protocol.h"
 
 namespace scheme::table {
 
@@ -49,11 +48,7 @@ void B::LoadData() {
   std::string key_meta_file = public_path_ + "/vrf_meta";
   h256_t const* check_h;
 
-#ifdef _DEBUG
-  bool verify = true;
-#else
   bool verify = NeedVerify();
-#endif
 
   // vrf meta
   check_h = verify ? &bulletin_.vrf_meta_digest : nullptr;

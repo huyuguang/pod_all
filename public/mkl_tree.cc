@@ -4,28 +4,10 @@
 #include <cassert>
 #include "tick.h"
 #include "public.h"
+#include "misc.h"
 
 namespace mkl {
 h256_t kEmptyH256 = h256_t();
-
-size_t Log2UB(size_t n) {
-  assert(n);
-  if (n == 1) return 0;
-  if (n % 2) ++n;
-  return 1 + Log2UB(n / 2);
-}
-
-uint64_t Pow2UB(uint64_t v) {
-  v--;
-  v |= v >> 1;
-  v |= v >> 2;
-  v |= v >> 4;
-  v |= v >> 8;
-  v |= v >> 16;
-  v |= v >> 32;
-  v++;
-  return v;
-}
 
 void TwoToOne(h256_t const& a, h256_t const& b, h256_t* r) {
   CryptoPP::Keccak_256 hash;
@@ -52,7 +34,7 @@ h256_t CalcPath(GetItem get_item, uint64_t item_count, uint64_t leaf,
   s.reserve(256);
   uint64_t offset;
 
-  uint64_t count = Pow2UB(item_count);
+  uint64_t count = misc::Pow2UB(item_count);
   assert((count & (count - 1)) == 0);
 
   offset = 0;
@@ -122,7 +104,7 @@ bool CalcRoot(std::string const& file, h256_t* root) {
 h256_t CalcRoot(GetItem get_item, uint64_t item_count) {
   // Tick tick(std::string(__FUNCTION__) + ", item_count: " +
   //          std::to_string(item_count));
-  uint64_t count = Pow2UB(item_count);
+  uint64_t count = misc::Pow2UB(item_count);
   assert((count & (count - 1)) == 0);
 
   auto get_item_or_empty = [&get_item, item_count](uint64_t i) {
@@ -165,7 +147,7 @@ h256_t CalcRoot(GetItem get_item, uint64_t item_count) {
 bool VerifyPath(uint64_t pos, h256_t value, uint64_t count, h256_t const& root,
                 Path const& path) {
   // Tick tick(__FUNCTION__);
-  auto depth = Log2UB(count);
+  auto depth = misc::Log2UB(count);
   assert(path.size() == depth);
   if (path.size() != depth) return false;
 
@@ -197,7 +179,7 @@ bool VerifyRangePath(GetItem get_item, Range const& range, uint64_t item_count,
     return (root == get_item(0));
   }
 
-  uint64_t depth = Log2UB(item_count);
+  uint64_t depth = misc::Log2UB(item_count);
   auto ranges = SplitRange(range);
   uint64_t path_count = 0;
   for (auto& i : ranges) {
@@ -205,7 +187,7 @@ bool VerifyRangePath(GetItem get_item, Range const& range, uint64_t item_count,
     if ((i.count & (i.count - 1))) return false;
     assert(i.start % i.count == 0);
     if (i.start % i.count) return false;
-    uint64_t level = Log2UB(i.count);
+    uint64_t level = misc::Log2UB(i.count);
     path_count += depth - level;
   }
   assert(path_count == path.size());
@@ -214,7 +196,7 @@ bool VerifyRangePath(GetItem get_item, Range const& range, uint64_t item_count,
   h256_t const* path_leaf = &path[0];
   for (auto& r : ranges) {
     uint64_t leaf = r.start / r.count;
-    uint64_t level = Log2UB(r.count);
+    uint64_t level = misc::Log2UB(r.count);
 
     auto get_range_item = [&get_item, item_count, &r](uint64_t i) {
       auto offset = i + r.start;
@@ -243,7 +225,7 @@ std::vector<Range> SplitRange(Range const& range) {
   std::vector<Range> ret;
   auto start = range.start;
   auto count = range.count;
-  uint64_t max_level = Log2UB(count);
+  uint64_t max_level = misc::Log2UB(count);
 
   for (; count;) {
     Range item;
@@ -272,8 +254,8 @@ Tree BuildTree(uint64_t item_count, GetItem const& get_item) {
     return digests;
   }
 
-  auto align_count = Pow2UB(item_count);
-  auto depth = Log2UB(item_count);
+  auto align_count = misc::Pow2UB(item_count);
+  auto depth = misc::Log2UB(item_count);
   digests.reserve(align_count - 1);
 
   auto get_item_or_empty = [item_count, &get_item](uint64_t i) -> h256_t {
@@ -304,7 +286,7 @@ Tree BuildTree(uint64_t item_count, GetItem const& get_item) {
 
 size_t GetTreeSize(uint64_t item_count) {
   if (item_count == 1) return 1;
-  return Pow2UB(item_count) - 1;
+  return misc::Pow2UB(item_count) - 1;
 }
 
 Path GetRangePath(uint64_t item_count, GetItem const& get_item,
@@ -315,8 +297,8 @@ Path GetRangePath(uint64_t item_count, GetItem const& get_item,
 
   if (tree.size() == 1) return path;  // empty
 
-  auto align_count = Pow2UB(item_count);
-  auto depth = Log2UB(item_count);
+  auto align_count = misc::Pow2UB(item_count);
+  auto depth = misc::Log2UB(item_count);
 
   auto ranges = SplitRange(range);
 
@@ -340,7 +322,7 @@ Path GetRangePath(uint64_t item_count, GetItem const& get_item,
     uint64_t leaf = r.start / r.count;
 
     assert((r.count & (r.count - 1)) == 0);
-    uint64_t level = Log2UB(r.count);
+    uint64_t level = misc::Log2UB(r.count);
 
     for (uint64_t i = level; i < depth; ++i) {
       uint64_t brother = (leaf % 2) ? leaf - 1 : leaf + 1;

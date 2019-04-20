@@ -105,12 +105,21 @@ void RecordToBin(Record const& record, std::vector<uint8_t>& bin) {
     memcpy(p, i.data(), i.size());
     p += i.size();
   }
-  for (auto i = p; i < bin.data() + bin.size(); ++i) {
-    *i = 0;
+
+  misc::RandomBytes(p, bin.data() + bin.size() - p);
+
+#ifdef _DEBUG
+  Record debug_record;
+  if (!BinToRecord(bin, debug_record, record.size())) {
+    assert(false);
   }
+#endif
+
+  assert((p - bin.data()) == (int64_t)GetRecordSize(record));
 }
 
-bool BinToRecord(std::vector<uint8_t> const& bin, Record& record) {
+bool BinToRecord(std::vector<uint8_t> const& bin, Record& record,
+                 uint64_t max_item) {
   uint8_t const* p = bin.data();
   size_t left_len = bin.size();
   for (;;) {
@@ -118,15 +127,16 @@ bool BinToRecord(std::vector<uint8_t> const& bin, Record& record) {
     if (left_len < sizeof(item_len)) return false;
     memcpy(&item_len, p, sizeof(item_len));
     item_len = boost::endian::big_to_native(item_len);
-    if (item_len > left_len) return false;
     p += sizeof(item_len);
     left_len -= sizeof(item_len);
+    if (item_len > left_len) return false;
     record.resize(record.size() + 1);
     auto& r = record.back();
     r.assign((char*)p, item_len);
     p += item_len;
     left_len -= item_len;
     if (left_len == 0) break;
+    if (record.size() >= max_item) break;
   }
   return true;
 }
@@ -138,10 +148,9 @@ void DataToM(Table const& table, std::vector<uint64_t> columens_index,
   auto record_fr_num = s - 1 - columens_index.size();
   auto n = table.size();
 
-  std::vector<uint8_t> bin(31 * record_fr_num);
-
 #pragma omp parallel for
   for (uint64_t i = 0; i < n; ++i) {
+    std::vector<uint8_t> bin(31 * record_fr_num);
     auto const& record = table[i];
     auto record_size = GetRecordSize(record);
     auto offset = i * s;
@@ -186,7 +195,7 @@ bool DecryptedMToFile(std::string const& file, uint64_t s,
 
   std::string str;
   for (auto const& i : vrf_meta.column_names) {
-    str += i + "\t";
+    str += i + ",";
   }
   str.pop_back();
   out << str;
@@ -196,7 +205,8 @@ bool DecryptedMToFile(std::string const& file, uint64_t s,
   for (auto const& i : demands) demands_count += i.count;
   h256_t pad_fr;
   uint64_t prefix_count = vrf_meta.keys.size() + 1;
-  std::vector<uint8_t> record_bin((s - prefix_count) * 31 + 1);
+  uint64_t max_record_len = (s - prefix_count) * 31 + 1;
+  std::vector<uint8_t> record_bin;
   for (size_t i = 0; i < demands_count; ++i) {
     // pad fr
     size_t j = vrf_meta.keys.size();
@@ -204,6 +214,7 @@ bool DecryptedMToFile(std::string const& file, uint64_t s,
     uint32_t real_len;
     memcpy(&real_len, pad_fr.data(), sizeof(real_len));
     real_len = boost::endian::big_to_native(real_len);
+    record_bin.resize(max_record_len);
     if (real_len >= record_bin.size()) {
       assert(false);
       return false;
@@ -220,17 +231,19 @@ bool DecryptedMToFile(std::string const& file, uint64_t s,
 
     Record record;
     record.reserve(vrf_meta.column_names.size());
-    if (!BinToRecord(record_bin, record)) {
+    if (!BinToRecord(record_bin, record, vrf_meta.column_names.size())) {
       assert(false);
       return false;
     }
     assert(record.size() <= vrf_meta.column_names.size());
 
+    str.clear();
     for (auto const& r : record) {
-      out << r << "\t";
+      str += r + ",";
     }
+    if (!str.empty()) str.pop_back();
 
-    out << "\n";
+    out << str << "\n";
   }
 
   return true;

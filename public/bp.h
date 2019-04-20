@@ -10,40 +10,22 @@
 #include "ecc.h"
 #include "multiexp.h"
 #include "tick.h"
+#include "misc.h"
 
 namespace bp {
 
 namespace detail {
 
-inline size_t Log2UB(size_t n) {
-  assert(n);
-  if (n == 1) return 0;
-  if (n % 2) ++n;
-  return 1 + Log2UB(n / 2);
-}
-
-inline uint64_t Pow2UB(uint64_t v) {
-  v--;
-  v |= v >> 1;
-  v |= v >> 2;
-  v |= v >> 4;
-  v |= v >> 8;
-  v |= v >> 16;
-  v |= v >> 32;
-  v++;
-  return v;
-}
-
 inline size_t PackGCount(size_t count) {
   assert(count);
-  auto align_count = Pow2UB(count);
+  auto align_count = misc::Pow2UB(count);
   if (align_count == 1) return 1;
   return align_count / 2;
 }
 
 inline size_t PackXCount(size_t count) {
   auto g_count = PackGCount(count);
-  return Log2UB(g_count);
+  return misc::Log2UB(g_count);
 }
 
 inline G1 MultiExpGH(G1 const* g, Fr const* a, G1 const* h, Fr const* b,

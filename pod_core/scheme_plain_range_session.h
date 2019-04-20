@@ -6,7 +6,7 @@
 
 #include "ecc.h"
 #include "scheme_plain_a.h"
-#include "scheme_plain_protocol.h"
+#include "scheme_plain_range_protocol.h"
 
 namespace scheme::plain {
 

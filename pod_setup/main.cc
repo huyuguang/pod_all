@@ -3,7 +3,6 @@
 
 int main(int argc, char** argv) {
   setlocale(LC_ALL, "");
-
   std::string output_file;
   uint64_t u1_size;
   uint64_t u2_size;

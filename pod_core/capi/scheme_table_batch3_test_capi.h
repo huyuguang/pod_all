@@ -5,5 +5,5 @@
 
 namespace scheme::table::batch3::capi {
 bool Test(std::string const& publish_path, std::string const& output_path,
-          std::vector<Range> const& demands, bool test_evil);
+          std::vector<Range> const& demands);
 }  // namespace scheme::table::batch3::capi

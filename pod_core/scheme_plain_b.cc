@@ -43,14 +43,12 @@ void B::LoadData() {
   std::string verify_file = public_path_ + "/.verify";
   std::string sigma_file = public_path_ + "/sigma";
 
-#ifdef _DEBUG
-  bool verify = NeedVerify();  // true;
-#else
+  h256_t const* check_h;
   bool verify = NeedVerify();
-#endif
 
   // sigma
-  if (!LoadSigma(sigma_file, bulletin_.n, &bulletin_.sigma_mkl_root, sigmas_)) {
+  check_h = verify ? &bulletin_.sigma_mkl_root : nullptr;
+  if (!LoadSigma(sigma_file, bulletin_.n, check_h, sigmas_)) {
     assert(false);
     throw std::runtime_error("invalid sigma file");
   }

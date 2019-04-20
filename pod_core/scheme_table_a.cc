@@ -1,7 +1,6 @@
 #include "scheme_table_a.h"
 #include "public.h"
 #include "misc.h"
-#include "scheme_table_protocol.h"
 
 namespace {
 

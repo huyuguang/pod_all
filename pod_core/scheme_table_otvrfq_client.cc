@@ -3,6 +3,7 @@
 #include "public.h"
 #include "scheme_table.h"
 #include "scheme_table_b.h"
+#include "scheme_table_otvrfq_notary.h"
 
 namespace scheme::table::otvrfq {
 
@@ -126,8 +127,7 @@ bool Client::OnResponse(Response const& response, Receipt& receipt) {
 
 bool Client::OnSecret(Secret const& query_secret,
                       std::vector<std::vector<uint64_t>>& positions) {
-  auto const& ecc_pub = GetEccPub();
-  if (ecc_pub.PowerG1(query_secret.r) != g_exp_r_) {
+  if (!VerifyProof(g_exp_r_, query_secret)) {
     assert(false);
     return false;
   }

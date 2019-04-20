@@ -28,7 +28,8 @@ Fr GetPadFr(uint32_t len);
 
 void RecordToBin(Record const& record, std::vector<uint8_t>& bin);
 
-bool BinToRecord(std::vector<uint8_t> const& bin, Record& record);
+bool BinToRecord(std::vector<uint8_t> const& bin, Record& record,
+                 uint64_t max_item);
 
 void DataToM(Table const& table, std::vector<uint64_t> columens_index,
              uint64_t s, vrf::Sk<> const& vrf_sk, std::vector<Fr>& m);

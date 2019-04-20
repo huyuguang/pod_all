@@ -5,7 +5,7 @@
 #include "basic_types.h"
 #include "ecc.h"
 #include "scheme_plain_b.h"
-#include "scheme_plain_protocol.h"
+#include "scheme_plain_otrange_protocol.h"
 
 namespace scheme::plain::otrange {
 

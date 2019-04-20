@@ -262,6 +262,29 @@ bool PublishTable(std::string publish_file, std::string output_path,
   }
 
   std::cout << "n: " << bulletin.n << ", s: " << bulletin.s << "\n";
+
+#ifdef _DEBUG
+  std::string debug_data_file = original_file + ".debug";
+  std::vector<Range> debug_demands(1);
+  debug_demands[0] = Range(0, bulletin.n);
+  if (!DecryptedMToFile(debug_data_file, bulletin.s, vrf_meta,
+                        debug_demands, m)) {
+    assert(false);
+    return false;
+  }
+  Table debug_table;
+  VrfMeta debug_vrf_meta;
+  if (!LoadTable(debug_data_file, table_type, debug_vrf_meta.column_names,
+                 debug_table)) {
+    assert(false);
+    return false;
+  }
+  assert(debug_vrf_meta.column_names == vrf_meta.column_names);
+  assert(table == debug_table);
+
+  fs::remove(debug_data_file);
+#endif
+
   return true;
 }
 

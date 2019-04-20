@@ -7,6 +7,7 @@
 #include <vector>
 
 #include <boost/endian/conversion.hpp>
+#include <boost/noncopyable.hpp>
 
 #include "ecc.h"
 #include "tick.h"
@@ -15,7 +16,7 @@
 // 21888242871839275222246405745257275088548364400416034343698204186575808495617
 // It's a prime number, that means for any generator u = g^xx, order of the sub
 // group is same.
-class EccPub {
+class EccPub : boost::noncopyable {
  public:
   G1WM const& g1_wm() const { return g1_wm_; }
   G2WM const& g2_wm() const { return g2_wm_; }
@@ -24,6 +25,8 @@ class EccPub {
   std::vector<G2> const& u2() const { return u2_; }
   std::vector<G2WM> const& u2_wm() const { return u2_wm_; }
   std::vector<Fp6> const& g2_1_coeff() const { return g2_1_coeff_; }
+  size_t u1_size() const { return u1_.size(); }
+  size_t u2_size() const { return u2_.size(); }
 
   EccPub(std::string const& file) {
     LoadInternal(file);
@@ -62,10 +65,6 @@ class EccPub {
 
   G1 PowerU1(uint64_t u_index, Fr const& f) const {
     if (u_index >= u1_wm_.size()) throw std::runtime_error("bad u_index");
-    if (u_index == 0) {
-      assert(u1_[0] == G1One());
-      return PowerG1(f);
-    }
     G1WM const& wm = u1_wm_[u_index];
     G1 ret;
     wm.mul(ret, f);
@@ -74,10 +73,6 @@ class EccPub {
 
   G2 PowerU2(uint64_t u_index, Fr const& f) const {
     if (u_index >= u2_wm_.size()) throw std::runtime_error("bad u_index");
-    if (u_index == 0) {
-      assert(u2_[0] == G2One());
-      return PowerG2(f);
-    }
     G2WM const& wm = u2_wm_[u_index];
     G2 ret;
     wm.mul(ret, f);
@@ -106,7 +101,7 @@ class EccPub {
 
     for (size_t i = 0; i < u1_.size(); ++i) {
       std::string seed = "pod_u1_" + std::to_string(i);
-      u1_[i] = (i == 0) ? G1One() : MapToG1(seed);
+      u1_[i] = MapToG1(seed);
       u1_[i].normalize();
 
       u1_wm_[i].init(u1_[i], fr_bits, 4);  // use 4 is ok
@@ -117,7 +112,7 @@ class EccPub {
 
     for (size_t i = 0; i < u2_.size(); ++i) {
       std::string seed = "pod_u2_" + std::to_string(i);
-      u2_[i] = (i == 0) ? G2One() : MapToG2(seed);
+      u2_[i] = MapToG2(seed);
       u2_[i].normalize();
 
       u2_wm_[i].init(u2_[i], fr_bits, 4);  // use 4 is ok

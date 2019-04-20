@@ -4,7 +4,7 @@
 #include "scheme_misc.h"
 #include "scheme_table.h"
 #include "scheme_table_a.h"
-#include "scheme_table_protocol.h"
+#include "scheme_table_batch_protocol.h"
 #include "tick.h"
 
 namespace {

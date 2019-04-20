@@ -2,10 +2,10 @@
 #include "scheme_plain.h"
 #include "scheme_plain_a.h"
 #include "scheme_plain_b.h"
-#include "scheme_plain_notary.h"
 #include "scheme_plain_otrange_client.h"
+#include "scheme_plain_otrange_notary.h"
+#include "scheme_plain_otrange_protocol.h"
 #include "scheme_plain_otrange_session.h"
-#include "scheme_plain_protocol.h"
 
 namespace {
 // The session id must be hash(addr_A), and the client id must be hash(addr_B).

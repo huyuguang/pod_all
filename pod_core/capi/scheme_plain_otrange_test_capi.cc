@@ -4,8 +4,8 @@
 #include <iostream>
 #include <memory>
 
-#include "../scheme_plain_notary.h"
-#include "../scheme_plain_protocol_serialize.h"
+#include "../scheme_plain_otrange_notary.h"
+#include "../scheme_plain_otrange_serialize.h"
 #include "c_api.h"
 #include "tick.h"
 

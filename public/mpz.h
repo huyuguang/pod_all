@@ -56,19 +56,19 @@ inline std::string MpzToStr(mpz_class const& mpz) {
   return mpz.get_str();
 }
 
-inline void TestMpz() {
-  mpz_class v = 0x11223344;
-  std::cout << v << "\n";
-  uint8_t buf[32];
-  MpzToBE(v, buf, sizeof(buf));
-  Fr f1;
-  f1.setMpz(v);
-
-  uint8_t buf2[32];
-  MpzToLE(v, buf2, sizeof(buf2));
-  Fr f2;
-  f2.setArrayMaskMod(buf2,32);
-
-  std::cout << f1 << "\n";
-  std::cout << f2 << "\n";
-}
+//inline void TestMpz() {
+//  mpz_class v = 0x11223344;
+//  std::cout << v << "\n";
+//  uint8_t buf[32];
+//  MpzToBE(v, buf, sizeof(buf));
+//  Fr f1;
+//  f1.setMpz(v);
+//
+//  uint8_t buf2[32];
+//  MpzToLE(v, buf2, sizeof(buf2));
+//  Fr f2;
+//  f2.setArrayMaskMod(buf2,32);
+//
+//  std::cout << f1 << "\n";
+//  std::cout << f2 << "\n";
+//}

@@ -109,13 +109,15 @@ EXPORT handle_t E_TableBatch3SessionNew(handle_t c_a, uint8_t const* c_self_id,
 
 EXPORT bool E_TableBatch3SessionOnRequest(handle_t c_session,
                                           char const* request_file,
-                                          char const* response_file);
+                                          char const* commitment_file);
+
+EXPORT bool E_TableBatch3SessionOnChallenge(handle_t c_session,
+                                            char const* challenge_file,
+                                            char const* response_file);
 
 EXPORT bool E_TableBatch3SessionOnReceipt(handle_t c_session,
                                           char const* receipt_file,
                                           char const* secret_file);
-
-EXPORT bool E_TableBatch3SessionSetEvil(handle_t c_session);
 
 EXPORT bool E_TableBatch3SessionFree(handle_t h);
 
@@ -126,6 +128,10 @@ EXPORT handle_t E_TableBatch3ClientNew(handle_t c_b, uint8_t const* c_self_id,
 
 EXPORT bool E_TableBatch3ClientGetRequest(handle_t c_client,
                                           char const* request_file);
+
+EXPORT bool E_TableBatch3ClientOnCommitment(handle_t c_client,
+                                          char const* commitment_file,
+                                          char const* challenge_file);
 
 EXPORT bool E_TableBatch3ClientOnResponse(handle_t c_client,
                                           char const* response_file,

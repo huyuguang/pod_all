@@ -4,8 +4,8 @@
 #include <iostream>
 #include <memory>
 
-#include "../scheme_table_notary.h"
-#include "../scheme_table_protocol_serialize.h"
+#include "../scheme_table_batch_notary.h"
+#include "../scheme_table_batch_serialize.h"
 #include "c_api.h"
 #include "tick.h"
 

@@ -4,8 +4,6 @@
 #include "scheme_misc.h"
 #include "scheme_plain.h"
 #include "scheme_plain_b.h"
-#include "scheme_plain_protocol.h"
-#include "vrf.h"
 
 namespace scheme::plain::otrange {
 

@@ -4,8 +4,8 @@
 #include "scheme_misc.h"
 #include "scheme_table.h"
 #include "scheme_table_b.h"
-#include "scheme_table_notary.h"
-#include "scheme_table_protocol.h"
+#include "scheme_table_batch2_notary.h"
+#include "scheme_table_batch2_protocol.h"
 #include "vrf.h"
 
 namespace {

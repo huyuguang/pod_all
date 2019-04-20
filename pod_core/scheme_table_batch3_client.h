@@ -5,7 +5,7 @@
 #include "basic_types.h"
 #include "ecc.h"
 #include "scheme_table_b.h"
-#include "scheme_table_protocol.h"
+#include "scheme_table_batch3_protocol.h"
 
 namespace scheme::table::batch3 {
 
@@ -17,15 +17,22 @@ class Client {
 
  public:
   void GetRequest(Request& request);
+  bool OnCommitment(Commitment commitment, Challenge& challenge);
   bool OnResponse(Response response, Receipt& receipt);
-  bool OnSecret(Secret const& secret);
+  bool OnSecret(Secret secret);
   bool SaveDecrypted(std::string const& file);
 
  private:
   void BuildMapping();
   bool CheckEncryptedM();
-  bool CheckKVW();
-  void DecryptM(std::vector<Fr> const& v);
+  bool CheckUX0();
+  bool CheckEK();
+  bool CheckEX();  
+  void ComputeChallenge(h256_t const& r);
+  bool CheckCommitmentOfD();
+  void DecryptK();
+  void DecryptX();
+  void DecryptM();
 
  private:
   BPtr b_;
@@ -34,23 +41,34 @@ class Client {
   uint64_t const n_;
   uint64_t const s_;
   std::vector<Range> const demands_;
-  uint64_t demands_count_ = 0;
-  h256_t seed2_seed_;
+  h256_t const r_;
 
  private:
-  std::vector<G1> k_;   // sizeof() = (count + 1) * s
-  std::vector<Fr> vw_;  // sizeof() = s
+  uint64_t demands_count_ = 0;
+  uint64_t align_c_;
+  uint64_t align_s_;
+  uint64_t log_c_;
+  uint64_t log_s_;
+  Fr c_;
+  Fr e1_;
+  Fr e2_;
+  Fr e1_square_;
+  Fr e2_square_;
+  Fr e1_e2_inverse_;
+  Commitment commitment_;
+  Response response_;
+  Receipt receipt_;
+  Secret secret_;
+  std::vector<Eigen::MatrixXFr> k_;
+  std::vector<Eigen::RowVectorXFr> x_;  
 
  private:
   struct Mapping {
     uint64_t index_of_m;
   };
   std::vector<Mapping> mappings_;
-  Fr sigma_vw_;
 
  private:
-  h256_t seed2_;
-  std::vector<Fr> w_;  // size() = count
   std::vector<Fr> decrypted_m_;
   std::vector<Fr> encrypted_m_;
 };

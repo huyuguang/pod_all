@@ -59,6 +59,30 @@
     <Filter Include="local\table_batch3">
       <UniqueIdentifier>{2490e28c-e28c-4b85-86ec-c1a338b48ccb}</UniqueIdentifier>
     </Filter>
+    <Filter Include="capi\plain_range">
+      <UniqueIdentifier>{4675ec94-6948-4251-a897-77325b10c3c7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="capi\plain_otrange">
+      <UniqueIdentifier>{c42af450-221e-4c6f-8bd5-a76cb30b88a0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="capi\table_batch">
+      <UniqueIdentifier>{2863110e-7e16-4f3a-9f91-41b545f36abb}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="capi\table_batch2">
+      <UniqueIdentifier>{04c3b53d-5fe9-49eb-99c9-f55fc9c2333a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="capi\table_batch3">
+      <UniqueIdentifier>{4f045dfa-c944-43ff-a1eb-293486d761e2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="capi\table_otbatch">
+      <UniqueIdentifier>{fb88a6e7-c9bc-4b2f-ab62-1121a24e486a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="capi\table_vrfq">
+      <UniqueIdentifier>{43af255e-80bf-4348-9913-26f7bf313c57}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="capi\table_otvrfq">
+      <UniqueIdentifier>{d7f8ed9d-b826-4174-bcaf-91c9572143e6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pod_core\main.cc">
@@ -74,9 +98,6 @@
       <Filter>local</Filter>
     </ClCompile>
     <ClCompile Include="pod_core\scheme_table_b.cc">
-      <Filter>local</Filter>
-    </ClCompile>
-    <ClCompile Include="pod_core\scheme_plain_notary.cc">
       <Filter>local</Filter>
     </ClCompile>
     <ClCompile Include="pod_core\scheme_plain_range_client.cc">
@@ -151,9 +172,6 @@
     <ClCompile Include="pod_core\scheme_table_otbatch_test.cc">
       <Filter>local\table_otbatch</Filter>
     </ClCompile>
-    <ClCompile Include="pod_core\scheme_table_notary.cc">
-      <Filter>local</Filter>
-    </ClCompile>
     <ClCompile Include="pod_core\scheme_table_batch_client.cc">
       <Filter>local\table_batch</Filter>
     </ClCompile>
@@ -175,31 +193,10 @@
     <ClCompile Include="pod_core\capi\c_api.cc">
       <Filter>capi</Filter>
     </ClCompile>
-    <ClCompile Include="pod_core\capi\scheme_plain_range_test_capi.cc">
-      <Filter>capi</Filter>
-    </ClCompile>
     <ClCompile Include="pod_core\capi\c_api_plain.cc">
       <Filter>capi</Filter>
     </ClCompile>
     <ClCompile Include="pod_core\capi\c_api_table.cc">
-      <Filter>capi</Filter>
-    </ClCompile>
-    <ClCompile Include="pod_core\capi\scheme_plain_otrange_test_capi.cc">
-      <Filter>capi</Filter>
-    </ClCompile>
-    <ClCompile Include="pod_core\capi\scheme_table_batch_test_capi.cc">
-      <Filter>capi</Filter>
-    </ClCompile>
-    <ClCompile Include="pod_core\capi\scheme_table_otbatch_test_capi.cc">
-      <Filter>capi</Filter>
-    </ClCompile>
-    <ClCompile Include="pod_core\capi\scheme_table_batch2_test_capi.cc">
-      <Filter>capi</Filter>
-    </ClCompile>
-    <ClCompile Include="pod_core\capi\scheme_table_otvrfq_test_capi.cc">
-      <Filter>capi</Filter>
-    </ClCompile>
-    <ClCompile Include="pod_core\capi\scheme_table_vrfq_test_capi.cc">
       <Filter>capi</Filter>
     </ClCompile>
     <ClCompile Include="public\scheme_error.cc">
@@ -214,8 +211,56 @@
     <ClCompile Include="pod_core\scheme_table_batch3_test.cc">
       <Filter>local\table_batch3</Filter>
     </ClCompile>
+    <ClCompile Include="pod_core\scheme_plain_range_notary.cc">
+      <Filter>local\plain_range</Filter>
+    </ClCompile>
+    <ClCompile Include="pod_core\scheme_plain_otrange_notary.cc">
+      <Filter>local\plain_otrange</Filter>
+    </ClCompile>
+    <ClCompile Include="pod_core\capi\scheme_plain_range_test_capi.cc">
+      <Filter>capi\plain_range</Filter>
+    </ClCompile>
+    <ClCompile Include="pod_core\capi\scheme_plain_otrange_test_capi.cc">
+      <Filter>capi\plain_otrange</Filter>
+    </ClCompile>
+    <ClCompile Include="pod_core\capi\scheme_table_batch_test_capi.cc">
+      <Filter>capi\table_batch</Filter>
+    </ClCompile>
+    <ClCompile Include="pod_core\capi\scheme_table_batch2_test_capi.cc">
+      <Filter>capi\table_batch2</Filter>
+    </ClCompile>
     <ClCompile Include="pod_core\capi\scheme_table_batch3_test_capi.cc">
-      <Filter>capi</Filter>
+      <Filter>capi\table_batch3</Filter>
+    </ClCompile>
+    <ClCompile Include="pod_core\capi\scheme_table_otbatch_test_capi.cc">
+      <Filter>capi\table_otbatch</Filter>
+    </ClCompile>
+    <ClCompile Include="pod_core\capi\scheme_table_otvrfq_test_capi.cc">
+      <Filter>capi\table_vrfq</Filter>
+    </ClCompile>
+    <ClCompile Include="pod_core\capi\scheme_table_vrfq_test_capi.cc">
+      <Filter>capi\table_otvrfq</Filter>
+    </ClCompile>
+    <ClCompile Include="pod_core\scheme_table_otbatch_notary.cc">
+      <Filter>local\table_otbatch</Filter>
+    </ClCompile>
+    <ClCompile Include="pod_core\scheme_table_batch_notary.cc">
+      <Filter>local\table_batch</Filter>
+    </ClCompile>
+    <ClCompile Include="pod_core\scheme_table_batch2_notary.cc">
+      <Filter>local\table_batch2</Filter>
+    </ClCompile>
+    <ClCompile Include="pod_core\scheme_table_batch3_notary.cc">
+      <Filter>local\table_batch3</Filter>
+    </ClCompile>
+    <ClCompile Include="pod_core\scheme_table_vrfq_notary.cc">
+      <Filter>local\table_vrfq</Filter>
+    </ClCompile>
+    <ClCompile Include="pod_core\scheme_table_otvrfq_notary.cc">
+      <Filter>local\table_otvrfq</Filter>
+    </ClCompile>
+    <ClCompile Include="pod_core\scheme_table_batch3_misc.cc">
+      <Filter>local\table_batch3</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -387,15 +432,6 @@
     <ClInclude Include="pod_core\scheme_table_b.h">
       <Filter>local</Filter>
     </ClInclude>
-    <ClInclude Include="pod_core\scheme_table_protocol.h">
-      <Filter>local</Filter>
-    </ClInclude>
-    <ClInclude Include="pod_core\scheme_plain_protocol.h">
-      <Filter>local</Filter>
-    </ClInclude>
-    <ClInclude Include="pod_core\scheme_plain_notary.h">
-      <Filter>local</Filter>
-    </ClInclude>
     <ClInclude Include="pod_core\scheme_plain_range_client.h">
       <Filter>local\plain_range</Filter>
     </ClInclude>
@@ -501,9 +537,6 @@
     <ClInclude Include="pod_core\scheme_table_otbatch_test.h">
       <Filter>local\table_otbatch</Filter>
     </ClInclude>
-    <ClInclude Include="pod_core\scheme_table_notary.h">
-      <Filter>local</Filter>
-    </ClInclude>
     <ClInclude Include="pod_core\scheme_table_batch_client.h">
       <Filter>local\table_batch</Filter>
     </ClInclude>
@@ -522,19 +555,10 @@
     <ClInclude Include="pod_core\scheme_table_batch2_test.h">
       <Filter>local\table_batch2</Filter>
     </ClInclude>
-    <ClInclude Include="pod_core\scheme_plain_protocol_serialize.h">
-      <Filter>local</Filter>
-    </ClInclude>
-    <ClInclude Include="pod_core\scheme_table_protocol_serialize.h">
-      <Filter>local</Filter>
-    </ClInclude>
     <ClInclude Include="pod_core\basic_types_serialize.h">
       <Filter>local</Filter>
     </ClInclude>
     <ClInclude Include="pod_core\capi\c_api.h">
-      <Filter>capi</Filter>
-    </ClInclude>
-    <ClInclude Include="pod_core\capi\scheme_plain_range_test_capi.h">
       <Filter>capi</Filter>
     </ClInclude>
     <ClInclude Include="pod_core\capi\c_api_plain.h">
@@ -544,24 +568,6 @@
       <Filter>capi</Filter>
     </ClInclude>
     <ClInclude Include="pod_core\capi\c_api_types.h">
-      <Filter>capi</Filter>
-    </ClInclude>
-    <ClInclude Include="pod_core\capi\scheme_plain_otrange_test_capi.h">
-      <Filter>capi</Filter>
-    </ClInclude>
-    <ClInclude Include="pod_core\capi\scheme_table_batch_test_capi.h">
-      <Filter>capi</Filter>
-    </ClInclude>
-    <ClInclude Include="pod_core\capi\scheme_table_otbatch_test_capi.h">
-      <Filter>capi</Filter>
-    </ClInclude>
-    <ClInclude Include="pod_core\capi\scheme_table_batch2_test_capi.h">
-      <Filter>capi</Filter>
-    </ClInclude>
-    <ClInclude Include="pod_core\capi\scheme_table_otvrfq_test_capi.h">
-      <Filter>capi</Filter>
-    </ClInclude>
-    <ClInclude Include="pod_core\capi\scheme_table_vrfq_test_capi.h">
       <Filter>capi</Filter>
     </ClInclude>
     <ClInclude Include="public\scheme_error.h">
@@ -582,8 +588,110 @@
     <ClInclude Include="pod_core\scheme_table_batch3_test.h">
       <Filter>local\table_batch3</Filter>
     </ClInclude>
+    <ClInclude Include="pod_core\scheme_plain_batch_protocol.h">
+      <Filter>local\plain_batch</Filter>
+    </ClInclude>
+    <ClInclude Include="pod_core\scheme_plain_otbatch_protocol.h">
+      <Filter>local\plain_otbatch</Filter>
+    </ClInclude>
+    <ClInclude Include="pod_core\scheme_plain_otrange_protocol.h">
+      <Filter>local\plain_otrange</Filter>
+    </ClInclude>
+    <ClInclude Include="pod_core\scheme_plain_range_protocol.h">
+      <Filter>local\plain_range</Filter>
+    </ClInclude>
+    <ClInclude Include="pod_core\scheme_plain_range_notary.h">
+      <Filter>local\plain_range</Filter>
+    </ClInclude>
+    <ClInclude Include="pod_core\scheme_plain_otrange_notary.h">
+      <Filter>local\plain_otrange</Filter>
+    </ClInclude>
+    <ClInclude Include="pod_core\scheme_plain_otrange_serialize.h">
+      <Filter>local\plain_otrange</Filter>
+    </ClInclude>
+    <ClInclude Include="pod_core\scheme_plain_range_serialize.h">
+      <Filter>local\plain_range</Filter>
+    </ClInclude>
+    <ClInclude Include="pod_core\capi\scheme_plain_range_test_capi.h">
+      <Filter>capi\plain_range</Filter>
+    </ClInclude>
+    <ClInclude Include="pod_core\capi\scheme_plain_otrange_test_capi.h">
+      <Filter>capi\plain_otrange</Filter>
+    </ClInclude>
+    <ClInclude Include="pod_core\capi\scheme_table_batch_test_capi.h">
+      <Filter>capi\table_batch</Filter>
+    </ClInclude>
+    <ClInclude Include="pod_core\capi\scheme_table_batch2_test_capi.h">
+      <Filter>capi\table_batch2</Filter>
+    </ClInclude>
     <ClInclude Include="pod_core\capi\scheme_table_batch3_test_capi.h">
-      <Filter>capi</Filter>
+      <Filter>capi\table_batch3</Filter>
+    </ClInclude>
+    <ClInclude Include="pod_core\capi\scheme_table_otbatch_test_capi.h">
+      <Filter>capi\table_otbatch</Filter>
+    </ClInclude>
+    <ClInclude Include="pod_core\capi\scheme_table_otvrfq_test_capi.h">
+      <Filter>capi\table_vrfq</Filter>
+    </ClInclude>
+    <ClInclude Include="pod_core\capi\scheme_table_vrfq_test_capi.h">
+      <Filter>capi\table_otvrfq</Filter>
+    </ClInclude>
+    <ClInclude Include="pod_core\scheme_table_otbatch_notary.h">
+      <Filter>local\table_otbatch</Filter>
+    </ClInclude>
+    <ClInclude Include="pod_core\scheme_table_batch_notary.h">
+      <Filter>local\table_batch</Filter>
+    </ClInclude>
+    <ClInclude Include="pod_core\scheme_table_batch2_notary.h">
+      <Filter>local\table_batch2</Filter>
+    </ClInclude>
+    <ClInclude Include="pod_core\scheme_table_batch3_notary.h">
+      <Filter>local\table_batch3</Filter>
+    </ClInclude>
+    <ClInclude Include="pod_core\scheme_table_vrfq_notary.h">
+      <Filter>local\table_vrfq</Filter>
+    </ClInclude>
+    <ClInclude Include="pod_core\scheme_table_otvrfq_notary.h">
+      <Filter>local\table_otvrfq</Filter>
+    </ClInclude>
+    <ClInclude Include="pod_core\scheme_table_batch_protocol.h">
+      <Filter>local\table_batch</Filter>
+    </ClInclude>
+    <ClInclude Include="pod_core\scheme_table_batch2_protocol.h">
+      <Filter>local\table_batch2</Filter>
+    </ClInclude>
+    <ClInclude Include="pod_core\scheme_table_batch3_protocol.h">
+      <Filter>local\table_batch3</Filter>
+    </ClInclude>
+    <ClInclude Include="pod_core\scheme_table_otbatch_protocol.h">
+      <Filter>local\table_otbatch</Filter>
+    </ClInclude>
+    <ClInclude Include="pod_core\scheme_table_otvrfq_protocol.h">
+      <Filter>local\table_otvrfq</Filter>
+    </ClInclude>
+    <ClInclude Include="pod_core\scheme_table_vrfq_protocol.h">
+      <Filter>local\table_vrfq</Filter>
+    </ClInclude>
+    <ClInclude Include="pod_core\scheme_table_vrfq_serialize.h">
+      <Filter>local\table_vrfq</Filter>
+    </ClInclude>
+    <ClInclude Include="pod_core\scheme_table_otvrfq_serialize.h">
+      <Filter>local\table_otvrfq</Filter>
+    </ClInclude>
+    <ClInclude Include="pod_core\scheme_table_otbatch_serialize.h">
+      <Filter>local\table_otbatch</Filter>
+    </ClInclude>
+    <ClInclude Include="pod_core\scheme_table_batch3_serialize.h">
+      <Filter>local\table_batch3</Filter>
+    </ClInclude>
+    <ClInclude Include="pod_core\scheme_table_batch2_serialize.h">
+      <Filter>local\table_batch2</Filter>
+    </ClInclude>
+    <ClInclude Include="pod_core\scheme_table_batch_serialize.h">
+      <Filter>local\table_batch</Filter>
+    </ClInclude>
+    <ClInclude Include="pod_core\scheme_table_batch3_misc.h">
+      <Filter>local\table_batch3</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -592,32 +700,32 @@
     <None Include="pod_core\capi\scheme_table.inc">
       <Filter>capi</Filter>
     </None>
-    <None Include="pod_core\capi\scheme_plain_otrange.inc">
-      <Filter>capi</Filter>
-    </None>
-    <None Include="pod_core\capi\scheme_plain_range.inc">
-      <Filter>capi</Filter>
-    </None>
-    <None Include="pod_core\capi\scheme_table_batch.inc">
-      <Filter>capi</Filter>
-    </None>
-    <None Include="pod_core\capi\scheme_table_batch2.inc">
-      <Filter>capi</Filter>
-    </None>
-    <None Include="pod_core\capi\scheme_table_otbatch.inc">
-      <Filter>capi</Filter>
-    </None>
-    <None Include="pod_core\capi\scheme_table_otvrfq.inc">
-      <Filter>capi</Filter>
-    </None>
-    <None Include="pod_core\capi\scheme_table_vrfq.inc">
-      <Filter>capi</Filter>
-    </None>
     <None Include="pod_core\capi\scheme_plain.inc">
       <Filter>capi</Filter>
     </None>
+    <None Include="pod_core\capi\scheme_plain_range.inc">
+      <Filter>capi\plain_range</Filter>
+    </None>
+    <None Include="pod_core\capi\scheme_plain_otrange.inc">
+      <Filter>capi\plain_otrange</Filter>
+    </None>
+    <None Include="pod_core\capi\scheme_table_batch.inc">
+      <Filter>capi\table_batch</Filter>
+    </None>
+    <None Include="pod_core\capi\scheme_table_batch2.inc">
+      <Filter>capi\table_batch2</Filter>
+    </None>
     <None Include="pod_core\capi\scheme_table_batch3.inc">
-      <Filter>capi</Filter>
+      <Filter>capi\table_batch3</Filter>
+    </None>
+    <None Include="pod_core\capi\scheme_table_otbatch.inc">
+      <Filter>capi\table_otbatch</Filter>
+    </None>
+    <None Include="pod_core\capi\scheme_table_otvrfq.inc">
+      <Filter>capi\table_vrfq</Filter>
+    </None>
+    <None Include="pod_core\capi\scheme_table_vrfq.inc">
+      <Filter>capi\table_otvrfq</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

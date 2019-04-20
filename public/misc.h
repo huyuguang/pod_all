@@ -173,4 +173,22 @@ inline void HexStrToH256(std::string const& str, h256_t& h) {
   StrToHex(str.c_str(), str.size(), h.data());
 }
 
+inline uint64_t Log2UB(uint64_t n) {
+  assert(n);
+  if (n == 1) return 0;
+  if (n % 2) ++n;
+  return 1 + Log2UB(n / 2);
+}
+
+inline uint64_t Pow2UB(uint64_t v) {
+  v--;
+  v |= v >> 1;
+  v |= v >> 2;
+  v |= v >> 4;
+  v |= v >> 8;
+  v |= v >> 16;
+  v |= v >> 32;
+  v++;
+  return v;
+}
 }  // namespace misc

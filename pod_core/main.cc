@@ -40,9 +40,6 @@ void DumpEccPub() {
 int main(int argc, char** argv) {
   setlocale(LC_ALL, "");
 
-  //TestEigen();
-  //return 0;
-
   using scheme::Action;
   using scheme::Mode;
   Mode mode;
@@ -227,7 +224,8 @@ int main(int argc, char** argv) {
     } else if (action == Action::kBatch3Pod) {
       auto func = use_capi ? scheme::table::batch3::capi::Test
                            : scheme::table::batch3::Test;
-      return func(publish_path, output_path, demand_ranges, test_evil) ? 0 : -1;
+      return func(publish_path, output_path, demand_ranges) ? 0 : -1;
+      return 0;
     } else {
       std::cerr << "Not implement yet.\n";
       return -1;

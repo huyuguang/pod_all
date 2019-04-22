@@ -238,7 +238,7 @@ void Client::DecryptM(std::vector<Fr> const& v) {
   Tick _tick_(__FUNCTION__);
 
 #pragma omp parallel for
-  for (int64_t i = 0; i < (int64_t)demand_.count; ++i) {
+  for (uint64_t i = 0; i < demand_.count; ++i) {
     Fr inv_w = FrInv(w_[i]);
     auto is = i * s_;
     for (uint64_t j = 0; j < s_; ++j) {

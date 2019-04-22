@@ -83,6 +83,12 @@
     <Filter Include="capi\table_otvrfq">
       <UniqueIdentifier>{d7f8ed9d-b826-4174-bcaf-91c9572143e6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="local\plain_batch3">
+      <UniqueIdentifier>{d79c5eb7-4785-4dc8-934c-b1c43973c2d2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="capi\plain_batch3">
+      <UniqueIdentifier>{dff72875-e10b-4dde-8113-b400b266c456}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pod_core\main.cc">
@@ -261,6 +267,24 @@
     </ClCompile>
     <ClCompile Include="pod_core\scheme_table_batch3_misc.cc">
       <Filter>local\table_batch3</Filter>
+    </ClCompile>
+    <ClCompile Include="pod_core\scheme_plain_batch3_client.cc">
+      <Filter>local\plain_batch3</Filter>
+    </ClCompile>
+    <ClCompile Include="pod_core\scheme_plain_batch3_misc.cc">
+      <Filter>local\plain_batch3</Filter>
+    </ClCompile>
+    <ClCompile Include="pod_core\scheme_plain_batch3_notary.cc">
+      <Filter>local\plain_batch3</Filter>
+    </ClCompile>
+    <ClCompile Include="pod_core\scheme_plain_batch3_session.cc">
+      <Filter>local\plain_batch3</Filter>
+    </ClCompile>
+    <ClCompile Include="pod_core\scheme_plain_batch3_test.cc">
+      <Filter>local\plain_batch3</Filter>
+    </ClCompile>
+    <ClCompile Include="pod_core\capi\scheme_plain_batch3_test_capi.cc">
+      <Filter>capi\plain_batch3</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -693,6 +717,30 @@
     <ClInclude Include="pod_core\scheme_table_batch3_misc.h">
       <Filter>local\table_batch3</Filter>
     </ClInclude>
+    <ClInclude Include="pod_core\scheme_plain_batch3_client.h">
+      <Filter>local\plain_batch3</Filter>
+    </ClInclude>
+    <ClInclude Include="pod_core\scheme_plain_batch3_misc.h">
+      <Filter>local\plain_batch3</Filter>
+    </ClInclude>
+    <ClInclude Include="pod_core\scheme_plain_batch3_notary.h">
+      <Filter>local\plain_batch3</Filter>
+    </ClInclude>
+    <ClInclude Include="pod_core\scheme_plain_batch3_protocol.h">
+      <Filter>local\plain_batch3</Filter>
+    </ClInclude>
+    <ClInclude Include="pod_core\scheme_plain_batch3_serialize.h">
+      <Filter>local\plain_batch3</Filter>
+    </ClInclude>
+    <ClInclude Include="pod_core\scheme_plain_batch3_session.h">
+      <Filter>local\plain_batch3</Filter>
+    </ClInclude>
+    <ClInclude Include="pod_core\scheme_plain_batch3_test.h">
+      <Filter>local\plain_batch3</Filter>
+    </ClInclude>
+    <ClInclude Include="pod_core\capi\scheme_plain_batch3_test_capi.h">
+      <Filter>capi\plain_batch3</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="pod_core\README.md" />
@@ -726,6 +774,9 @@
     </None>
     <None Include="pod_core\capi\scheme_table_vrfq.inc">
       <Filter>capi\table_otvrfq</Filter>
+    </None>
+    <None Include="pod_core\capi\scheme_plain_batch3.inc">
+      <Filter>capi\plain_batch3</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

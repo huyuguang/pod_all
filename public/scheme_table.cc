@@ -92,7 +92,7 @@ Fr GetPadFr(uint32_t len) {
   return BinToFr31(bin, bin + sizeof(bin));
 }
 
-// NOTE: maybe should use some more efficient serialize solution
+// NOTE: maybe should use some more efficient serialize solutions
 void RecordToBin(Record const& record, std::vector<uint8_t>& bin) {
   assert(bin.size() >= GetRecordSize(record));
 

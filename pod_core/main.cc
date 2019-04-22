@@ -1,3 +1,4 @@
+#include "capi/scheme_plain_batch3_test_capi.h"
 #include "capi/scheme_plain_otrange_test_capi.h"
 #include "capi/scheme_plain_range_test_capi.h"
 #include "capi/scheme_table_batch2_test_capi.h"
@@ -9,6 +10,7 @@
 #include "ecc_pub.h"
 #include "public.h"
 #include "scheme_misc.h"
+#include "scheme_plain_batch3_test.h"
 #include "scheme_plain_otrange_test.h"
 #include "scheme_plain_range_test.h"
 #include "scheme_table_batch2_test.h"
@@ -93,8 +95,8 @@ int main(int argc, char** argv) {
         "phantoms_a phantoms_b phantoms_c)")(
         "omp_thread_num", po::value<uint32_t>(&omp_thread_num),
         "Provide the number of the openmp thread, 1: disable "
-        "openmp, 0: default.")("use_c_api,c", "")("test_evil", "")
-          ("dump_ecc_pub", "");
+        "openmp, 0: default.")("use_c_api,c", "")("test_evil", "")(
+        "dump_ecc_pub", "");
 
     boost::program_options::variables_map vmap;
 
@@ -190,6 +192,11 @@ int main(int argc, char** argv) {
                   test_evil)
                  ? 0
                  : -1;
+    } else if (action == Action::kBatch3Pod) {
+      auto func = use_capi ? scheme::plain::batch3::capi::Test
+                           : scheme::plain::batch3::Test;
+      return func(publish_path, output_path, demand_ranges) ? 0 : -1;
+      return 0;
     } else {
       std::cerr << "Not implement yet.\n";
       return -1;

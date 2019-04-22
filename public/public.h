@@ -27,6 +27,7 @@
 #include <thread>
 #include <unordered_map>
 #include <vector>
+#include <numeric>
 
 #include <boost/any.hpp>
 //#include <boost/archive/binary_iarchive.hpp>

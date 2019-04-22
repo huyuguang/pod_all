@@ -654,9 +654,16 @@ CYBOZU_TEST_AUTO(multi)
 CYBOZU_TEST_AUTO(BLS12_G1mulCofactor)
 {
 	if (BN::param.cp.curveType != MCL_BLS12_381) return;
-	
 }
 
+typedef std::vector<Fp> FpVec;
+
+void f(FpVec& zv, const FpVec& xv, const FpVec& yv)
+{
+	for (size_t i = 0; i < zv.size(); i++) {
+		Fp::mul(zv[i], xv[i], yv[i]);
+	}
+}
 int main(int argc, char *argv[])
 	try
 {
@@ -669,6 +676,43 @@ int main(int argc, char *argv[])
 	}
 	g_mode = mcl::fp::StrToMode(mode);
 	printf("JIT %d\n", mcl::fp::isEnableJIT());
+#if 0
+	initPairing(mcl::BLS12_381);
+	cybozu::XorShift rg;
+	const int n = 1;
+	std::vector<Fp> xv(n), yv(n), zv(n);
+	for (int i = 0; i < n; i++) {
+		xv[i].setByCSPRNG(rg);
+		yv[i].setByCSPRNG(rg);
+	}
+	FpDbl dx;
+	FpDbl::mulPre(dx, xv[0], yv[0]);
+	Fp2 x2, y2;
+	x2.a.setByCSPRNG(rg);
+	x2.b.setByCSPRNG(rg);
+	y2.a.setByCSPRNG(rg);
+	y2.b.setByCSPRNG(rg);
+	Fp2Dbl x2d, y2d;
+	Fp2Dbl::mulPre(x2d, x2, x2);
+	Fp2Dbl::mulPre(y2d, x2, y2);
+if(0){
+	puts("----------");
+	xv[0].dump();
+	yv[0].dump();
+	dx.dump();
+	puts("----------");
+//	exit(1);
+}
+//	CYBOZU_BENCH_C("Fp2::neg", 10000000, Fp2::neg, x2, x2);
+	CYBOZU_BENCH_C("Fp2::sqr", 10000000, Fp2::sqr, x2, x2);
+//	CYBOZU_BENCH_C("Fp2::sqrPre", 100000000, Fp2Dbl::sqrPre, x2d, x2);
+//	CYBOZU_BENCH_C("Fp2::mulPre", 100000000, Fp2Dbl::mulPre, x2d, x2, y2);
+//	CYBOZU_BENCH_C("sqrPre", 100000000, FpDbl::sqrPre, dx, xv[0]);
+//	CYBOZU_BENCH_C("mod   ", 100000000, FpDbl::mod, xv[0], dx);
+//	CYBOZU_BENCH_C("mul   ", 100000000, Fp::mul, xv[0], yv[0], xv[0]);
+//	CYBOZU_BENCH_C("sqr   ", 100000000, Fp::sqr, xv[0], xv[0]);
+	return 0;
+#endif
 	return cybozu::test::autoRun.run(argc, argv);
 } catch (std::exception& e) {
 	printf("ERR %s\n", e.what());

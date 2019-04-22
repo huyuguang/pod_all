@@ -158,12 +158,22 @@ struct Rand {
 	const uint8_t *p;
 	size_t pos;
 	size_t endPos;
-	void read(void *x, size_t n)
+	void read(bool *pb, void *x, size_t n)
 	{
-		if (pos + n > endPos) throw cybozu::Exception("Rand:get:bad n") << pos << n << endPos;
+		if (pos + n > endPos) {
+			*pb = false;
+			return;
+		}
 		uint8_t *dst = (uint8_t*)x;
 		memcpy(dst, p + pos, n);
 		pos += n;
+		*pb = true;
+	}
+	void read(void *x, size_t n)
+	{
+		bool b;
+		read(&b, x, n);
+		if (!b) throw cybozu::Exception("Rand") << n;
 	}
 	uint32_t operator()()
 	{
@@ -184,41 +194,6 @@ struct Rand {
 		endPos = v.size() * 4;
 	}
 };
-
-CYBOZU_TEST_AUTO(getRandVal)
-{
-	const size_t rn = 8;
-	const struct {
-		uint32_t r[rn];
-		uint32_t mod[2];
-		size_t bitSize;
-		uint32_t expect[2];
-	} tbl[] = {
-		{ { 1, 2, 3, 4, 5, 6, 7, 8 }, { 5, 6 }, 64, { 1, 2 } },
-		{ { 0xfffffffc, 0x7, 3, 4, 5, 6, 7, 8 }, { 0xfffffffe, 0x3 }, 34, { 0xfffffffc, 0x3 } },
-		{ { 0xfffffffc, 0x7, 3, 4, 5, 6, 7, 8 }, { 0xfffffffb, 0x3 }, 34, { 3, 0 } },
-		{ { 2, 3, 5, 7, 4, 3, 0, 3 }, { 1, 0x3 }, 34, { 0, 3 } },
-	};
-	for (size_t i = 0; i < CYBOZU_NUM_OF_ARRAY(tbl); i++) {
-		Rand rg(tbl[i].r, rn);
-#if CYBOZU_OS_BIT == 64
-		uint64_t out[1];
-#else
-		uint32_t out[2];
-#endif
-		mcl::fp::RandGen wrg(rg);
-#if CYBOZU_OS_BIT == 64
-		uint64_t mod = tbl[i].mod[0] | (uint64_t(tbl[i].mod[1]) << 32);
-		mcl::fp::getRandVal(out, wrg, &mod, tbl[i].bitSize);
-		uint64_t expect = tbl[i].expect[0] | (uint64_t(tbl[i].expect[1]) << 32);
-		CYBOZU_TEST_EQUAL(out[0], expect);
-#else
-		mcl::fp::getRandVal(out, wrg, tbl[i].mod, tbl[i].bitSize);
-		CYBOZU_TEST_EQUAL(out[0], tbl[i].expect[0]);
-		CYBOZU_TEST_EQUAL(out[1], tbl[i].expect[1]);
-#endif
-	}
-}
 
 CYBOZU_TEST_AUTO(maskArray)
 {

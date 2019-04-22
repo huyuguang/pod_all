@@ -24,7 +24,7 @@ CXXFLAGS := \
  -fmerge-all-constants  \
  -I $(CXX11_HOME)/include \
  -I $(MCL_HOME) \
- -I $(CSV_HOME) \
+ -isystem $(CSV_HOME) \
  -I $(THIRD_PARTY_HOME) \
  -I $(PUB_HOME) \
  -I. \
@@ -71,7 +71,7 @@ $(shell mkdir -p $(BUILDPUB))
 $(shell mkdir -p $(BUILD3RD))
 $(shell mkdir -p $(BUILDCSV))
 
-DIR := . $(CSV_HOME) ../public
+DIR := . ../public
 
 SRC := $(foreach d, $(DIR), $(wildcard $(d)/*.cc))
 

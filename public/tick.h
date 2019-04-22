@@ -13,7 +13,7 @@ struct Tick {
     auto t = std::chrono::steady_clock::now() - start_;
     auto s = std::chrono::duration_cast<std::chrono::seconds>(t);
     auto ms = std::chrono::duration_cast<std::chrono::milliseconds>(t);
-    if (s.count() < 2) {
+    if (s.count() < 10) {
       std::cout << "<== " << desc_ << " tick: " << ms.count() << " ms\n";
     } else {
       std::cout << "<== " << desc_ << " tick: " << s.count() << " seconds\n";

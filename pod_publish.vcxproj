@@ -116,14 +116,10 @@
     <ClCompile Include="public\scheme_plain.cc" />
     <ClCompile Include="public\scheme_table.cc" />
     <ClCompile Include="public\vrf_meta.cc" />
-    <ClCompile Include="thirdparty\csv\csv_reader.cc" />
-    <ClCompile Include="thirdparty\csv\csv_reader_iterator.cc" />
-    <ClCompile Include="thirdparty\csv\csv_row.cc" />
-    <ClCompile Include="thirdparty\csv\csv_stat.cc" />
-    <ClCompile Include="thirdparty\csv\data_type.cc" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pod_publish\publish.h" />
+    <ClInclude Include="thirdparty\csv\csv.hpp" />
     <ClInclude Include="thirdparty\mcl\include\cybozu\array.hpp" />
     <ClInclude Include="thirdparty\mcl\include\cybozu\atoi.hpp" />
     <ClInclude Include="thirdparty\mcl\include\cybozu\benchmark.hpp" />
@@ -197,11 +193,6 @@
     <ClInclude Include="public\tick.h" />
     <ClInclude Include="public\vrf.h" />
     <ClInclude Include="public\vrf_meta.h" />
-    <ClInclude Include="thirdparty\csv\csv_parser.h" />
-    <ClInclude Include="thirdparty\csv\csv_row.h" />
-    <ClInclude Include="thirdparty\csv\csv_writer.h" />
-    <ClInclude Include="thirdparty\csv\data_type.h" />
-    <ClInclude Include="thirdparty\csv\memory.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="pod_publish\Makefile" />

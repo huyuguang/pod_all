@@ -1,5 +1,6 @@
 #include "scheme_plain_batch3_misc.h"
 #include "misc.h"
+#include "tick.h"
 
 namespace scheme::plain::batch3 {
 bool CheckDemands(uint64_t n, std::vector<Range> const& demands) {
@@ -22,6 +23,7 @@ bool CheckDemands(uint64_t n, std::vector<Range> const& demands) {
 h256_t RomChallengeSeed(h256_t const& client_id, h256_t const& session_id,
                         Bulletin const& bulletin, Request const& request,
                         Response const& response) {
+  Tick _tick_(__FUNCTION__);
   CryptoPP::Keccak_256 hash;
 
   // client_id and session_id

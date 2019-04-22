@@ -57,6 +57,8 @@ bool Test(std::string const& output_path, APtr a, BPtr b, Range const& demand,
       assert(false);
       return false;
     }
+
+    std::cout << "success: save to " << output_file << "\n";
   } else {
     if (client.OnSecret(secret)) {
       assert(false);

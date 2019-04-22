@@ -67,21 +67,6 @@
     <ClCompile Include="public\scheme_error.cc">
       <Filter>public</Filter>
     </ClCompile>
-    <ClCompile Include="thirdparty\csv\csv_reader.cc">
-      <Filter>thirdparty\cvs</Filter>
-    </ClCompile>
-    <ClCompile Include="thirdparty\csv\csv_reader_iterator.cc">
-      <Filter>thirdparty\cvs</Filter>
-    </ClCompile>
-    <ClCompile Include="thirdparty\csv\csv_row.cc">
-      <Filter>thirdparty\cvs</Filter>
-    </ClCompile>
-    <ClCompile Include="thirdparty\csv\csv_stat.cc">
-      <Filter>thirdparty\cvs</Filter>
-    </ClCompile>
-    <ClCompile Include="thirdparty\csv\data_type.cc">
-      <Filter>thirdparty\cvs</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="thirdparty\mcl\include\mcl\aggregate_sig.hpp">
@@ -306,19 +291,7 @@
     <ClInclude Include="public\scheme_error.h">
       <Filter>public</Filter>
     </ClInclude>
-    <ClInclude Include="thirdparty\csv\csv_parser.h">
-      <Filter>thirdparty\cvs</Filter>
-    </ClInclude>
-    <ClInclude Include="thirdparty\csv\csv_row.h">
-      <Filter>thirdparty\cvs</Filter>
-    </ClInclude>
-    <ClInclude Include="thirdparty\csv\csv_writer.h">
-      <Filter>thirdparty\cvs</Filter>
-    </ClInclude>
-    <ClInclude Include="thirdparty\csv\data_type.h">
-      <Filter>thirdparty\cvs</Filter>
-    </ClInclude>
-    <ClInclude Include="thirdparty\csv\memory.h">
+    <ClInclude Include="thirdparty\csv\csv.hpp">
       <Filter>thirdparty\cvs</Filter>
     </ClInclude>
   </ItemGroup>

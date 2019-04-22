@@ -116,8 +116,9 @@ void Session::BuildK() {
     size_t rows = align_c_ / (1ULL << p);
     size_t cols = align_s_;
     kp.resize(rows * cols);
-    for (auto& i : kp) {
-      i = FrRand();
+//#pragma omp parallel for
+    for (size_t i = 0; i < kp.size(); ++i) {
+      kp[i] = FrRand();
     }
   }
 }
@@ -162,16 +163,54 @@ void Session::BuildUK(std::vector<std::vector<G1>>& uk) {
     ukp.resize(rows);
   }
 
-  std::vector<G1> temp(align_s_);
+  //  std::vector<G1> temp(align_s_);
+  //  for (uint64_t p = 0; p < uk.size(); ++p) {
+  //    auto& ukp = uk[p];
+  //    for (uint64_t i = 0; i < ukp.size(); ++i) {
+  //#pragma omp parallel for
+  //      for (uint64_t j = 0; j < align_s_; ++j) {
+  //        temp[j] = ecc_pub.PowerU1(j, GetK(i, j, p));
+  //      }
+  //      ukp[i] = std::accumulate(temp.begin(), temp.end(), G1Zero());
+  //    }
+  //  }
+
+  std::vector<G1> all_g((align_c_ * 2 - 1) * align_s_);
+  std::vector<Fr const*> all_f;
+  all_f.reserve(all_g.size());
   for (uint64_t p = 0; p < uk.size(); ++p) {
     auto& ukp = uk[p];
     for (uint64_t i = 0; i < ukp.size(); ++i) {
-#pragma omp parallel for
       for (uint64_t j = 0; j < align_s_; ++j) {
-        temp[j] = ecc_pub.PowerU1(j, GetK(i, j, p));
+        all_f.resize(all_f.size() + 1);
+        all_f.back() = &GetK(i, j, p);
       }
-      ukp[i] = std::accumulate(temp.begin(), temp.end(), G1Zero());
     }
+  }
+  assert(all_f.size() == all_g.size());
+
+#pragma omp parallel for
+  for (uint64_t i = 0; i < all_f.size(); ++i) {
+    all_g[i] = ecc_pub.PowerU1(i % align_s_, *all_f[i]);
+  }
+
+  std::vector<G1*> result;
+  result.reserve(align_c_ * 2 - 1);
+  for (uint64_t p = 0; p < uk.size(); ++p) {
+    auto& ukp = uk[p];
+    for (uint64_t i = 0; i < ukp.size(); ++i) {
+      result.resize(result.size() + 1);
+      result.back() = &ukp[i];
+    }
+  }
+  assert(result.size() == align_c_ * 2 - 1);
+
+#pragma omp parallel for
+  for (uint64_t i = 0; i < result.size(); ++i) {
+    auto begin = all_g.begin() + align_s_ * i;
+    auto end = begin + align_s_;
+    *result[i] = std::accumulate(begin, end, G1Zero());
+    result[i]->normalize();
   }
 }
 
@@ -183,6 +222,7 @@ void Session::BuildUX0(std::vector<G1>& ux0) {
 #pragma omp parallel for
   for (uint64_t j = 0; j < ux0.size(); ++j) {
     ux0[j] = ecc_pub.PowerU1(j, GetK(0, j, k_.size() - 1));
+    ux0[j].normalize();
   }
 }
 
@@ -197,6 +237,7 @@ void Session::BuildU0X(std::vector<std::vector<G1>>& u0x) {
 #pragma omp parallel for
     for (uint64_t j = 0; j < u0xp.size(); ++j) {
       u0xp[j] = ecc_pub.PowerU1(0, GetX(j, p));
+      u0xp[j].normalize();
     }
   }
 }
@@ -298,6 +339,7 @@ void Session::BuildCommitmentD(std::vector<G1>& ud, G2& g2d) {
 #pragma omp parallel for
   for (size_t j = 0; j < align_s_; ++j) {
     ud[j] = ecc_pub.PowerU1(j, d_);
+    ud[j].normalize();
   }
   u0d_ = ud[0];
 }

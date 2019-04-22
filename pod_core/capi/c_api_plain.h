@@ -119,3 +119,39 @@ EXPORT bool E_PlainOtRangeClientSaveDecrypted(handle_t c_client,
 
 EXPORT bool E_PlainOtRangeClientFree(handle_t h);
 }  // extern "C" otrange
+
+// batch3
+extern "C" {
+EXPORT handle_t E_PlainBatch3SessionNew(handle_t c_a, uint8_t const* c_self_id,
+                                        uint8_t const* c_peer_id);
+
+EXPORT bool E_PlainBatch3SessionOnRequest(handle_t c_session,
+                                          char const* request_file,
+                                          char const* response_file);
+
+EXPORT bool E_PlainBatch3SessionOnReceipt(handle_t c_session,
+                                          char const* receipt_file,
+                                          char const* secret_file);
+
+EXPORT bool E_PlainBatch3SessionFree(handle_t h);
+
+EXPORT handle_t E_PlainBatch3ClientNew(handle_t c_b, uint8_t const* c_self_id,
+                                       uint8_t const* c_peer_id,
+                                       range_t const* c_demand,
+                                       uint64_t c_demand_count);
+
+EXPORT bool E_PlainBatch3ClientGetRequest(handle_t c_client,
+                                          char const* request_file);
+
+EXPORT bool E_PlainBatch3ClientOnResponse(handle_t c_client,
+                                          char const* response_file,
+                                          char const* receipt_file);
+
+EXPORT bool E_PlainBatch3ClientOnSecret(handle_t c_client,
+                                        char const* secret_file);
+
+EXPORT bool E_PlainBatch3ClientSaveDecrypted(handle_t c_client,
+                                             char const* file);
+
+EXPORT bool E_PlainBatch3ClientFree(handle_t h);
+}  // extern "C" batch3

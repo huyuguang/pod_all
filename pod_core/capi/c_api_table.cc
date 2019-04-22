@@ -572,7 +572,7 @@ EXPORT handle_t E_TableBatch3SessionNew(handle_t c_a, uint8_t const* c_self_id,
 
 EXPORT bool E_TableBatch3SessionOnRequest(handle_t c_session,
                                           char const* request_file,
-                                          char const* commitment_file) {
+                                          char const* response_file) {
   using namespace scheme::table;
   using namespace scheme::table::batch3;
   SessionPtr session = GetSessionPtr(c_session);
@@ -584,41 +584,13 @@ EXPORT bool E_TableBatch3SessionOnRequest(handle_t c_session,
     yas::binary_iarchive<yas::file_istream, YasBinF()> ia(is);
     ia.serialize(request);
 
-    Commitment commitment;
-    if (!session->OnRequest(request, commitment)) return false;
-
-    yas::file_ostream os(commitment_file);
-    yas::binary_oarchive<yas::file_ostream, YasBinF()> oa(os);
-    oa.serialize(commitment);
-  } catch (std::exception&) {
-    return false;
-  }
-
-  return true;
-}
-
-EXPORT bool E_TableBatch3SessionOnChallenge(handle_t c_session,
-                                            char const* challenge_file,
-                                            char const* response_file) {
-  using namespace scheme::table;
-  using namespace scheme::table::batch3;
-  SessionPtr session = GetSessionPtr(c_session);
-  if (!session) return false;
-
-  try {
-    Challenge challenge;
-    yas::file_istream is(challenge_file);
-    yas::binary_iarchive<yas::file_istream, YasBinF()> ia(is);
-    ia.serialize(challenge);
-
     Response response;
-    if (!session->OnChallenge(challenge, response)) return false;
+    if (!session->OnRequest(request, response)) return false;
 
     yas::file_ostream os(response_file);
     yas::binary_oarchive<yas::file_ostream, YasBinF()> oa(os);
     oa.serialize(response);
-  } catch (std::exception& e) {
-    std::cerr << e.what() << "\n";
+  } catch (std::exception&) {
     return false;
   }
 
@@ -699,33 +671,6 @@ EXPORT bool E_TableBatch3ClientGetRequest(handle_t c_client,
     yas::file_ostream os(request_file);
     yas::binary_oarchive<yas::file_ostream, YasBinF()> oa(os);
     oa.serialize(request);
-  } catch (std::exception&) {
-    return false;
-  }
-
-  return true;
-}
-
-EXPORT bool E_TableBatch3ClientOnCommitment(handle_t c_client,
-                                            char const* commitment_file,
-                                            char const* challenge_file) {
-  using namespace scheme::table;
-  using namespace scheme::table::batch3;
-  ClientPtr client = GetClientPtr(c_client);
-  if (!client) return false;
-
-  try {
-    Commitment commitment;
-    yas::file_istream is(commitment_file);
-    yas::binary_iarchive<yas::file_istream, YasBinF()> ia(is);
-    ia.serialize(commitment);
-
-    Challenge challenge;
-    if (!client->OnCommitment(std::move(commitment), challenge)) return false;
-
-    yas::file_ostream os(challenge_file);
-    yas::binary_oarchive<yas::file_ostream, YasBinF()> oa(os);
-    oa.serialize(challenge);
   } catch (std::exception&) {
     return false;
   }

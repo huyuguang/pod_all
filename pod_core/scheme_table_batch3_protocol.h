@@ -4,30 +4,25 @@
 #include <vector>
 
 #include "ecc.h"
-#include "matrix_fr.h"
 
 namespace scheme::table::batch3 {
 struct Request {
   std::vector<Range> demands;
 };
 
-struct Commitment {
-  std::vector<Eigen::ColVectorXG1> uk;
-  Eigen::RowVectorXG1 ux0;  // s
-  std::vector<Eigen::RowVectorXG1> u0x;
-  Eigen::RowVectorXG2 g2x0;  // s
-  Eigen::RowVectorXG1 ud;
-  G2 g2d;
-};
-
-struct Challenge {
-  h256_t r;
-};
-
 struct Response {
+  // commitment
+  std::vector<std::vector<G1>> uk;
+  std::vector<G1> ux0;  // s
+  std::vector<std::vector<G1>> u0x;
+  std::vector<G2> g2x0;  // s
+  std::vector<G1> ud;
+  G2 g2d;
+  // encrypted data 
   std::vector<Fr> m;  // n*s
-  std::vector<Eigen::MatrixXFr> ek;
-  std::vector<Eigen::MatrixXFr> ex;
+  // encrypted key
+  std::vector<std::vector<Fr>> ek;
+  std::vector<std::vector<Fr>> ex;
 };
 
 struct Receipt {
@@ -39,8 +34,8 @@ struct Secret {
   Fr x0_lgs;
   Fr d;
 #ifdef _DEBUG
-  std::vector<Eigen::MatrixXFr> k;
-  std::vector<Eigen::RowVectorXFr> x;
+  std::vector<std::vector<Fr>> k;
+  std::vector<std::vector<Fr>> x;
   std::vector<Fr> m;
 #endif
 };

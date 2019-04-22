@@ -4,26 +4,9 @@
 #include "scheme_misc.h"
 #include "scheme_plain.h"
 #include "scheme_plain_b.h"
+#include "scheme_plain_batch3_misc.h"
 #include "scheme_plain_batch3_notary.h"
 #include "scheme_plain_batch3_protocol.h"
-
-namespace {
-
-void CheckDemands(uint64_t n, std::vector<Range> const& demands) {
-  if (demands.empty()) throw std::invalid_argument("demands empty");
-
-  for (auto const& demand : demands) {
-    if (!demand.count || demand.start >= n || demand.count > n ||
-        (demand.start + demand.count) > n)
-      throw std::invalid_argument("demand");
-  }
-
-  for (size_t i = 1; i < demands.size(); ++i) {
-    if (demands[i].start <= demands[i - 1].start + demands[i - 1].count)
-      throw std::invalid_argument("demand overlap, must combine them");
-  }
-}
-}  // namespace
 
 namespace scheme::plain::batch3 {
 
@@ -34,10 +17,15 @@ Client::Client(BPtr b, h256_t const& self_id, h256_t const& peer_id,
       peer_id_(peer_id),
       n_(b_->bulletin().n),
       s_(b_->bulletin().s),
-      demands_(std::move(demands)),
-      r_(misc::RandH256()) {
-  CheckDemands(n_, demands_);
-  for (auto const& i : demands_) demands_count_ += i.count;
+      demands_(std::move(demands)) {
+  if (!CheckDemands(n_, demands_)) {
+    throw std::invalid_argument("demands");
+  }
+
+  for (auto const& i : demands_) {
+    demands_count_ += i.count;
+  }
+
   BuildMapping();
   align_c_ = misc::Pow2UB(demands_count_);
   align_s_ = misc::Pow2UB(s_);
@@ -58,20 +46,23 @@ void Client::BuildMapping() {
   }
 }
 
-void Client::GetRequest(Request& request) { request.demands = demands_; }
+void Client::GetRequest(Request& request) {
+  request.demands = demands_;
+  request_ = request;
+}
 
-bool Client::OnCommitment(Commitment commitment, Challenge& challenge) {
+bool Client::OnResponse(Response response, Receipt& receipt) {
   Tick _tick_(__FUNCTION__);
-  commitment_ = std::move(commitment);
+  response_ = std::move(response);
 
-  // check data format
-  if (commitment_.uk.size() != (log_c_ + 1)) {
+  // check commitment data format
+  if (response_.uk.size() != (log_c_ + 1)) {
     assert(false);
     return false;
   }
 
-  for (uint64_t p = 0; p < commitment_.uk.size(); ++p) {
-    auto& ukp = commitment_.uk[p];
+  for (uint64_t p = 0; p < response_.uk.size(); ++p) {
+    auto& ukp = response_.uk[p];
     auto rows = align_c_ / (1LL << p);
     if (ukp.size() != rows) {
       assert(false);
@@ -79,18 +70,18 @@ bool Client::OnCommitment(Commitment commitment, Challenge& challenge) {
     }
   }
 
-  if (commitment_.ux0.size() != align_s_) {
+  if (response_.ux0.size() != align_s_) {
     assert(false);
     return false;
   }
 
-  if (commitment_.u0x.size() != (log_s_ + 1)) {
+  if (response_.u0x.size() != (log_s_ + 1)) {
     assert(false);
     return false;
   }
 
-  for (uint64_t p = 0; p < commitment_.u0x.size(); ++p) {
-    auto& u0xp = commitment_.u0x[p];
+  for (uint64_t p = 0; p < response_.u0x.size(); ++p) {
+    auto& u0xp = response_.u0x[p];
     auto cols = align_s_ / (1LL << p);
     if (u0xp.size() != cols) {
       assert(false);
@@ -98,12 +89,12 @@ bool Client::OnCommitment(Commitment commitment, Challenge& challenge) {
     }
   }
 
-  if (commitment_.g2x0.size() != align_s_) {
+  if (response_.g2x0.size() != align_s_) {
     assert(false);
     return false;
   }
 
-  if (commitment_.ud.size() != align_s_) {
+  if (response_.ud.size() != align_s_) {
     assert(false);
     return false;
   }
@@ -114,21 +105,20 @@ bool Client::OnCommitment(Commitment commitment, Challenge& challenge) {
     return false;
   }
 
-  challenge.r = r_;
-  ComputeChallenge(r_);
-  return true;
-}
+  // rom the challenge the seed
+  auto challenge_seed =
+      RomChallengeSeed(self_id_, peer_id_, b_->bulletin(), request_, response_);
+  ComputeChallenge(challenge_seed, challenge_);
+  std::cout << "Client side: challenge_seed: " << misc::HexToStr(challenge_seed)
+            << "\n";
 
-bool Client::OnResponse(Response response, Receipt& receipt) {
-  Tick _tick_(__FUNCTION__);
-  response_ = std::move(response);
-
-  // check format
+  // check encrypted data format
   if (response_.m.size() != demands_count_ * align_s_) {
     assert(false);
     return false;
   }
 
+  // check encrypted ek, ex format
   if (response_.ek.size() != log_c_) {
     assert(false);
     return false;
@@ -160,6 +150,7 @@ bool Client::OnResponse(Response response, Receipt& receipt) {
 
   encrypted_m_ = std::move(response_.m);
 
+  // check valid
   if (!CheckEncryptedM()) {
     assert(false);
     return false;
@@ -180,8 +171,8 @@ bool Client::OnResponse(Response response, Receipt& receipt) {
     return false;
   }
 
-  receipt.u0d = commitment_.ud[0];
-  receipt.u0_x0_lgs = commitment_.u0x.back()[0];
+  receipt.u0d = response_.ud[0];
+  receipt.u0_x0_lgs = response_.u0x.back()[0];
 
   receipt_ = receipt;
   return true;
@@ -192,8 +183,8 @@ bool Client::CheckEncryptedM() {
 
   auto const& ecc_pub = GetEccPub();
   auto const& sigmas = b_->sigmas();
-  
-  auto const& ud = commitment_.ud;
+
+  auto const& ud = response_.ud;
   assert(ud.size() == align_s_);
   G1 sigma_ud = std::accumulate(ud.begin(), ud.end(), G1Zero());
 
@@ -203,8 +194,8 @@ bool Client::CheckEncryptedM() {
     if (not_equal) continue;
     auto const& mapping = mappings_[i];
     G1 const& sigma = sigmas[mapping.index_of_m];
-    auto const& uk0 = commitment_.uk[0];
-    G1 left = sigma * c_;
+    auto const& uk0 = response_.uk[0];
+    G1 left = sigma * challenge_.c;
     left += uk0[i];
     left += sigma_ud;
 
@@ -246,8 +237,8 @@ bool Client::OnSecret(Secret secret) {
 
 void Client::DecryptM() {
   Tick _tick_(__FUNCTION__);
-  
-  Fr inv_c = FrInv(c_);
+
+  Fr inv_c = FrInv(challenge_.c);
 
   decrypted_m_.resize(demands_count_ * s_);
 
@@ -283,37 +274,6 @@ bool Client::SaveDecrypted(std::string const& file) {
   return true;
 }
 
-void Client::ComputeChallenge(h256_t const& r) {
-  static const std::string suffix_c = "challenge_c";
-  static const std::string suffix_e1 = "challenge_e1";
-  static const std::string suffix_e2 = "challenge_e2";
-
-  h256_t digest;
-  CryptoPP::Keccak_256 hash;
-
-  hash.Update(r.data(), r.size());
-  hash.Update((uint8_t*)suffix_c.data(), suffix_c.size());
-  hash.Final(digest.data());
-  c_.setArrayMaskMod(digest.data(), digest.size());
-  //std::cout << "client c_: " << c_ << "\n";
-
-  hash.Update(r.data(), r.size());
-  hash.Update((uint8_t*)suffix_e1.data(), suffix_e1.size());
-  hash.Final(digest.data());
-  e1_.setArrayMaskMod(digest.data(), digest.size());
-  //std::cout << "client e1_: " << e1_ << "\n";
-
-  hash.Update(r.data(), r.size());
-  hash.Update((uint8_t*)suffix_e2.data(), suffix_e2.size());
-  hash.Final(digest.data());
-  e2_.setArrayMaskMod(digest.data(), digest.size());
-  //std::cout << "client e2_: " << e2_ << "\n";
-
-  e1_square_ = e1_ * e1_;
-  e2_square_ = e2_ * e2_;
-  e1_e2_inverse_ = FrInv(e1_ * e2_square_ - e2_ * e1_square_);
-}
-
 bool Client::CheckCommitmentOfD() {
   Tick _tick_(__FUNCTION__);
   auto const& ecc_pub = GetEccPub();
@@ -322,9 +282,9 @@ bool Client::CheckCommitmentOfD() {
 #pragma omp parallel for
   for (size_t j = 0; j < align_s_; ++j) {
     if (failed) continue;
-    auto const& ujd = commitment_.ud[j];
+    auto const& ujd = response_.ud[j];
     auto const& uj = ecc_pub.u1()[j];
-    auto const& g2d = commitment_.g2d;
+    auto const& g2d = response_.g2d;
     if (!PairingMatch(ujd, uj, g2d)) {
 #pragma omp atomic
       ++failed;
@@ -337,9 +297,9 @@ bool Client::CheckCommitmentOfD() {
 bool Client::CheckUX0() {
   Tick _tick_(__FUNCTION__);
   auto const& ecc_pub = GetEccPub();
-  auto const& ux0 = commitment_.ux0;
-  auto const& u0x0 = commitment_.u0x[0];
-  auto const& g2x0 = commitment_.g2x0;
+  auto const& ux0 = response_.ux0;
+  auto const& u0x0 = response_.u0x[0];
+  auto const& g2x0 = response_.g2x0;
 
   int failed = 0;
 #pragma omp parallel for
@@ -370,7 +330,7 @@ bool Client::CheckEX() {
   Tick _tick_(__FUNCTION__);
   auto const& ecc_pub = GetEccPub();
   auto const& ex = response_.ex;
-  auto const& u0x = commitment_.u0x;
+  auto const& u0x = response_.u0x;
 
   int failed = 0;
   for (size_t p = 0; p < log_s_; ++p) {
@@ -378,7 +338,7 @@ bool Client::CheckEX() {
     auto const& u0xp = u0x[p];
     auto const& u0xp_1 = u0x[p + 1];
     auto cols = align_s_ / (1ULL << (p + 1));
-    assert(exp.size() ==  cols * 2);
+    assert(exp.size() == cols * 2);
     if (failed) break;
 
 #pragma omp parallel for
@@ -386,8 +346,8 @@ bool Client::CheckEX() {
       if (failed) continue;
       auto left = ecc_pub.PowerU1(0, exp[j]);
       auto right = u0xp_1[j];
-      right += u0xp[2 * j] * e1_;
-      right += u0xp[2 * j + 1] * e1_square_;
+      right += u0xp[2 * j] * challenge_.e1;
+      right += u0xp[2 * j + 1] * challenge_.e1_square;
       if (left != right) {
         assert(false);
 #pragma omp atomic
@@ -396,8 +356,8 @@ bool Client::CheckEX() {
       }
       left = ecc_pub.PowerU1(0, exp[cols + j]);
       right = u0xp_1[j];
-      right += u0xp[2 * j] * e2_;
-      right += u0xp[2 * j + 1] * e2_square_;
+      right += u0xp[2 * j] * challenge_.e2;
+      right += u0xp[2 * j + 1] * challenge_.e2_square;
       if (left != right) {
         assert(false);
 #pragma omp atomic
@@ -413,7 +373,7 @@ bool Client::CheckEK() {
   Tick _tick_(__FUNCTION__);
   auto const& ecc_pub = GetEccPub();
   auto const& ek = response_.ek;
-  auto const& uk = commitment_.uk;
+  auto const& uk = response_.uk;
 
   int failed = 0;
   for (size_t p = 0; p < log_c_; ++p) {
@@ -426,17 +386,17 @@ bool Client::CheckEK() {
 
 #pragma omp parallel for
     for (size_t i = 0; i < rows / 2; ++i) {
-      if (failed) continue;      
+      if (failed) continue;
       std::vector<G1> temp(align_s_);
       for (size_t j = 0; j < align_s_; ++j) {
-        temp[j] += ecc_pub.PowerU1(j, ekp[2 * i * cols + j]);
+        temp[j] = ecc_pub.PowerU1(j, ekp[2 * i * cols + j]);
       }
       G1 left = std::accumulate(temp.begin(), temp.end(), G1Zero());
 
       auto const& ukp_1 = uk[p + 1];
       G1 right = ukp_1[i];
-      right += ukp[2 * i] * e1_;
-      right += ukp[2 * i + 1] * e1_square_;
+      right += ukp[2 * i] * challenge_.e1;
+      right += ukp[2 * i + 1] * challenge_.e1_square;
       if (left != right) {
         assert(false);
         std::cout << "CheckEK " << p << " " << i << " " << __LINE__ << "\n";
@@ -446,12 +406,12 @@ bool Client::CheckEK() {
       }
 
       for (size_t j = 0; j < align_s_; ++j) {
-        temp[j] += ecc_pub.PowerU1(j, ekp[(2 * i + 1) * cols + j]);
+        temp[j] = ecc_pub.PowerU1(j, ekp[(2 * i + 1) * cols + j]);
       }
       left = std::accumulate(temp.begin(), temp.end(), G1Zero());
       right = ukp_1[i];
-      right += ukp[2 * i] * e2_;
-      right += ukp[2 * i + 1] * e2_square_;
+      right += ukp[2 * i] * challenge_.e2;
+      right += ukp[2 * i + 1] * challenge_.e2_square;
       if (left != right) {
         assert(false);
         std::cout << "CheckEK " << p << " " << i << " " << __LINE__ << "\n";
@@ -465,6 +425,7 @@ bool Client::CheckEK() {
 }
 
 void Client::DecryptK() {
+  Tick _tick_(__FUNCTION__);
   k_.resize(log_c_ + 1);
   for (size_t p = 0; p < k_.size(); ++p) {
     auto& kp = k_[p];
@@ -488,16 +449,17 @@ void Client::DecryptK() {
     for (size_t i = 0; i < kp_1_rows; ++i) {
       for (size_t j = 0; j < cols; ++j) {
         kp[2 * i * cols + j] =
-            e2_square_ * (ekp[2 * i * cols + j] - kp_1[i * cols + j]);
+            challenge_.e2_square * (ekp[2 * i * cols + j] - kp_1[i * cols + j]);
         kp[2 * i * cols + j] -=
-            e1_square_ * (ekp[(2 * i + 1) * cols + j] - kp_1[i * cols + j]);
-        kp[2 * i * cols + j] *= e1_e2_inverse_;
+            challenge_.e1_square *
+            (ekp[(2 * i + 1) * cols + j] - kp_1[i * cols + j]);
+        kp[2 * i * cols + j] *= challenge_.e1_e2_inverse;
 
         kp[(2 * i + 1) * cols + j] =
-            e1_ * (ekp[(2 * i + 1) * cols + j] - kp_1[i * cols + j]);
+            challenge_.e1 * (ekp[(2 * i + 1) * cols + j] - kp_1[i * cols + j]);
         kp[(2 * i + 1) * cols + j] -=
-            e2_ * (ekp[2 * i * cols + j] - kp_1[i * cols + j]);
-        kp[(2 * i + 1)*cols+ j] *= e1_e2_inverse_;
+            challenge_.e2 * (ekp[2 * i * cols + j] - kp_1[i * cols + j]);
+        kp[(2 * i + 1) * cols + j] *= challenge_.e1_e2_inverse;
       }
     }
   }
@@ -510,6 +472,7 @@ void Client::DecryptK() {
 }
 
 void Client::DecryptX() {
+  Tick _tick_(__FUNCTION__);
   x_.resize(log_s_ + 1);
   for (size_t p = 0; p < x_.size(); ++p) {
     auto& xp = x_[p];
@@ -527,13 +490,13 @@ void Client::DecryptX() {
     auto const& exp = ex[p];
     auto exp_cols = align_s_ / (1ULL << (p + 1));
     for (size_t j = 0; j < xp_1.size(); ++j) {
-      xp[2 * j] = e2_square_ * (exp[j] - xp_1[j]);
-      xp[2 * j] -= e1_square_ * (exp[exp_cols+ j] - xp_1[j]);
-      xp[2 * j] *= e1_e2_inverse_;
+      xp[2 * j] = challenge_.e2_square * (exp[j] - xp_1[j]);
+      xp[2 * j] -= challenge_.e1_square * (exp[exp_cols + j] - xp_1[j]);
+      xp[2 * j] *= challenge_.e1_e2_inverse;
 
-      xp[2 * j + 1] = e1_ * (exp[exp_cols+ j] - xp_1[j]);
-      xp[2 * j + 1] -= e2_ * (exp[j] - xp_1[j]);
-      xp[2 * j + 1] *= e1_e2_inverse_;
+      xp[2 * j + 1] = challenge_.e1 * (exp[exp_cols + j] - xp_1[j]);
+      xp[2 * j + 1] -= challenge_.e2 * (exp[j] - xp_1[j]);
+      xp[2 * j + 1] *= challenge_.e1_e2_inverse;
     }
   }
 

@@ -18,11 +18,11 @@ const h256_t kDummyClientId = h256_t{2};
 class WrapperA {
  public:
   WrapperA(char const* publish_path) {
-    h_ = E_TableANew(publish_path);
+    h_ = E_PlainANew(publish_path);
     if (!h_) throw std::runtime_error("");
   }
   ~WrapperA() {
-    if (!E_TableAFree(h_)) abort();
+    if (!E_PlainAFree(h_)) abort();
   }
   handle_t h() const { return h_; }
 
@@ -33,11 +33,11 @@ class WrapperA {
 class WrapperB {
  public:
   WrapperB(char const* bulletin_file, char const* public_path) {
-    h_ = E_TableBNew(bulletin_file, public_path);
+    h_ = E_PlainBNew(bulletin_file, public_path);
     if (!h_) throw std::runtime_error("");
   }
   ~WrapperB() {
-    if (!E_TableBFree(h_)) abort();
+    if (!E_PlainBFree(h_)) abort();
   }
   handle_t h() const { return h_; }
 
@@ -49,11 +49,11 @@ class WrapperSession {
  public:
   WrapperSession(handle_t c_a, uint8_t const* c_self_id,
                  uint8_t const* c_peer_id) {
-    h_ = E_TableBatch3SessionNew(c_a, c_self_id, c_peer_id);
+    h_ = E_PlainBatch3SessionNew(c_a, c_self_id, c_peer_id);
     if (!h_) throw std::runtime_error("");
   }
   ~WrapperSession() {
-    if (!E_TableBatch3SessionFree(h_)) abort();
+    if (!E_PlainBatch3SessionFree(h_)) abort();
   }
   handle_t h() const { return h_; }
 
@@ -66,12 +66,12 @@ class WrapperClient {
   WrapperClient(handle_t c_b, uint8_t const* c_self_id,
                 uint8_t const* c_peer_id, range_t const* c_demand,
                 uint64_t c_demand_count) {
-    h_ = E_TableBatch3ClientNew(c_b, c_self_id, c_peer_id, c_demand,
+    h_ = E_PlainBatch3ClientNew(c_b, c_self_id, c_peer_id, c_demand,
                                 c_demand_count);
     if (!h_) throw std::runtime_error("");
   }
   ~WrapperClient() {
-    if (!E_TableBatch3ClientFree(h_)) abort();
+    if (!E_PlainBatch3ClientFree(h_)) abort();
   }
   handle_t h() const { return h_; }
 
@@ -96,58 +96,45 @@ bool Test(std::string const& output_path, WrapperA const& a, WrapperB const& b,
                        c_demand.data(), c_demand.size());
 
   std::string request_file = output_path + "/request";
-  std::string commitment_file = output_path + "/commitment";
-  std::string challenge_file = output_path + "/challenge";
   std::string response_file = output_path + "/response";
   std::string receipt_file = output_path + "/receipt";
   std::string secret_file = output_path + "/secret";
   std::string output_file = output_path + "/decrypted_data";
 
-  if (!E_TableBatch3ClientGetRequest(client.h(), request_file.c_str())) {
+  if (!E_PlainBatch3ClientGetRequest(client.h(), request_file.c_str())) {
     assert(false);
     return false;
   }
 
-  if (!E_TableBatch3SessionOnRequest(session.h(), request_file.c_str(),
-                                     commitment_file.c_str())) {
+  if (!E_PlainBatch3SessionOnRequest(session.h(), request_file.c_str(),
+                                     response_file.c_str())) {
     assert(false);
     return false;
   }
 
-  if (!E_TableBatch3ClientOnCommitment(client.h(), commitment_file.c_str(),
-                                       challenge_file.c_str())) {
-    assert(false);
-    return false;
-  }
-
-  if (!E_TableBatch3SessionOnChallenge(session.h(), challenge_file.c_str(),
-                                       response_file.c_str())) {
-    assert(false);
-    return false;
-  }
-
-  if (!E_TableBatch3ClientOnResponse(client.h(), response_file.c_str(),
+  if (!E_PlainBatch3ClientOnResponse(client.h(), response_file.c_str(),
                                      receipt_file.c_str())) {
     assert(false);
     return false;
   }
 
-  if (!E_TableBatch3SessionOnReceipt(session.h(), receipt_file.c_str(),
+  if (!E_PlainBatch3SessionOnReceipt(session.h(), receipt_file.c_str(),
                                      secret_file.c_str())) {
     assert(false);
     return false;
   }
 
-  if (!E_TableBatch3ClientOnSecret(client.h(), secret_file.c_str())) {
+  if (!E_PlainBatch3ClientOnSecret(client.h(), secret_file.c_str())) {
     assert(false);
     return false;
   }
 
-  if (!E_TableBatch3ClientSaveDecrypted(client.h(), output_file.c_str())) {
+  if (!E_PlainBatch3ClientSaveDecrypted(client.h(), output_file.c_str())) {
     assert(false);
     return false;
   }
 
+  std::cout << "success: save to " << output_file << "\n";
   return true;
 }
 

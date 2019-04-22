@@ -109,11 +109,7 @@ EXPORT handle_t E_TableBatch3SessionNew(handle_t c_a, uint8_t const* c_self_id,
 
 EXPORT bool E_TableBatch3SessionOnRequest(handle_t c_session,
                                           char const* request_file,
-                                          char const* commitment_file);
-
-EXPORT bool E_TableBatch3SessionOnChallenge(handle_t c_session,
-                                            char const* challenge_file,
-                                            char const* response_file);
+                                          char const* response_file);
 
 EXPORT bool E_TableBatch3SessionOnReceipt(handle_t c_session,
                                           char const* receipt_file,

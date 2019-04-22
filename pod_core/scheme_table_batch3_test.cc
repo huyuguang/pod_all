@@ -28,20 +28,8 @@ bool Test(std::string const& output_path, APtr a, BPtr b,
   Request request;
   client.GetRequest(request);
 
-  Commitment commitment;
-  if (!session.OnRequest(request, commitment)) {
-    assert(false);
-    return false;
-  }
-
-  Challenge challenge;
-  if (!client.OnCommitment(commitment, challenge)) {
-    assert(false);
-    return false;
-  }
-
   Response response;
-  if (!session.OnChallenge(challenge, response)) {
+  if (!session.OnRequest(request, response)) {
     assert(false);
     return false;
   }
@@ -68,6 +56,7 @@ bool Test(std::string const& output_path, APtr a, BPtr b,
     return false;
   }
 
+  std::cout << "success: save to " << output_file << "\n";
   return true;
 }
 

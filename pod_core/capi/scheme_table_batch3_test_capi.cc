@@ -96,8 +96,6 @@ bool Test(std::string const& output_path, WrapperA const& a, WrapperB const& b,
                        c_demand.data(), c_demand.size());
 
   std::string request_file = output_path + "/request";
-  std::string commitment_file = output_path + "/commitment";
-  std::string challenge_file = output_path + "/challenge";
   std::string response_file = output_path + "/response";
   std::string receipt_file = output_path + "/receipt";
   std::string secret_file = output_path + "/secret";
@@ -109,19 +107,7 @@ bool Test(std::string const& output_path, WrapperA const& a, WrapperB const& b,
   }
 
   if (!E_TableBatch3SessionOnRequest(session.h(), request_file.c_str(),
-                                     commitment_file.c_str())) {
-    assert(false);
-    return false;
-  }
-
-  if (!E_TableBatch3ClientOnCommitment(client.h(), commitment_file.c_str(),
-                                       challenge_file.c_str())) {
-    assert(false);
-    return false;
-  }
-
-  if (!E_TableBatch3SessionOnChallenge(session.h(), challenge_file.c_str(),
-                                       response_file.c_str())) {
+                                     response_file.c_str())) {
     assert(false);
     return false;
   }
@@ -131,6 +117,7 @@ bool Test(std::string const& output_path, WrapperA const& a, WrapperB const& b,
     assert(false);
     return false;
   }
+
 
   if (!E_TableBatch3SessionOnReceipt(session.h(), receipt_file.c_str(),
                                      secret_file.c_str())) {
@@ -148,6 +135,7 @@ bool Test(std::string const& output_path, WrapperA const& a, WrapperB const& b,
     return false;
   }
 
+  std::cout << "success: save to " << output_file << "\n";
   return true;
 }
 

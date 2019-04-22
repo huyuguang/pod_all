@@ -7,6 +7,7 @@
 #include "ecc.h"
 #include "scheme_plain_a.h"
 #include "scheme_plain_batch3_protocol.h"
+#include "scheme_plain_batch3_misc.h"
 
 namespace scheme::plain::batch3 {
 
@@ -16,8 +17,7 @@ class Session {
   Session(APtr a, h256_t const& self_id, h256_t const& peer_id);
 
  public:
-  bool OnRequest(Request request, Commitment& commitment);
-  bool OnChallenge(Challenge const& challenge, Response& response);
+  bool OnRequest(Request request, Response& response);
   bool OnReceipt(Receipt const& receipt, Secret& secret);
 
  private:
@@ -34,7 +34,7 @@ class Session {
   void BuildCommitmentD(std::vector<G1>& ud, G2& g2d);
   Fr const& GetK(uint64_t i, uint64_t j, uint64_t p);
   Fr const& GetX(uint64_t j, uint64_t p);
-  void ComputeChallenge(h256_t const& r);
+
  private:
   APtr a_;
   h256_t const self_id_;
@@ -44,19 +44,15 @@ class Session {
   Fr const d_;
 
  private:
-  std::vector<Range> demands_;
+  Request request_;
   uint64_t align_c_ = 0;
   uint64_t align_s_ = 0;
   uint64_t log_c_ = 0;
   uint64_t log_s_ = 0;
   std::vector<std::vector<Fr>> k_;
   std::vector<std::vector<Fr>> x_;
-  Fr c_;
-  Fr e1_;
-  Fr e2_;
-  Fr e1_square_;
-  Fr e2_square_;
   G1 u0d_;
+  RomChallenge challenge_;
 
  private:
   struct Mapping {

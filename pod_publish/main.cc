@@ -46,13 +46,13 @@ int main(int argc, char** argv) {
         "Provide the publish path")(
         "table_type,t", po::value<Type>(&table_type)->default_value(Type::kCsv),
         "Provide the publish file type in table mode (csv)")(
-        "column_num,c", po::value<uint64_t>(&column_num)->default_value(1024),
+        "column_num,c", po::value<uint64_t>(&column_num)->default_value(1023),
         "Provide the column number per block(line) in "
-        "plain mode (default 1024)")(
+        "plain mode (default 1023)")(
         "vrf_colnum_index,k",
         po::value<std::vector<uint64_t>>(&vrf_colnum_index)->multitoken(),
         "Provide the publish file vrf key column index "
-        "positions in table mode (for example: -v 0 1 3)")(
+        "positions in table mode (for example: -k 0 1 3)")(
         "unique_key,u", po::value<std::vector<bool>>(&unique_key)->multitoken(),
         "Provide the flag if publish must unique the key"
         " in table mode (for example: -u 1 0 1)")(

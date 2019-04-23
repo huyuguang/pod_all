@@ -116,7 +116,7 @@ void Session::BuildK() {
     size_t rows = align_c_ / (1ULL << p);
     size_t cols = align_s_;
     kp.resize(rows * cols);
-//#pragma omp parallel for
+//#pragma omp parallel for (system random generator has internal lock)
     for (size_t i = 0; i < kp.size(); ++i) {
       kp[i] = FrRand();
     }
@@ -162,18 +162,6 @@ void Session::BuildUK(std::vector<std::vector<G1>>& uk) {
     size_t rows = align_c_ / (1ULL << p);
     ukp.resize(rows);
   }
-
-  //  std::vector<G1> temp(align_s_);
-  //  for (uint64_t p = 0; p < uk.size(); ++p) {
-  //    auto& ukp = uk[p];
-  //    for (uint64_t i = 0; i < ukp.size(); ++i) {
-  //#pragma omp parallel for
-  //      for (uint64_t j = 0; j < align_s_; ++j) {
-  //        temp[j] = ecc_pub.PowerU1(j, GetK(i, j, p));
-  //      }
-  //      ukp[i] = std::accumulate(temp.begin(), temp.end(), G1Zero());
-  //    }
-  //  }
 
   std::vector<G1> all_g((align_c_ * 2 - 1) * align_s_);
   std::vector<Fr const*> all_f;
@@ -250,6 +238,7 @@ void Session::BuildG2X0(std::vector<G2>& g2x0) {
   for (uint64_t j = 0; j < g2x0.size(); ++j) {
     auto const& x = GetX(j, 0);
     g2x0[j] = ecc_pub.PowerG2(x);
+    g2x0[j].normalize();
   }
 }
 

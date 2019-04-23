@@ -24,7 +24,7 @@ bool Test(std::string const& output_path, APtr a, BPtr b,
 
   Session session(a, kDummySessionId, kDummyClientId);
   Client client(b, kDummyClientId, kDummySessionId, demands);
-
+  
   Request request;
   client.GetRequest(request);
 
@@ -64,10 +64,12 @@ bool Test(std::string const& publish_path, std::string const& output_path,
           std::vector<Range> const& demands) {
   try {
     auto a = std::make_shared<A>(publish_path);
-
     std::string bulletin_file = publish_path + "/bulletin";
     std::string public_path = publish_path + "/public";
     auto b = std::make_shared<B>(bulletin_file, public_path);
+    auto const& bulletin = b->bulletin();
+    std::cout << "n: " << bulletin.n << ", s: " << bulletin.s
+              << ", size: " << bulletin.size << "\n";
     return Test(output_path, a, b, demands);
   } catch (std::exception& e) {
     std::cerr << __FUNCTION__ << "\t" << e.what() << "\n";

@@ -303,7 +303,7 @@ bool Client::CheckUX0() {
 
   int failed = 0;
 #pragma omp parallel for
-  for (size_t j = 0; j < s_; ++j) {
+  for (size_t j = 0; j < align_s_; ++j) {
     if (failed) continue;
     auto const& uj_xj_0 = ux0[j];
     auto const& uj = ecc_pub.u1()[j];
@@ -371,58 +371,143 @@ bool Client::CheckEX() {
 
 bool Client::CheckEK() {
   Tick _tick_(__FUNCTION__);
+  if (align_c_ == 1) return true;
+
   auto const& ecc_pub = GetEccPub();
   auto const& ek = response_.ek;
   auto const& uk = response_.uk;
+  Fr w1 = FrRand();
+  Fr w2 = FrRand();
+  Fr w1_w2 = w1 + w2;
+  Fr w1e1_w2e2 = w1 * challenge_.e1 + w2 * challenge_.e2;
+  Fr w1e1e1_w2e2e2 = w1 * challenge_.e1_square + w2 * challenge_.e2_square;
 
-  int failed = 0;
+  struct Left {
+    std::vector<Fr const*> ek1;
+    std::vector<Fr const*> ek2;
+  };
+
+  struct Right {
+    G1 const* uk1;
+    G1 const* uk2;
+    G1 const* uk3;
+  };
+
+  std::vector<Left> left_items;
+  std::vector<Right> right_items;
+  left_items.reserve(align_c_ - 1);
+  right_items.reserve(align_c_ - 1);
   for (size_t p = 0; p < log_c_; ++p) {
     auto const& ukp = uk[p];
     auto const& ekp = ek[p];
     auto rows = align_c_ / (1ULL << p);
     auto cols = align_s_;
     assert(ekp.size() == rows * cols);
-    if (failed) break;
-
-#pragma omp parallel for
     for (size_t i = 0; i < rows / 2; ++i) {
-      if (failed) continue;
-      std::vector<G1> temp(align_s_);
+      left_items.resize(left_items.size() + 1);
+      auto& left = left_items.back();
+      left.ek1.resize(align_s_);
+      left.ek2.resize(align_s_);
       for (size_t j = 0; j < align_s_; ++j) {
-        temp[j] = ecc_pub.PowerU1(j, ekp[2 * i * cols + j]);
+        left.ek1[j] = &ekp[2 * i * cols + j];
+        left.ek2[j] = &ekp[(2 * i + 1) * cols + j];
       }
-      G1 left = std::accumulate(temp.begin(), temp.end(), G1Zero());
 
       auto const& ukp_1 = uk[p + 1];
-      G1 right = ukp_1[i];
-      right += ukp[2 * i] * challenge_.e1;
-      right += ukp[2 * i + 1] * challenge_.e1_square;
-      if (left != right) {
-        assert(false);
-        std::cout << "CheckEK " << p << " " << i << " " << __LINE__ << "\n";
-#pragma omp atomic
-        ++failed;
-        continue;
-      }
-
-      for (size_t j = 0; j < align_s_; ++j) {
-        temp[j] = ecc_pub.PowerU1(j, ekp[(2 * i + 1) * cols + j]);
-      }
-      left = std::accumulate(temp.begin(), temp.end(), G1Zero());
-      right = ukp_1[i];
-      right += ukp[2 * i] * challenge_.e2;
-      right += ukp[2 * i + 1] * challenge_.e2_square;
-      if (left != right) {
-        assert(false);
-        std::cout << "CheckEK " << p << " " << i << " " << __LINE__ << "\n";
-#pragma omp atomic
-        ++failed;
-        continue;
-      }
+      right_items.resize(right_items.size() + 1);
+      auto& right = right_items.back();
+      right.uk1 = &ukp_1[i];
+      right.uk2 = &ukp[2 * i];
+      right.uk3 = &ukp[2 * i + 1];
     }
   }
+  assert(left_items.size() == align_c_ - 1);
+  assert(left_items.size() == right_items.size());
+
+  int failed = 0;
+#pragma omp parallel for
+  for (size_t i = 0; i < left_items.size(); ++i) {
+    if (failed) continue;
+    auto const& left = left_items[i];
+    assert(left.ek1.size() == left.ek2.size());
+    assert(left.ek1.size() == align_s_);
+    G1 left_value = G1Zero();
+    for (size_t j = 0; j < align_s_; ++j) {
+      Fr wk = w1 * (*left.ek1[j]) + w2 * (*left.ek2[j]);
+      left_value += ecc_pub.PowerU1(j, wk);
+    }
+
+    auto const& right = right_items[i];
+    G1 right_value = (*right.uk1) * w1_w2;
+    right_value += (*right.uk2) * w1e1_w2e2;
+    right_value += (*right.uk3) * w1e1e1_w2e2e2;
+
+    if (left_value != right_value) {
+      assert(false);
+      std::cout << "CheckEK " << i << " " << __LINE__ << "\n";
+#pragma omp atomic
+      ++failed;
+      continue;
+    }
+  }
+
   return failed == 0;
 }
+
+// bool Client::CheckEK() {
+//  Tick _tick_(__FUNCTION__);
+//  auto const& ecc_pub = GetEccPub();
+//  auto const& ek = response_.ek;
+//  auto const& uk = response_.uk;
+//
+//  int failed = 0;
+//  for (size_t p = 0; p < log_c_; ++p) {
+//    auto const& ukp = uk[p];
+//    auto const& ekp = ek[p];
+//    auto rows = align_c_ / (1ULL << p);
+//    auto cols = align_s_;
+//    assert(ekp.size() == rows * cols);
+//    if (failed) break;
+//
+//#pragma omp parallel for
+//    for (size_t i = 0; i < rows / 2; ++i) {
+//      if (failed) continue;
+//      std::vector<G1> temp(align_s_);
+//      for (size_t j = 0; j < align_s_; ++j) {
+//        temp[j] = ecc_pub.PowerU1(j, ekp[2 * i * cols + j]);
+//      }
+//      G1 left = std::accumulate(temp.begin(), temp.end(), G1Zero());
+//
+//      auto const& ukp_1 = uk[p + 1];
+//      G1 right = ukp_1[i];
+//      right += ukp[2 * i] * challenge_.e1;
+//      right += ukp[2 * i + 1] * challenge_.e1_square;
+//      if (left != right) {
+//        assert(false);
+//        std::cout << "CheckEK " << p << " " << i << " " << __LINE__ << "\n";
+//#pragma omp atomic
+//        ++failed;
+//        continue;
+//      }
+//
+//      for (size_t j = 0; j < align_s_; ++j) {
+//        temp[j] = ecc_pub.PowerU1(j, ekp[(2 * i + 1) * cols + j]);
+//      }
+//      left = std::accumulate(temp.begin(), temp.end(), G1Zero());
+//      right = ukp_1[i];
+//      right += ukp[2 * i] * challenge_.e2;
+//      right += ukp[2 * i + 1] * challenge_.e2_square;
+//      if (left != right) {
+//        assert(false);
+//        std::cout << "CheckEK " << p << " " << i << " " << __LINE__ << "\n";
+//#pragma omp atomic
+//        ++failed;
+//        continue;
+//      }
+//    }
+//  }
+//  return failed == 0;
+//}
 
 void Client::DecryptK() {
   Tick _tick_(__FUNCTION__);

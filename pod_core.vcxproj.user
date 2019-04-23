@@ -3,11 +3,11 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LocalDebuggerWorkingDirectory>$(OutDir)</LocalDebuggerWorkingDirectory>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
-    <LocalDebuggerCommandArguments> -e ecc_pub.bin -m plain -a batch3_pod -p plain_data -o plain_output --demand_ranges 1-10</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments> -e ecc_pub.bin -m plain -a batch3_pod -p plain_data -o plain_output --demand_ranges 0-1 3-250</LocalDebuggerCommandArguments>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LocalDebuggerWorkingDirectory>$(OutDir)</LocalDebuggerWorkingDirectory>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
-    <LocalDebuggerCommandArguments> -e ecc_pub.bin -m plain -a batch3_pod -p plain_data -o plain_output --demand_ranges 1-10</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments> -e ecc_pub.bin -m plain -a batch3_pod -p plain_data -o plain_output --demand_ranges 1-250 -c</LocalDebuggerCommandArguments>
   </PropertyGroup>
 </Project>

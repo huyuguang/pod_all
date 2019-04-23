@@ -262,7 +262,8 @@ void Client::DecryptM() {
 bool Client::SaveDecrypted(std::string const& file) {
   Tick _tick_(__FUNCTION__);
 
-  return DecryptedMToFile(file, s_, b_->vrf_meta(), demands_, decrypted_m_);
+  return DecryptedRangeMToFile(file, s_, b_->vrf_meta(), demands_,
+                               decrypted_m_);
 }
 
 bool Client::CheckCommitmentOfD() {

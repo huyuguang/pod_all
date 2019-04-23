@@ -705,12 +705,16 @@ EXPORT bool E_PlainBatch3SessionOnRequest(handle_t c_session,
     ia.serialize(request);
 
     Response response;
-    if (!session->OnRequest(request, response)) return false;
+    if (!session->OnRequest(request, response)) {
+      std::cerr << "Session::OnRequest failed\n";
+      return false;
+    }
 
     yas::file_ostream os(response_file);
     yas::binary_oarchive<yas::file_ostream, YasBinF()> oa(os);
     oa.serialize(response);
-  } catch (std::exception&) {
+  } catch (std::exception& e) {
+    std::cerr << e.what() << "\n";
     return false;
   }
 
@@ -732,12 +736,16 @@ EXPORT bool E_PlainBatch3SessionOnReceipt(handle_t c_session,
     ia.serialize(receipt);
 
     Secret secret;
-    if (!session->OnReceipt(receipt, secret)) return false;
+    if (!session->OnReceipt(receipt, secret)) {
+      std::cerr << "Session::OnReceipt failed\n";
+      return false;
+    }
 
     yas::file_ostream os(secret_file);
     yas::json_oarchive<yas::file_ostream> oa(os);
     oa.serialize(secret);
-  } catch (std::exception&) {
+  } catch (std::exception& e) {
+    std::cerr << e.what() << "\n";
     return false;
   }
 
@@ -813,12 +821,16 @@ EXPORT bool E_PlainBatch3ClientOnResponse(handle_t c_client,
     ia.serialize(response);
 
     Receipt receipt;
-    if (!client->OnResponse(std::move(response), receipt)) return false;
+    if (!client->OnResponse(std::move(response), receipt)) {
+      std::cerr << "Client::OnResponse failed\n";
+      return false;
+    }
 
     yas::file_ostream os(receipt_file);
     yas::json_oarchive<yas::file_ostream> oa(os);
     oa.serialize(receipt);
-  } catch (std::exception&) {
+  } catch (std::exception& e) {
+    std::cerr << e.what() << "\n";
     return false;
   }
 

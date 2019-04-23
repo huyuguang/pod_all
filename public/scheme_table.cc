@@ -183,10 +183,10 @@ VrfKeyMeta const* GetKeyMetaByName(VrfMeta const& vrf_meta,
   return nullptr;
 }
 
-bool DecryptedMToFile(std::string const& file, uint64_t s,
-                      VrfMeta const& vrf_meta,
-                      std::vector<Range> const& demands,
-                      std::vector<Fr> const& part_m) {
+bool DecryptedRangeMToFile(std::string const& file, uint64_t s,
+                           VrfMeta const& vrf_meta,
+                           std::vector<Range> const& demands,
+                           std::vector<Fr> const& part_m) {
   boost::system::error_code err;
   fs::remove(file, err);
 

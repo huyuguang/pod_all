@@ -210,6 +210,7 @@ void Client::DecryptM(std::vector<Fr> const& v) {
 bool Client::SaveDecrypted(std::string const& file) {
   Tick _tick_(__FUNCTION__);
 
-  return DecryptedMToFile(file, s_, b_->vrf_meta(), demands_, decrypted_m_);
+  return DecryptedRangeMToFile(file, s_, b_->vrf_meta(), demands_,
+                               decrypted_m_);
 }
 }  // namespace scheme::table::batch2

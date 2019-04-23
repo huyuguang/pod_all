@@ -79,19 +79,32 @@ bool Session::OnRequest(Request request, Response& response) {
 }
 
 bool Session::OnReceipt(Receipt const& receipt, Secret& secret) {
-  Tick _tick_(__FUNCTION__);
-  auto const& ecc_pub = GetEccPub();
-  auto x0_p = GetX(0, log_s_);
-  if (receipt.u0_x0_lgs != ecc_pub.PowerU1(0, x0_p)) {
+  Tick _tick_(__FUNCTION__);  
+
+  if (receipt.u0_x0_lgs != u0_x0_lgs_) {
     assert(false);
+    std::cerr << __FUNCTION__ << ":" << __LINE__ << " ASSERT\n";
+    std::cout << "receipt.u0_x0_lgs: " << receipt.u0_x0_lgs << "\n";
+    std::cout << "u0_x0_lgs_: " << u0_x0_lgs_ << "\n";
+    
     return false;
   }
   if (receipt.u0d != u0d_) {
     assert(false);
+    std::cerr << __FUNCTION__ << ":" << __LINE__ << " ASSERT\n";
     return false;
   }
+
+  auto x0_p = GetX(0, log_s_);
+
+#ifdef _DEBUG
+  auto const& ecc_pub = GetEccPub();
+  assert(ecc_pub.PowerU1(0, x0_p) == u0_x0_lgs_);
+#endif
+
   secret.x0_lgs = x0_p;
   secret.d = d_;
+
 #ifdef _DEBUG
   secret.k = k_;
   secret.x = x_;
@@ -116,7 +129,7 @@ void Session::BuildK() {
     size_t rows = align_c_ / (1ULL << p);
     size_t cols = align_s_;
     kp.resize(rows * cols);
-//#pragma omp parallel for (system random generator has internal lock)
+    //#pragma omp parallel for (system random generator has internal lock)
     for (size_t i = 0; i < kp.size(); ++i) {
       kp[i] = FrRand();
     }
@@ -219,15 +232,31 @@ void Session::BuildU0X(std::vector<std::vector<G1>>& u0x) {
   auto const& ecc_pub = GetEccPub();
   u0x.resize(log_s_ + 1);
 
+  struct Item {
+    Fr const* f;
+    G1* g;
+  };
+
+  std::vector<Item> items;
+  items.reserve(align_s_ * 2 - 1);
   for (uint64_t p = 0; p < u0x.size(); ++p) {
     auto& u0xp = u0x[p];
     u0xp.resize(align_s_ / (1ULL << p));
-#pragma omp parallel for
     for (uint64_t j = 0; j < u0xp.size(); ++j) {
-      u0xp[j] = ecc_pub.PowerU1(0, GetX(j, p));
-      u0xp[j].normalize();
+      items.resize(items.size() + 1);
+      auto& item = items.back();
+      item.f = &GetX(j, p);
+      item.g = &u0xp[j];
     }
   }
+
+#pragma omp parallel for
+  for (uint64_t i = 0; i < items.size(); ++i) {
+    *items[i].g = ecc_pub.PowerU1(0, *items[i].f);
+    items[i].g->normalize();
+  }
+
+  u0_x0_lgs_ = u0x.back()[0];
 }
 
 void Session::BuildG2X0(std::vector<G2>& g2x0) {
@@ -330,6 +359,7 @@ void Session::BuildCommitmentD(std::vector<G1>& ud, G2& g2d) {
     ud[j] = ecc_pub.PowerU1(j, d_);
     ud[j].normalize();
   }
+
   u0d_ = ud[0];
 }
 

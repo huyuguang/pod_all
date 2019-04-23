@@ -15,11 +15,18 @@
 #include <algorithm>
 #include <array>
 #include <atomic>
+#include <boost/any.hpp>
 #include <chrono>
 #include <condition_variable>
+#if defined(_MSC_VER)
+#include <execution>
+#else
+#include <parallel/algorithm>
+#endif
 #include <functional>
 #include <map>
 #include <memory>
+#include <numeric>
 #include <queue>
 #include <random>
 #include <set>
@@ -27,12 +34,10 @@
 #include <thread>
 #include <unordered_map>
 #include <vector>
-#include <numeric>
-
-#include <boost/any.hpp>
 //#include <boost/archive/binary_iarchive.hpp>
 //#include <boost/archive/binary_oarchive.hpp>
 //#include <boost/asio.hpp>
+#include <boost/endian/conversion.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/iostreams/device/array.hpp>
 #include <boost/iostreams/device/back_inserter.hpp>
@@ -43,16 +48,15 @@
 #include <boost/iostreams/filtering_streambuf.hpp>
 #include <boost/iostreams/stream.hpp>
 #include <boost/lexical_cast.hpp>
+#include <boost/multi_index/hashed_index.hpp>
+#include <boost/multi_index/member.hpp>
+#include <boost/multi_index_container.hpp>
 #include <boost/multiprecision/cpp_int.hpp>
 #include <boost/multiprecision/cpp_int/serialize.hpp>
 #include <boost/multiprecision/gmp.hpp>
 #include <boost/program_options.hpp>
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/property_tree/ptree.hpp>
-#include <boost/multi_index_container.hpp>
-#include <boost/multi_index/hashed_index.hpp>
-#include <boost/multi_index/member.hpp>
-#include <boost/endian/conversion.hpp>
 
 //#include <boost/random.hpp>
 
@@ -70,7 +74,7 @@
 #include <cryptopp/sha.h>
 #include <cryptopp/sha3.h>
 
-//namespace asio = boost::asio;
+// namespace asio = boost::asio;
 namespace bs = boost::system;
 namespace fs = boost::filesystem;
 namespace mp = boost::multiprecision;

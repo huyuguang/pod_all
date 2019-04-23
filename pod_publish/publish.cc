@@ -266,8 +266,8 @@ bool PublishTable(std::string publish_file, std::string output_path,
   std::string debug_data_file = original_file + ".debug";
   std::vector<Range> debug_demands(1);
   debug_demands[0] = Range(0, bulletin.n);
-  if (!DecryptedMToFile(debug_data_file, bulletin.s, vrf_meta,
-                        debug_demands, m)) {
+  if (!DecryptedRangeMToFile(debug_data_file, bulletin.s, vrf_meta,
+                             debug_demands, m)) {
     assert(false);
     return false;
   }
@@ -365,8 +365,8 @@ bool PublishPlain(std::string publish_file, std::string output_path,
 
 #ifdef _DEBUG
   std::string debug_data_file = original_file + ".debug";
-  if (!DecryptedMToFile(debug_data_file, bulletin.size, bulletin.s, 0,
-                        bulletin.n, m)) {
+  if (!DecryptedRangeMToFile(debug_data_file, bulletin.size, bulletin.s, 0,
+                             bulletin.n, m.begin(), m.end())) {
     assert(false);
     return false;
   }

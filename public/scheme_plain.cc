@@ -38,14 +38,15 @@ bool DataToM(std::string const& pathname, uint64_t size, uint64_t n,
   }
 }
 
-bool DecryptedMToFile(std::string const& file, uint64_t size, uint64_t s,
-                      uint64_t start, uint64_t count,
-                      std::vector<Fr> const& part_m) {
+bool DecryptedRangeMToFile(std::string const& file, uint64_t size, uint64_t s,
+                           uint64_t start, uint64_t count,
+                           std::vector<Fr>::const_iterator m_begin,
+                           std::vector<Fr>::const_iterator m_end) {
   if (s < 1 || !count || !size) return false;
   uint64_t column_num = s - 1;
   uint64_t n = GetDataBlockCount(size, column_num);
   if (!n || start >= n || (start + count) > n) return false;
-  if (part_m.size() != count * s) return false;
+  if ((size_t)std::distance(m_begin, m_end) != count * s) return false;
 
   fs::remove(file);
   io::mapped_file_params file_params;
@@ -58,7 +59,7 @@ bool DecryptedMToFile(std::string const& file, uint64_t size, uint64_t s,
   uint8_t* p = (uint8_t*)file_view.data();
   for (uint64_t i = 0; i < count; ++i) {
     for (uint64_t j = 1; j < s; ++j) {
-      Fr const& fr = part_m[i * s + j];
+      Fr const& fr = m_begin[i * s + j];
       FrToBin(fr, p);
       if (p[31]) {
         assert(false);

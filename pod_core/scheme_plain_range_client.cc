@@ -252,8 +252,8 @@ void Client::DecryptM(std::vector<Fr> const& v) {
 
 bool Client::SaveDecrypted(std::string const& file) {
   Tick _tick_(__FUNCTION__);
-
-  return DecryptedMToFile(file, b_->bulletin().size, s_, demand_.start,
-                          demand_.count, decrypted_m_);
+  return DecryptedRangeMToFile(file, b_->bulletin().size, s_, demand_.start,
+                               demand_.count, decrypted_m_.begin(),
+                               decrypted_m_.end());
 }
 }  // namespace scheme::plain::range

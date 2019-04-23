@@ -121,7 +121,7 @@ bool Client::OnNegoResponse(NegoBResponse const& response) {
 
 void Client::GetRequest(Request& request) {
   request.seed2_seed = seed2_seed_;
-  request.phantoms = phantoms_;  
+  request.phantoms = phantoms_;
 
   request.ot_vi.reserve(demands_count_);
   for (auto const& i : demands_) {
@@ -147,7 +147,7 @@ bool Client::OnResponse(Response response, Receipt& receipt) {
     assert(false);
     return false;
   }
-    
+
   k_ = std::move(response.k);
   ot_ui_ = std::move(response.ot_ui);
   k_mkl_root_ = CalcRootOfK(k_);
@@ -385,6 +385,7 @@ void Client::DecryptM(std::vector<Fr> const& v) {
 bool Client::SaveDecrypted(std::string const& file) {
   Tick _tick_(__FUNCTION__);
 
-  return DecryptedMToFile(file, s_, b_->vrf_meta(), demands_, decrypted_m_);
+  return DecryptedRangeMToFile(file, s_, b_->vrf_meta(), demands_,
+                               decrypted_m_);
 }
 }  // namespace scheme::table::otbatch

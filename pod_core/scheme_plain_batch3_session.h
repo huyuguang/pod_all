@@ -53,6 +53,7 @@ class Session {
   std::vector<std::vector<Fr>> x_;
   G1 u0d_;
   G1 u0_x0_lgs_;
+  Fr x0_lgs_;
   RomChallenge challenge_;
 
  private:

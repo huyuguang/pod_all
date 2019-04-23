@@ -95,14 +95,12 @@ bool Session::OnReceipt(Receipt const& receipt, Secret& secret) {
     return false;
   }
 
-  auto x0_p = GetX(0, log_s_);
-
 #ifdef _DEBUG
   auto const& ecc_pub = GetEccPub();
-  assert(ecc_pub.PowerU1(0, x0_p) == u0_x0_lgs_);
+  assert(ecc_pub.PowerU1(0, x0_lgs_) == u0_x0_lgs_);
 #endif
 
-  secret.x0_lgs = x0_p;
+  secret.x0_lgs = x0_lgs_;
   secret.d = d_;
 
 #ifdef _DEBUG
@@ -257,6 +255,8 @@ void Session::BuildU0X(std::vector<std::vector<G1>>& u0x) {
   }
 
   u0_x0_lgs_ = u0x.back()[0];
+  x0_lgs_ = *items.back().f;
+  assert(x0_lgs_ == GetX(0, log_s_));
 }
 
 void Session::BuildG2X0(std::vector<G2>& g2x0) {

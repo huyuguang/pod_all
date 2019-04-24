@@ -1,5 +1,6 @@
 #include "scheme_plain_batch3_client.h"
 #include "misc.h"
+#include "omp_helper.h"
 #include "public.h"
 #include "scheme_misc.h"
 #include "scheme_plain.h"
@@ -23,6 +24,20 @@ struct W {
   Fr w1_w2;
   Fr w1e1_w2e2;
   Fr w1e1e1_w2e2e2;
+};
+
+struct WN {
+  WN(RomChallenge const& challenge, size_t count) {
+    Tick _tick_(__FUNCTION__);
+    w_.resize(count);
+    for (auto& i : w_) {
+      i.reset(new W(challenge));
+    }
+  }
+  W const& w(size_t i) const { return *w_[i]; }
+
+ private:
+  std::vector<std::unique_ptr<W>> w_;
 };
 
 Client::Client(BPtr b, h256_t const& self_id, h256_t const& peer_id,
@@ -201,32 +216,47 @@ bool Client::CheckEncryptedM() {
 
   auto const& ud = response_.ud;
   assert(ud.size() == align_s_);
-  G1 sigma_ud = std::accumulate(ud.begin(), ud.end(), G1Zero());
 
-  int not_equal = 0;
-#pragma omp parallel for
-  for (size_t i = 0; i < mappings_.size(); ++i) {
-    if (not_equal) continue;
+  auto const& uk0 = response_.uk[0];
+  assert(uk0.size() == align_c_);
+
+  std::vector<Fr> w(demands_count_);
+  for (auto& i : w) i = FrRand();
+
+  // left
+  std::vector<G1> left_g(demands_count_ * 2);
+  for (size_t i = 0; i < demands_count_; ++i) {
     auto const& mapping = mappings_[i];
     G1 const& sigma = sigmas[mapping.index_of_m];
-    auto const& uk0 = response_.uk[0];
-    G1 left = sigma * challenge_.c;
-    left += uk0[i];
-    left += sigma_ud;
+    left_g[i] = sigma;
+    left_g[i + demands_count_] = uk0[i];
+  }
+  std::vector<Fr> left_f(left_g.size());
+  for (size_t i = 0; i < demands_count_; ++i) {
+    left_f[i] = challenge_.c * w[i];
+    left_f[i + demands_count_] = w[i];
+  }
+  G1 sigma_ud = std::accumulate(ud.begin(), ud.end(), G1Zero());
+  G1 sigma_udn = sigma_ud * std::accumulate(w.begin(), w.end(), FrZero());
+  G1 left = MultiExpBdlo12(left_g, left_f) + sigma_udn;
 
-    G1 right = G1Zero();
-    for (uint64_t j = 0; j < align_s_; ++j) {
-      Fr const& m = encrypted_m_[i * align_s_ + j];
-      right += ecc_pub.PowerU1(j, m);
-    }
-    if (left != right) {
-#pragma omp atomic
-      ++not_equal;
-      assert(false);
+  // right
+  std::vector<Fr> right_f(align_s_);
+  for (size_t j = 0; j < right_f.size(); ++j) {
+    right_f[j] = FrZero();
+    for (size_t i = 0; i < demands_count_; ++i) {
+      right_f[j] += w[i] * encrypted_m_[i * align_s_ + j];
     }
   }
+  std::vector<G1> right_g(align_s_);
+#pragma omp parallel for
+  for (size_t j = 0; j < right_f.size(); ++j) {
+    right_g[j] = ecc_pub.PowerU1(j, right_f[j]);
+  }
+  G1 right = std::accumulate(right_g.begin(), right_g.end(), G1Zero());
 
-  if (not_equal) {
+  if (left != right) {
+    std::cout << __FUNCTION__ << " " << __LINE__ << " ASSERT\n";
     assert(false);
     return false;
   }
@@ -351,7 +381,6 @@ bool Client::CheckEX() {
   auto const& ecc_pub = GetEccPub();
   auto const& ex = response_.ex;
   auto const& u0x = response_.u0x;
-  W w(challenge_);
 
   struct Item {
     Fr const* ex1;
@@ -383,43 +412,38 @@ bool Client::CheckEX() {
   }
 
   assert(items.size() == align_s_ - 1);
+  WN wn(challenge_, items.size());
 
-  auto f = [&ecc_pub, &w](auto& item) mutable {
-    Fr wx = w.w1 * (*item.ex1) + w.w2 * (*item.ex2);
-    G1 left_value = ecc_pub.PowerU1(0, wx);
+  Fr left_f = FrZero();
+  for (size_t j = 0; j < items.size(); ++j) {
+    auto const& w = wn.w(j);
+    auto const& item = items[j];
+    left_f += w.w1 * (*item.ex1) + w.w2 * (*item.ex2);
+  }
+  G1 left = ecc_pub.PowerU1(0, left_f);
 
-    G1 right_value = (*item.ux1) * w.w1_w2;
-    right_value += (*item.ux2) * w.w1e1_w2e2;
-    right_value += (*item.ux3) * w.w1e1e1_w2e2e2;
-    if (left_value != right_value) {
-      return false;
-    }
-    return true;
-  };
-
-  std::atomic<bool> failed{false};
-#pragma omp parallel for
-  for (size_t i = 0; i < items.size(); ++i) {
-    if (failed) continue;
-    if (!f(items[i])) failed.store(false);
+  std::vector<Fr const*> right_f(items.size() * 3);
+  std::vector<G1 const*> right_g(right_f.size());
+  for (size_t j = 0; j < items.size(); ++j) {
+    auto const& w = wn.w(j);
+    auto const& item = items[j];
+    right_f[3 * j] = &w.w1_w2;
+    right_f[3 * j + 1] = &w.w1e1_w2e2;
+    right_f[3 * j + 2] = &w.w1e1e1_w2e2e2;
+    right_g[3 * j] = item.ux1;
+    right_g[3 * j + 1] = item.ux2;
+    right_g[3 * j + 2] = item.ux3;
   }
 
-#if 0 
-  if (failed) {
-    std::cout << __FUNCTION__ << " try single thread\n";
-    failed.store(false);
-    for (size_t i = 0; i < items.size(); ++i) {
-      if (!f(items[i])) {
-        std::cout << "still failed, i = " << i << "\n";
-        failed.store(true);
-        break;
-      }
-    }
-  }
-#endif
+  G1 right = MultiExpBdlo12(right_g, right_f);
 
-  if (failed) std::cerr << __FUNCTION__ << " failed\n";
-  return !failed;
+  if (left != right) {
+    std::cerr << __FUNCTION__ << ":" << __LINE__ << " ASSERT\n";
+    assert(false);
+    return false;
+  }
+
+  return true;
 }
 
 bool Client::CheckEK() {
@@ -429,7 +453,6 @@ bool Client::CheckEK() {
   auto const& ecc_pub = GetEccPub();
   auto const& ek = response_.ek;
   auto const& uk = response_.uk;
-  W w(challenge_);
 
   struct Item {
     std::vector<Fr const*> ek1;
@@ -464,88 +487,115 @@ bool Client::CheckEK() {
     }
   }
   assert(items.size() == align_c_ - 1);
+  WN wn(challenge_, items.size());
 
-  std::atomic<bool> failed{false};
-  auto f = [&ecc_pub, &failed, &w, this](auto& item) mutable {
-    if (failed) return;
-    assert(item.ek1.size() == item.ek2.size());
-    assert(item.ek1.size() == align_s_);
-    G1 left_value = G1Zero();
-    for (size_t j = 0; j < align_s_; ++j) {
-      Fr wk = w.w1 * (*item.ek1[j]) + w.w2 * (*item.ek2[j]);
-      left_value += ecc_pub.PowerU1(j, wk);
+  std::vector<Fr> left_f(align_s_);
+  for (size_t j = 0; j < align_s_; ++j) {
+    left_f[j] = FrZero();
+    for (size_t i = 0; i < items.size(); ++i) {
+      auto const& item = items[i];
+      left_f[j] += wn.w(i).w1 * (*item.ek1[j]);
+      left_f[j] += wn.w(i).w2 * (*item.ek2[j]);
     }
+  }
+  std::vector<G1> left_g(align_s_);
+  for (size_t j = 0; j < align_s_; ++j) {
+    left_g[j] = ecc_pub.PowerU1(j, left_f[j]);
+  }
+  G1 left = std::accumulate(left_g.begin(), left_g.end(), G1Zero());
 
-    G1 right_value = (*item.uk1) * w.w1_w2;
-    right_value += (*item.uk2) * w.w1e1_w2e2;
-    right_value += (*item.uk3) * w.w1e1e1_w2e2e2;
-    if (left_value != right_value) {
-      failed.store(true);
-    }
-  };
-
-#pragma omp parallel for
+  std::vector<Fr const*> right_f(items.size() * 3);
+  std::vector<G1 const*> right_g(right_f.size());
   for (size_t i = 0; i < items.size(); ++i) {
-    f(items[i]);
+    auto const& item = items[i];
+    auto const& w = wn.w(i);
+    right_f[3 * i] = &w.w1_w2;
+    right_f[3 * i + 1] = &w.w1e1_w2e2;
+    right_f[3 * i + 2] = &w.w1e1e1_w2e2e2;
+    right_g[3 * i] = item.uk1;
+    right_g[3 * i + 1] = item.uk2;
+    right_g[3 * i + 2] = item.uk3;
+  }
+  G1 right = MultiExpBdlo12(right_g, right_f);
+
+  if (left != right) {
+    std::cerr << __FUNCTION__ << ":" << __LINE__ << " ASSERT\n";
+    assert(false);
+    return false;
   }
 
-  if (failed) std::cerr << __FUNCTION__ << " failed\n";
-  return !failed;
+  return true;
 }
 
 // bool Client::CheckEK() {
 //  Tick _tick_(__FUNCTION__);
+//  if (align_c_ == 1) return true;
+//
 //  auto const& ecc_pub = GetEccPub();
 //  auto const& ek = response_.ek;
 //  auto const& uk = response_.uk;
+//  W w(challenge_);
 //
-//  int failed = 0;
+//  struct Item {
+//    std::vector<Fr const*> ek1;
+//    std::vector<Fr const*> ek2;
+//    G1 const* uk1;
+//    G1 const* uk2;
+//    G1 const* uk3;
+//  };
+//
+//  std::vector<Item> items;
+//  items.reserve(align_c_ - 1);
 //  for (size_t p = 0; p < log_c_; ++p) {
 //    auto const& ukp = uk[p];
 //    auto const& ekp = ek[p];
 //    auto rows = align_c_ / (1ULL << p);
 //    auto cols = align_s_;
 //    assert(ekp.size() == rows * cols);
-//    if (failed) break;
-//
-//#pragma omp parallel for
 //    for (size_t i = 0; i < rows / 2; ++i) {
-//      if (failed) continue;
-//      std::vector<G1> temp(align_s_);
+//      items.resize(items.size() + 1);
+//      auto& item = items.back();
+//      item.ek1.resize(align_s_);
+//      item.ek2.resize(align_s_);
 //      for (size_t j = 0; j < align_s_; ++j) {
-//        temp[j] = ecc_pub.PowerU1(j, ekp[2 * i * cols + j]);
+//        item.ek1[j] = &ekp[2 * i * cols + j];
+//        item.ek2[j] = &ekp[(2 * i + 1) * cols + j];
 //      }
-//      G1 left = std::accumulate(temp.begin(), temp.end(), G1Zero());
 //
 //      auto const& ukp_1 = uk[p + 1];
-//      G1 right = ukp_1[i];
-//      right += ukp[2 * i] * challenge_.e1;
-//      right += ukp[2 * i + 1] * challenge_.e1_square;
-//      if (left != right) {
-//        assert(false);
-//        std::cout << "CheckEK " << p << " " << i << " " << __LINE__ << "\n";
-//#pragma omp atomic
-//        ++failed;
-//        continue;
-//      }
-//
-//      for (size_t j = 0; j < align_s_; ++j) {
-//        temp[j] = ecc_pub.PowerU1(j, ekp[(2 * i + 1) * cols + j]);
-//      }
-//      left = std::accumulate(temp.begin(), temp.end(), G1Zero());
-//      right = ukp_1[i];
-//      right += ukp[2 * i] * challenge_.e2;
-//      right += ukp[2 * i + 1] * challenge_.e2_square;
-//      if (left != right) {
-//        assert(false);
-//        std::cout << "CheckEK " << p << " " << i << " " << __LINE__ << "\n";
-//#pragma omp atomic
-//        ++failed;
-//        continue;
-//      }
+//      item.uk1 = &ukp_1[i];
+//      item.uk2 = &ukp[2 * i];
+//      item.uk3 = &ukp[2 * i + 1];
 //    }
 //  }
-//  return failed == 0;
+//  assert(items.size() == align_c_ - 1);
+//
+//  std::atomic<bool> failed{false};
+//  auto f = [&ecc_pub, &failed, &w, this](auto& item) mutable {
+//    if (failed) return;
+//    assert(item.ek1.size() == item.ek2.size());
+//    assert(item.ek1.size() == align_s_);
+//    G1 left_value = G1Zero();
+//    for (size_t j = 0; j < align_s_; ++j) {
+//      Fr wk = w.w1 * (*item.ek1[j]) + w.w2 * (*item.ek2[j]);
+//      left_value += ecc_pub.PowerU1(j, wk);
+//    }
+//
+//    G1 right_value = (*item.uk1) * w.w1_w2;
+//    right_value += (*item.uk2) * w.w1e1_w2e2;
+//    right_value += (*item.uk3) * w.w1e1e1_w2e2e2;
+//    if (left_value != right_value) {
+//      failed.store(true);
+//    }
+//  };
+//
+//#pragma omp parallel for
+//  for (size_t i = 0; i < items.size(); ++i) {
+//    f(items[i]);
+//  }
+//
+//  if (failed) std::cerr << __FUNCTION__ << " failed\n";
+//  return !failed;
 //}
 
 void Client::DecryptK() {

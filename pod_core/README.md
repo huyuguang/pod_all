@@ -12,6 +12,8 @@
 
 -e ecc_pub.bin -m table -a batch2_pod -p table_data -o table_output --demand_ranges 1-2
 
+-e ecc_pub.bin -m table -a batch3_pod -p table_data -o table_output --demand_ranges 1-8000
+
 -e ecc_pub.bin -m table -a vrf_query -p table_data -o table_output -k first_name -v Kathy
 
 -e ecc_pub.bin -m table -a vrf_query -p table_data -o table_output -k "Emp ID" -v 614227

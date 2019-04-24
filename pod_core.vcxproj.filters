@@ -741,6 +741,9 @@
     <ClInclude Include="pod_core\capi\scheme_plain_batch3_test_capi.h">
       <Filter>capi\plain_batch3</Filter>
     </ClInclude>
+    <ClInclude Include="public\omp_helper.h">
+      <Filter>public</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="pod_core\README.md" />

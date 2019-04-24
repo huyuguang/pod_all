@@ -213,6 +213,7 @@
     <ClInclude Include="pod_core\scheme_table_vrfq_protocol.h" />
     <ClInclude Include="pod_core\scheme_table_vrfq_serialize.h" />
     <ClInclude Include="public\matrix_fr.h" />
+    <ClInclude Include="public\omp_helper.h" />
     <ClInclude Include="thirdparty\mcl\include\cybozu\array.hpp" />
     <ClInclude Include="thirdparty\mcl\include\cybozu\atoi.hpp" />
     <ClInclude Include="thirdparty\mcl\include\cybozu\benchmark.hpp" />

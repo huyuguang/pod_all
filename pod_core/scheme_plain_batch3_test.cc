@@ -34,15 +34,11 @@ bool Test(std::string const& output_path, APtr a, BPtr b,
     return false;
   }
 
-  std::cout << __FUNCTION__ << ": " << __LINE__ << "\n";
-
   Receipt receipt;
   if (!client.OnResponse(std::move(response), receipt)) {
     assert(false);
     return false;
   }
-
-  std::cout << __FUNCTION__ << ": " << __LINE__ << "\n";
 
   Secret secret;
   if (!session.OnReceipt(receipt, secret)) {
@@ -50,14 +46,10 @@ bool Test(std::string const& output_path, APtr a, BPtr b,
     return false;
   }
 
-  std::cout << __FUNCTION__ << ": " << __LINE__ << "\n";
-
   if (!client.OnSecret(std::move(secret))) {
     assert(false);
     return false;
   }
-
-  std::cout << __FUNCTION__ << ": " << __LINE__ << "\n";
 
   if (!client.SaveDecrypted(output_file)) {
     assert(false);

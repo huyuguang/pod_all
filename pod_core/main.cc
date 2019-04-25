@@ -5,6 +5,7 @@
 #include "capi/scheme_table_batch3_test_capi.h"
 #include "capi/scheme_table_batch_test_capi.h"
 #include "capi/scheme_table_otbatch_test_capi.h"
+#include "capi/scheme_table_otbatch3_test_capi.h"
 #include "capi/scheme_table_otvrfq_test_capi.h"
 #include "capi/scheme_table_vrfq_test_capi.h"
 #include "ecc_pub.h"
@@ -19,6 +20,7 @@
 #include "scheme_table_otbatch_test.h"
 #include "scheme_table_otvrfq_test.h"
 #include "scheme_table_vrfq_test.h"
+#include "scheme_table_otbatch3_test.h"
 
 namespace {
 void DumpEccPub() {
@@ -232,6 +234,11 @@ int main(int argc, char** argv) {
       auto func = use_capi ? scheme::table::batch3::capi::Test
                            : scheme::table::batch3::Test;
       return func(publish_path, output_path, demand_ranges) ? 0 : -1;
+      return 0;
+    } else if (action == Action::kOtBatch3Pod) {
+      auto func = use_capi ? scheme::table::otbatch3::capi::Test
+                           : scheme::table::otbatch3::Test;
+      return func(publish_path, output_path, demand_ranges, phantom_ranges) ? 0 : -1;
       return 0;
     } else {
       std::cerr << "Not implement yet.\n";

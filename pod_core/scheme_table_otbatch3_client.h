@@ -5,9 +5,10 @@
 #include "basic_types.h"
 #include "ecc.h"
 #include "scheme_table_b.h"
-#include "scheme_table_otbatch_protocol.h"
+#include "scheme_table_otbatch3_protocol.h"
+#include "scheme_table_otbatch3_misc.h"
 
-namespace scheme::table::otbatch {
+namespace scheme::table::otbatch3 {
 
 class Client {
  public:
@@ -23,22 +24,21 @@ class Client {
  public:
   void GetRequest(Request& request);
   bool OnResponse(Response response, Receipt& receipt);
-  bool OnSecret(Secret const& secret);
-  bool GenerateClaim(Claim& claim);
+  bool OnSecret(Secret secret);
   bool SaveDecrypted(std::string const& file);
 
  private:
   void BuildMapping();
   bool CheckEncryptedM();
-  bool CheckK(std::vector<Fr> const& v);
-  bool CheckKDirect(std::vector<Fr> const& v);
-  bool CheckKMultiExp(std::vector<Fr> const& v);
-  void DecryptM(std::vector<Fr> const& v);
-  uint64_t FindMismatchI(uint64_t mismatch_j,
-                         std::vector<G1 const*> const& k_col,
-                         std::vector<Fr const*> const& v_col);
-  void BuildClaim(uint64_t i, uint64_t j, Claim& claim);
-
+  bool CheckUX0();
+  bool CheckEK();
+  bool CheckEX();  
+  bool CheckCommitmentOfD();
+  void DecryptK();
+  void DecryptX();
+  void DecryptM();
+  void ExtractM();
+  Fr GetOtFrE(G1 const& ot_ui);
  private:
   BPtr b_;
   h256_t const self_id_;
@@ -51,9 +51,25 @@ class Client {
   uint64_t phantoms_count_ = 0;
 
  private:
-  std::vector<G1> k_;      // sizeof() = L
-  std::vector<G1> ot_ui_;  // sizeof() = K
-  h256_t seed2_seed_;
+  uint64_t align_c_;
+  uint64_t align_s_;
+  uint64_t log_c_;
+  uint64_t log_s_;
+  Request request_;
+  Response response_;
+  Receipt receipt_;
+  Secret secret_;
+  std::vector<std::vector<Fr>> k_;
+  std::vector<std::vector<Fr>> x_;
+  RomChallenge challenge_;
+
+ private:
+  G1 ot_self_pk_;
+  G2 ot_peer_pk_;
+  G1 ot_sk_;
+  Fr ot_beta_;
+  Fr ot_rand_a_;
+  Fr ot_rand_b_;
 
  private:
   struct Mapping {
@@ -63,22 +79,9 @@ class Client {
   std::vector<Mapping> mappings_;
 
  private:
-  h256_t seed2_;
-  std::vector<Fr> w_;  // size() is L
-  h256_t k_mkl_root_;
   std::vector<Fr> decrypted_m_;
   std::vector<Fr> encrypted_m_;
-  int64_t claim_i_ = -1;
-  int64_t claim_j_ = -1;
-
- private:
-  G1 ot_self_pk_;
-  G2 ot_peer_pk_;
-  G1 ot_sk_;
-  Fr ot_beta_;
-  Fr ot_rand_a_;
-  Fr ot_rand_b_;
 };
 
 typedef std::shared_ptr<Client> ClientPtr;
-}  // namespace scheme::table::otbatch
+}  // namespace scheme::table::otbatch3

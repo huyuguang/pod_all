@@ -42,7 +42,7 @@ void Session::BuildMapping() {
   size_t index = 0;
   for (auto const& p : phantoms_) {
     for (size_t i = p.start; i < (p.start + p.count); ++i) {
-      mappings_[index++].index_of_m = i;
+      mappings_[index++].global_index = i;
     }
   }
 }
@@ -115,7 +115,7 @@ bool Session::OnRequest(Request request, Response& response) {
 #pragma omp parallel for
   for (int64_t i = 0; i < (int64_t)mappings_.size(); ++i) {
     auto const& map = mappings_[i];
-    auto fr_i = MapToFr(map.index_of_m);
+    auto fr_i = MapToFr(map.global_index);
     Fp12 e;
     G1 v_exp_fr_c = ot_v_ * (fr_i * ot_rand_c_);
     mcl::bn256::pairing(e, v_exp_fr_c, ot_sk_);
@@ -128,7 +128,7 @@ bool Session::OnRequest(Request request, Response& response) {
     Fr fr_e = MapToFr(buf, sizeof(buf));
 
     auto is = i * s_;
-    auto m_is = map.index_of_m * s_;
+    auto m_is = map.global_index * s_;
     for (uint64_t j = 0; j < s_; ++j) {
       auto ij = is + j;
       auto m_ij = m_is + j;

@@ -98,7 +98,7 @@ void Client::BuildMapping() {
   for (auto const& d : demands_) {
     for (size_t i = d.start; i < (d.start + d.count); ++i) {
       auto& map = mappings_[index];
-      map.index_of_m = i;
+      map.global_index = i;
       map.phantom_offset = GetRangesOffsetByIndexOfM(phantoms_, i);
       ++index;
     }
@@ -199,7 +199,7 @@ bool Client::CheckEncryptedM() {
   for (int64_t i = 0; i < (int64_t)mappings_.size(); ++i) {
     if (not_equal) continue;
     auto const& mapping = mappings_[i];
-    G1 const& sigma = sigmas[mapping.index_of_m];
+    G1 const& sigma = sigmas[mapping.global_index];
     G1 left = sigma * w_[mapping.phantom_offset];
     for (uint64_t j = 0; j < s_; ++j) {
       left += k_[mapping.phantom_offset * s_ + j];

@@ -70,7 +70,7 @@ void Client::BuildMapping() {
   for (auto const& d : demands_) {
     for (size_t i = d.start; i < (d.start + d.count); ++i) {
       auto& map = mappings_[index];
-      map.index_of_m = i;
+      map.global_index = i;
       ++index;
     }
   }
@@ -227,7 +227,7 @@ bool Client::CheckEncryptedM() {
   std::vector<G1> left_g(demands_count_ * 2);
   for (size_t i = 0; i < demands_count_; ++i) {
     auto const& mapping = mappings_[i];
-    G1 const& sigma = sigmas[mapping.index_of_m];
+    G1 const& sigma = sigmas[mapping.global_index];
     left_g[i] = sigma;
     left_g[i + demands_count_] = uk0[i];
   }

@@ -58,7 +58,7 @@ class Session {
 
  private:
   struct Mapping {
-    uint64_t index_of_m;
+    uint64_t global_index;
   };
   uint64_t demands_count_ = 0;
   std::vector<Mapping> mappings_;

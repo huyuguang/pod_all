@@ -3,7 +3,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LocalDebuggerWorkingDirectory>$(OutDir)</LocalDebuggerWorkingDirectory>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
-    <LocalDebuggerCommandArguments>-e ecc_pub.bin -m table -a batch3_pod -p table_data -o table_output --demand_ranges 1-10</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>-e ecc_pub.bin -m table -a otbatch3_pod -p table_data -o table_output --demand_ranges 2-10 --phantom_ranges 1-15 -c</LocalDebuggerCommandArguments>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LocalDebuggerWorkingDirectory>$(OutDir)</LocalDebuggerWorkingDirectory>

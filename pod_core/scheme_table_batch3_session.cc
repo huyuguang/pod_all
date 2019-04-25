@@ -33,7 +33,7 @@ void Session::BuildMapping() {
   size_t index = 0;
   for (auto const& p : request_.demands) {
     for (size_t i = p.start; i < (p.start + p.count); ++i) {
-      mappings_[index++].index_of_m = i;
+      mappings_[index++].global_index = i;
     }
   }
 }
@@ -110,7 +110,7 @@ bool Session::OnReceipt(Receipt const& receipt, Secret& secret) {
   for (size_t i = 0; i < mappings_.size(); ++i) {
     auto const& map = mappings_[i];
     for (uint64_t j = 0; j < s_; ++j) {
-      auto m_ij = map.index_of_m * s_ + j;
+      auto m_ij = map.global_index * s_ + j;
       secret.m[i * s_ + j] = a_->m()[m_ij];
     }
   }
@@ -282,7 +282,7 @@ void Session::BuildM(std::vector<Fr>& encrypted_m) {
   for (int64_t i = 0; i < (int64_t)mappings_.size(); ++i) {
     auto const& map = mappings_[i];
     for (uint64_t j = 0; j < align_s_; ++j) {
-      Fr const& mij = j < s_ ? m[map.index_of_m * s_ + j] : zero;
+      Fr const& mij = j < s_ ? m[map.global_index * s_ + j] : zero;
       encrypted_m[i * align_s_ + j] = GetK(i, j, 0) + d_ + challenge_.c * mij;
     }
   }

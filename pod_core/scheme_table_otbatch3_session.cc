@@ -1,15 +1,31 @@
-#include "scheme_plain_batch3_session.h"
+#include "scheme_table_otbatch3_session.h"
 #include "chain.h"
 #include "misc.h"
 #include "public.h"
 #include "scheme_misc.h"
-#include "scheme_plain.h"
-#include "scheme_plain_a.h"
-#include "scheme_plain_batch3_misc.h"
-#include "scheme_plain_batch3_protocol.h"
+#include "scheme_table.h"
+#include "scheme_table_a.h"
+#include "scheme_table_otbatch3_misc.h"
+#include "scheme_table_otbatch3_protocol.h"
 #include "tick.h"
 
-namespace scheme::plain::batch3 {
+namespace {
+bool CheckPhantoms(uint64_t n, std::vector<Range> const& phantoms) {
+  for (auto const& phantom : phantoms) {
+    if (!phantom.count || phantom.start >= n || phantom.count > n ||
+        (phantom.start + phantom.count) > n)
+      return false;
+  }
+
+  for (size_t i = 1; i < phantoms.size(); ++i) {
+    if (phantoms[i].start <= phantoms[i - 1].start + phantoms[i - 1].count)
+      return false;
+  }
+  return true;
+}
+}
+
+namespace scheme::table::otbatch3 {
 
 Session::Session(APtr a, h256_t const& self_id, h256_t const& peer_id)
     : a_(a),
@@ -25,36 +41,60 @@ Session::Session(APtr a, h256_t const& self_id, h256_t const& peer_id)
     assert(false);
     throw std::runtime_error("align_s too large");
   }
+  ot_self_pk_ = G2Rand();
+  ot_alpha_ = FrRand();
 }
 
 void Session::BuildMapping() {
   Tick _tick_(__FUNCTION__);
-  mappings_.resize(demands_count_);
+  mappings_.resize(phantoms_count_);
   size_t index = 0;
-  for (auto const& p : request_.demands) {
+  for (auto const& p : request_.phantoms) {
     for (size_t i = p.start; i < (p.start + p.count); ++i) {
       mappings_[index++].global_index = i;
     }
   }
 }
 
+void Session::GetNegoReqeust(NegoARequest& request) { request.s = ot_self_pk_; }
+
+bool Session::OnNegoRequest(NegoBRequest const& request,
+                            NegoBResponse& response) {
+  ot_peer_pk_ = request.t;
+  response.t_exp_alpha = ot_peer_pk_ * ot_alpha_;
+  return true;
+}
+
+bool Session::OnNegoResponse(NegoAResponse const& response) {
+  ot_sk_ = response.s_exp_beta * ot_alpha_;
+  return true;
+}
+
 bool Session::OnRequest(Request request, Response& response) {
   Tick _tick_(__FUNCTION__);
 
-  if (!CheckDemands(n_, request.demands)) {
+  request_ = std::move(request);
+
+  if (!CheckPhantoms(n_, request_.phantoms)) {
+    assert(false);
+    return false;
+  }
+  
+  for (auto const& i : request_.phantoms) {
+    phantoms_count_ += i.count;
+  }
+
+  if (request_.ot_vi.size() >= phantoms_count_) {
     assert(false);
     return false;
   }
 
-  request_ = std::move(request);
-  for (auto const& i : request_.demands) {
-    demands_count_ += i.count;
-  }
-
   BuildMapping();
 
-  align_c_ = misc::Pow2UB(demands_count_);
+  align_c_ = misc::Pow2UB(phantoms_count_);
   log_c_ = misc::Log2UB(align_c_);
+
+  BuildOt(response.ot_ui);
 
   BuildK();
   BuildX();
@@ -63,15 +103,13 @@ bool Session::OnRequest(Request request, Response& response) {
   BuildUX0(response.ux0);
   BuildU0X(response.u0x);
   BuildG2X0(response.g2x0);
-  BuildCommitmentD(response.ud, response.g2d);
+  BuildCommitmentD(response.ud, response.g2d);  
 
-  auto challenge_seed =
-      RomChallengeSeed(peer_id_, self_id_, a_->bulletin(), request_, response);
-  ComputeChallenge(challenge_seed, challenge_);
-  std::cout << "Session side: challenge_seed: "
-            << misc::HexToStr(challenge_seed) << "\n";
-
+  ComputeChallenge(challenge_, peer_id_, self_id_, a_->bulletin(), request_,
+                   response);  
+  
   BuildM(response.m);
+  BlendM(response.m);
   BuildEK(response.ek);
   BuildEX(response.ex);
 
@@ -106,12 +144,12 @@ bool Session::OnReceipt(Receipt const& receipt, Secret& secret) {
 #ifdef _DEBUG
   secret.k = k_;
   secret.x = x_;
-  secret.m.resize(demands_count_ * s_);
+  secret.m.resize(phantoms_count_ * s_);
   for (size_t i = 0; i < mappings_.size(); ++i) {
     auto const& map = mappings_[i];
     for (uint64_t j = 0; j < s_; ++j) {
-      auto m_ij = map.global_index * s_ + j;
-      secret.m[i * s_ + j] = a_->m()[m_ij];
+      auto golbal_ij = map.global_index * s_ + j;
+      secret.m[i * s_ + j] = a_->m()[golbal_ij];
     }
   }
 #endif
@@ -271,11 +309,46 @@ void Session::BuildG2X0(std::vector<G2>& g2x0) {
   }
 }
 
+void Session::BuildOt(std::vector<G1>& ot_ui) {
+  ot_rand_c_ = FrRand();
+  ot_ui.resize(request_.ot_vi.size());
+
+#pragma omp parallel for
+  for (size_t j = 0; j < ot_ui.size(); ++j) {
+    ot_ui[j] = request_.ot_vi[j] * ot_rand_c_;
+  }
+}
+
+void Session::BlendM(std::vector<Fr>& encrypted_m) {
+  Tick _tick_(__FUNCTION__);
+#pragma omp parallel for
+  for (int64_t i = 0; i < (int64_t)mappings_.size(); ++i) {
+    Fr fr_e = GetOtFrE(mappings_[i].global_index);
+    for (uint64_t j = 0; j < align_s_; ++j) {
+      encrypted_m[i * align_s_ + j] += fr_e;
+    }
+  }
+}
+
+Fr Session::GetOtFrE(uint64_t global_index) {
+    auto fr_i = MapToFr(global_index);
+    Fp12 e;
+    G1 v_exp_fr_c = request_.ot_v * (fr_i * ot_rand_c_);
+    mcl::bn256::pairing(e, v_exp_fr_c, ot_sk_);
+    uint8_t buf[32 * 12];
+    auto ret_len = e.serialize(buf, sizeof(buf));
+    if (ret_len != sizeof(buf)) {
+      assert(false);
+      throw std::runtime_error("oops");
+    }
+    return MapToFr(buf, sizeof(buf));
+}
+
 void Session::BuildM(std::vector<Fr>& encrypted_m) {
   Tick _tick_(__FUNCTION__);
   // mij' = kij0 + d + c^i * mij
   auto const& m = a_->m();
-  encrypted_m.resize(demands_count_ * align_s_);
+  encrypted_m.resize(phantoms_count_ * align_s_);
   Fr zero = FrZero();
 
 #pragma omp parallel for
@@ -363,4 +436,4 @@ void Session::BuildCommitmentD(std::vector<G1>& ud, G2& g2d) {
   u0d_ = ud[0];
 }
 
-}  // namespace scheme::plain::batch3
+}  // namespace scheme::table::otbatch3

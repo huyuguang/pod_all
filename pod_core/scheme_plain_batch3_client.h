@@ -57,7 +57,7 @@ class Client {
 
  private:
   struct Mapping {
-    uint64_t index_of_m;
+    uint64_t global_index;
   };
   std::vector<Mapping> mappings_;
 

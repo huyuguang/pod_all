@@ -89,6 +89,12 @@
     <Filter Include="capi\plain_batch3">
       <UniqueIdentifier>{dff72875-e10b-4dde-8113-b400b266c456}</UniqueIdentifier>
     </Filter>
+    <Filter Include="local\table_otbatch3">
+      <UniqueIdentifier>{6bdd0600-03b1-4021-872f-9ea64e6b6fc0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="capi\table_otbatch3">
+      <UniqueIdentifier>{07eb92a8-56be-43cb-86f6-be649b4781e4}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pod_core\main.cc">
@@ -285,6 +291,24 @@
     </ClCompile>
     <ClCompile Include="pod_core\capi\scheme_plain_batch3_test_capi.cc">
       <Filter>capi\plain_batch3</Filter>
+    </ClCompile>
+    <ClCompile Include="pod_core\capi\scheme_table_otbatch3_test_capi.cc">
+      <Filter>capi\table_otbatch3</Filter>
+    </ClCompile>
+    <ClCompile Include="pod_core\scheme_table_otbatch3_client.cc">
+      <Filter>local\table_otbatch3</Filter>
+    </ClCompile>
+    <ClCompile Include="pod_core\scheme_table_otbatch3_misc.cc">
+      <Filter>local\table_otbatch3</Filter>
+    </ClCompile>
+    <ClCompile Include="pod_core\scheme_table_otbatch3_notary.cc">
+      <Filter>local\table_otbatch3</Filter>
+    </ClCompile>
+    <ClCompile Include="pod_core\scheme_table_otbatch3_session.cc">
+      <Filter>local\table_otbatch3</Filter>
+    </ClCompile>
+    <ClCompile Include="pod_core\scheme_table_otbatch3_test.cc">
+      <Filter>local\table_otbatch3</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -744,6 +768,30 @@
     <ClInclude Include="public\omp_helper.h">
       <Filter>public</Filter>
     </ClInclude>
+    <ClInclude Include="pod_core\capi\scheme_table_otbatch3_test_capi.h">
+      <Filter>capi\table_otbatch3</Filter>
+    </ClInclude>
+    <ClInclude Include="pod_core\scheme_table_otbatch3_client.h">
+      <Filter>local\table_otbatch3</Filter>
+    </ClInclude>
+    <ClInclude Include="pod_core\scheme_table_otbatch3_misc.h">
+      <Filter>local\table_otbatch3</Filter>
+    </ClInclude>
+    <ClInclude Include="pod_core\scheme_table_otbatch3_notary.h">
+      <Filter>local\table_otbatch3</Filter>
+    </ClInclude>
+    <ClInclude Include="pod_core\scheme_table_otbatch3_protocol.h">
+      <Filter>local\table_otbatch3</Filter>
+    </ClInclude>
+    <ClInclude Include="pod_core\scheme_table_otbatch3_serialize.h">
+      <Filter>local\table_otbatch3</Filter>
+    </ClInclude>
+    <ClInclude Include="pod_core\scheme_table_otbatch3_session.h">
+      <Filter>local\table_otbatch3</Filter>
+    </ClInclude>
+    <ClInclude Include="pod_core\scheme_table_otbatch3_test.h">
+      <Filter>local\table_otbatch3</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="pod_core\README.md" />
@@ -780,6 +828,9 @@
     </None>
     <None Include="pod_core\capi\scheme_plain_batch3.inc">
       <Filter>capi\plain_batch3</Filter>
+    </None>
+    <None Include="pod_core\capi\scheme_table_otbatch3.inc">
+      <Filter>capi\table_otbatch3</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

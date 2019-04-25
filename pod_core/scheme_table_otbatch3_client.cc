@@ -1,15 +1,75 @@
-#include "scheme_table_batch3_client.h"
+#include "scheme_table_otbatch3_client.h"
 #include "misc.h"
 #include "omp_helper.h"
 #include "public.h"
 #include "scheme_misc.h"
 #include "scheme_table.h"
 #include "scheme_table_b.h"
-#include "scheme_table_batch3_misc.h"
-#include "scheme_table_batch3_notary.h"
-#include "scheme_table_batch3_protocol.h"
+#include "scheme_table_otbatch3_misc.h"
+#include "scheme_table_otbatch3_notary.h"
+#include "scheme_table_otbatch3_protocol.h"
 
-namespace scheme::table::batch3 {
+namespace {
+
+void CheckDemandPhantoms(uint64_t n, std::vector<Range> const& demands,
+                         std::vector<Range> const& phantoms) {
+  if (demands.empty() || phantoms.empty()) throw std::invalid_argument("empty");
+
+  for (auto const& demand : demands) {
+    if (!demand.count || demand.start >= n || demand.count > n ||
+        (demand.start + demand.count) > n)
+      throw std::invalid_argument("demand");
+  }
+
+  for (auto const& phantom : phantoms) {
+    if (!phantom.count || phantom.start >= n || phantom.count > n ||
+        (phantom.start + phantom.count) > n)
+      throw std::invalid_argument("phantom");
+  }
+
+  for (size_t i = 1; i < demands.size(); ++i) {
+    if (demands[i].start <= demands[i - 1].start + demands[i - 1].count)
+      throw std::invalid_argument("demand overlap");
+  }
+
+  for (size_t i = 1; i < phantoms.size(); ++i) {
+    if (phantoms[i].start <= phantoms[i - 1].start + phantoms[i - 1].count)
+      throw std::invalid_argument("phantoms overlap");
+  }
+
+  for (size_t i = 0; i < demands.size(); ++i) {
+    auto d_start = demands[i].start;
+    auto d_end = d_start + demands[i].count;
+    bool find = false;
+    for (size_t j = 0; j < phantoms.size(); ++j) {
+      auto p_start = phantoms[j].start;
+      auto p_end = p_start + phantoms[j].count;
+      if (p_start <= d_start && p_end >= d_end) {
+        find = true;
+        break;
+      }
+    }
+    if (!find) throw std::invalid_argument("phantoms must include demand");
+  }
+}
+
+uint64_t GetRangesOffsetByIndexOfM(std::vector<Range> const& ranges,
+                                   uint64_t index) {
+  uint64_t offset = 0;
+  for (auto const& range : ranges) {
+    if (index >= range.start && index < (range.start + range.count)) {
+      offset += index - range.start;
+      return offset;
+    }
+    offset += range.count;
+  }
+  assert(false);
+  throw std::runtime_error(__FUNCTION__);
+}
+
+}  // namespace
+
+namespace scheme::table::otbatch3 {
 
 struct W {
   W(RomChallenge const& challenge) {
@@ -41,26 +101,28 @@ struct WN {
 };
 
 Client::Client(BPtr b, h256_t const& self_id, h256_t const& peer_id,
-               std::vector<Range> demands)
+               std::vector<Range> demands, std::vector<Range> phantoms)
     : b_(b),
       self_id_(self_id),
       peer_id_(peer_id),
       n_(b_->bulletin().n),
       s_(b_->bulletin().s),
-      demands_(std::move(demands)) {
-  if (!CheckDemands(n_, demands_)) {
-    throw std::invalid_argument("demands");
-  }
-
-  for (auto const& i : demands_) {
-    demands_count_ += i.count;
-  }
-
+      demands_(std::move(demands)),
+      phantoms_(std::move(phantoms)) {
+  CheckDemandPhantoms(n_, demands_, phantoms_);
+  for (auto const& i : demands_) demands_count_ += i.count;
+  for (auto const& i : phantoms_) phantoms_count_ += i.count;
   BuildMapping();
-  align_c_ = misc::Pow2UB(demands_count_);
+
+  align_c_ = misc::Pow2UB(phantoms_count_);
   align_s_ = misc::Pow2UB(s_);
   log_c_ = misc::Log2UB(align_c_);
   log_s_ = misc::Log2UB(align_s_);
+
+  ot_self_pk_ = G1Rand();
+  ot_beta_ = FrRand();
+  ot_rand_a_ = FrRand();
+  ot_rand_b_ = FrRand();
 }
 
 void Client::BuildMapping() {
@@ -71,19 +133,51 @@ void Client::BuildMapping() {
     for (size_t i = d.start; i < (d.start + d.count); ++i) {
       auto& map = mappings_[index];
       map.global_index = i;
+      map.phantom_offset = GetRangesOffsetByIndexOfM(phantoms_, i);
       ++index;
     }
   }
 }
 
+void Client::GetNegoReqeust(NegoBRequest& request) { request.t = ot_self_pk_; }
+
+bool Client::OnNegoRequest(NegoARequest const& request,
+                           NegoAResponse& response) {
+  ot_peer_pk_ = request.s;
+  response.s_exp_beta = ot_peer_pk_ * ot_beta_;
+  return true;
+}
+
+bool Client::OnNegoResponse(NegoBResponse const& response) {
+  ot_sk_ = response.t_exp_alpha * ot_beta_;
+  return true;
+}
+
 void Client::GetRequest(Request& request) {
-  request.demands = demands_;
-  request_ = request;
+  request.phantoms = phantoms_;
+
+  // ot
+  request.ot_vi.reserve(demands_count_);
+  for (auto const& i : demands_) {
+    for (size_t j = i.start; j < i.start + i.count; ++j) {
+      auto fr = MapToFr(j);
+      request.ot_vi.push_back(ot_sk_ * (ot_rand_b_ * fr));
+    }
+  }
+  request.ot_v = ot_self_pk_ * (ot_rand_a_ * ot_rand_b_);
+
+  request_ = request; // we will RomChallengeSeed, so save the request
 }
 
 bool Client::OnResponse(Response response, Receipt& receipt) {
   Tick _tick_(__FUNCTION__);
   response_ = std::move(response);
+
+  // check ot format
+  if (response_.ot_ui.size() != demands_count_) {
+    assert(false);
+    return false;
+  }
 
   // check commitment data format
   if (response_.uk.size() != (log_c_ + 1)) {
@@ -136,14 +230,11 @@ bool Client::OnResponse(Response response, Receipt& receipt) {
   }
 
   // rom the challenge the seed
-  auto challenge_seed =
-      RomChallengeSeed(self_id_, peer_id_, b_->bulletin(), request_, response_);
-  ComputeChallenge(challenge_seed, challenge_);
-  std::cout << "Client side: challenge_seed: " << misc::HexToStr(challenge_seed)
-            << "\n";
+  ComputeChallenge(challenge_, self_id_, peer_id_, b_->bulletin(), request_,
+                   response_);
 
   // check encrypted data format
-  if (response_.m.size() != demands_count_ * align_s_) {
+  if (response_.m.size() != phantoms_count_ * align_s_) {
     assert(false);
     return false;
   }
@@ -178,7 +269,8 @@ bool Client::OnResponse(Response response, Receipt& receipt) {
     }
   }
 
-  encrypted_m_ = std::move(response_.m);
+  // ot extract
+  ExtractM();
 
   // check valid
   if (!CheckEncryptedM()) {
@@ -208,6 +300,38 @@ bool Client::OnResponse(Response response, Receipt& receipt) {
   return true;
 }
 
+void Client::ExtractM() {
+  encrypted_m_.resize(demands_count_ * align_s_);
+
+#pragma omp parallel for
+  for (size_t i = 0; i < response_.ot_ui.size(); ++i) {
+    Fr fr_e = GetOtFrE(response_.ot_ui[i]);
+
+    auto phantom_offset = mappings_[i].phantom_offset;
+    for (size_t j = 0; j < align_s_; ++j) {
+      encrypted_m_[i * align_s_ + j] =
+          response_.m[phantom_offset * align_s_ + j] - fr_e;
+    }
+  }
+
+  // now we can free the response_.m
+  std::vector<Fr>().swap(response_.m);
+}
+
+Fr Client::GetOtFrE(G1 const& ot_ui) {
+  Fp12 e;
+  G1 ui_exp_a = ot_ui * ot_rand_a_;
+  mcl::bn256::pairing(e, ui_exp_a, ot_peer_pk_);
+  uint8_t buf[32 * 12];
+  auto ret_len = e.serialize(buf, sizeof(buf));
+  if (ret_len != sizeof(buf)) {
+    assert(false);
+    throw std::runtime_error("oops");
+  }
+  return MapToFr(buf, sizeof(buf));
+}
+
+// NOTE: check demand_count, not phantom_count, not align_c
 bool Client::CheckEncryptedM() {
   Tick _tick_(__FUNCTION__);
 
@@ -227,9 +351,8 @@ bool Client::CheckEncryptedM() {
   std::vector<G1> left_g(demands_count_ * 2);
   for (size_t i = 0; i < demands_count_; ++i) {
     auto const& mapping = mappings_[i];
-    G1 const& sigma = sigmas[mapping.global_index];
-    left_g[i] = sigma;
-    left_g[i + demands_count_] = uk0[i];
+    left_g[i] = sigmas[mapping.global_index];
+    left_g[i + demands_count_] = uk0[mapping.phantom_offset];
   }
   std::vector<Fr> left_f(left_g.size());
   for (size_t i = 0; i < demands_count_; ++i) {
@@ -290,17 +413,26 @@ void Client::DecryptM() {
   auto const& k0 = k_[0];
 #pragma omp parallel for
   for (size_t i = 0; i < mappings_.size(); ++i) {
+    auto const& mapping = mappings_[i];
     for (uint64_t j = 0; j < s_; ++j) {
       auto index1 = i * s_ + j;
       auto index2 = i * align_s_ + j;
+      auto index3 = mapping.phantom_offset * align_s_ + j;
       decrypted_m_[index1] =
-          (encrypted_m_[index2] - k0[index2] - secret_.d) * inv_c;
+          (encrypted_m_[index2] - k0[index3] - secret_.d) * inv_c;
     }
   }
 
 #ifdef _DEBUG
   if (!secret_.m.empty()) {
-    assert(decrypted_m_ == secret_.m);
+    for (size_t i = 0; i < mappings_.size(); ++i) {
+      auto const& mapping = mappings_[i];
+      for (uint64_t j = 0; j < s_; ++j) {
+        auto index1 = i * s_ + j;
+        auto index2 = mapping.phantom_offset * s_ + j;
+        assert(decrypted_m_[index1] == secret_.m[index2]);
+      }
+    }
   }
 #endif
 }
@@ -516,77 +648,6 @@ bool Client::CheckEK() {
   return true;
 }
 
-// bool Client::CheckEK() {
-//  Tick _tick_(__FUNCTION__);
-//  if (align_c_ == 1) return true;
-//
-//  auto const& ecc_pub = GetEccPub();
-//  auto const& ek = response_.ek;
-//  auto const& uk = response_.uk;
-//  W w(challenge_);
-//
-//  struct Item {
-//    std::vector<Fr const*> ek1;
-//    std::vector<Fr const*> ek2;
-//    G1 const* uk1;
-//    G1 const* uk2;
-//    G1 const* uk3;
-//  };
-//
-//  std::vector<Item> items;
-//  items.reserve(align_c_ - 1);
-//  for (size_t p = 0; p < log_c_; ++p) {
-//    auto const& ukp = uk[p];
-//    auto const& ekp = ek[p];
-//    auto rows = align_c_ / (1ULL << p);
-//    auto cols = align_s_;
-//    assert(ekp.size() == rows * cols);
-//    for (size_t i = 0; i < rows / 2; ++i) {
-//      items.resize(items.size() + 1);
-//      auto& item = items.back();
-//      item.ek1.resize(align_s_);
-//      item.ek2.resize(align_s_);
-//      for (size_t j = 0; j < align_s_; ++j) {
-//        item.ek1[j] = &ekp[2 * i * cols + j];
-//        item.ek2[j] = &ekp[(2 * i + 1) * cols + j];
-//      }
-//
-//      auto const& ukp_1 = uk[p + 1];
-//      item.uk1 = &ukp_1[i];
-//      item.uk2 = &ukp[2 * i];
-//      item.uk3 = &ukp[2 * i + 1];
-//    }
-//  }
-//  assert(items.size() == align_c_ - 1);
-//
-//  std::atomic<bool> failed{false};
-//  auto f = [&ecc_pub, &failed, &w, this](auto& item) mutable {
-//    if (failed) return;
-//    assert(item.ek1.size() == item.ek2.size());
-//    assert(item.ek1.size() == align_s_);
-//    G1 left_value = G1Zero();
-//    for (size_t j = 0; j < align_s_; ++j) {
-//      Fr wk = w.w1 * (*item.ek1[j]) + w.w2 * (*item.ek2[j]);
-//      left_value += ecc_pub.PowerU1(j, wk);
-//    }
-//
-//    G1 right_value = (*item.uk1) * w.w1_w2;
-//    right_value += (*item.uk2) * w.w1e1_w2e2;
-//    right_value += (*item.uk3) * w.w1e1e1_w2e2e2;
-//    if (left_value != right_value) {
-//      failed.store(true);
-//    }
-//  };
-//
-//#pragma omp parallel for
-//  for (size_t i = 0; i < items.size(); ++i) {
-//    f(items[i]);
-//  }
-//
-//  if (failed) std::cerr << __FUNCTION__ << " failed\n";
-//  return !failed;
-//}
-
 void Client::DecryptK() {
   Tick _tick_(__FUNCTION__);
   k_.resize(log_c_ + 1);
@@ -669,4 +730,4 @@ void Client::DecryptX() {
   }
 #endif
 }
-}  // namespace scheme::table::batch3
+}  // namespace scheme::table::otbatch3

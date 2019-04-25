@@ -40,7 +40,7 @@ void Session::BuildMapping() {
   size_t index = 0;
   for (auto const& p : demands_) {
     for (size_t i = p.start; i < (p.start + p.count); ++i) {
-      mappings_[index++].index_of_m = i;
+      mappings_[index++].global_index = i;
     }
   }
 }
@@ -83,7 +83,7 @@ bool Session::OnRequest(Request request, Response& response) {
   for (int64_t i = 0; i < (int64_t)mappings_.size(); ++i) {
     auto const& map = mappings_[i];
     auto is = i * s_;
-    auto m_is = map.index_of_m * s_;
+    auto m_is = map.global_index * s_;
     for (uint64_t j = 0; j < s_; ++j) {
       auto ij = is + j;
       auto m_ij = m_is + j;

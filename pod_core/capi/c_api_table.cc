@@ -23,6 +23,9 @@
 #include "../scheme_table_otbatch_client.h"
 #include "../scheme_table_otbatch_serialize.h"
 #include "../scheme_table_otbatch_session.h"
+#include "../scheme_table_otbatch3_client.h"
+#include "../scheme_table_otbatch3_serialize.h"
+#include "../scheme_table_otbatch3_session.h"
 #include "../scheme_table_otvrfq_client.h"
 #include "../scheme_table_otvrfq_serialize.h"
 #include "../scheme_table_otvrfq_session.h"
@@ -36,6 +39,7 @@
 #include "scheme_table_batch.inc"
 #include "scheme_table_batch2.inc"
 #include "scheme_table_batch3.inc"
+#include "scheme_table_otbatch3.inc"
 #include "scheme_table_otbatch.inc"
 #include "scheme_table_otvrfq.inc"
 #include "scheme_table_vrfq.inc"
@@ -745,6 +749,349 @@ EXPORT bool E_TableBatch3ClientFree(handle_t h) {
   return DelClient((Client*)h);
 }
 }  // extern "C" batch3
+
+// otbatch3
+extern "C" {
+EXPORT handle_t E_TableOtBatch3SessionNew(handle_t c_a,
+                                          uint8_t const* c_self_id,
+                                          uint8_t const* c_peer_id) {
+  using namespace scheme::table;
+  using namespace scheme::table::otbatch3;
+  APtr a = GetAPtr(c_a);
+  if (!a) return nullptr;
+
+  h256_t self_id;
+  memcpy(self_id.data(), c_self_id, h256_t::size_value);
+  h256_t peer_id;
+  memcpy(peer_id.data(), c_peer_id, h256_t::size_value);
+
+  try {
+    auto p = new Session(a, self_id, peer_id);
+    AddSession(p);
+    return p;
+  } catch (std::exception&) {
+    return nullptr;
+  }
+}
+
+EXPORT bool E_TableOtBatch3SessionGetNegoRequest(handle_t c_session,
+                                                 char const* request_file) {
+  using namespace scheme::table;
+  using namespace scheme::table::otbatch3;
+  SessionPtr session = GetSessionPtr(c_session);
+  if (!session) return false;
+
+  try {
+    NegoARequest request;
+    session->GetNegoReqeust(request);
+    yas::file_ostream os(request_file);
+    yas::binary_oarchive<yas::file_ostream, YasBinF()> oa(os);
+    oa.serialize(request);
+  } catch (std::exception&) {
+    return false;
+  }
+
+  return true;
+}
+
+EXPORT bool E_TableOtBatch3SessionOnNegoRequest(handle_t c_session,
+                                                char const* request_file,
+                                                char const* response_file) {
+  using namespace scheme::table;
+  using namespace scheme::table::otbatch3;
+  SessionPtr session = GetSessionPtr(c_session);
+  if (!session) return false;
+
+  try {
+    NegoBRequest request;
+    yas::file_istream is(request_file);
+    yas::binary_iarchive<yas::file_istream, YasBinF()> ia(is);
+    ia.serialize(request);
+
+    NegoBResponse response;
+    if (!session->OnNegoRequest(request, response)) return false;
+
+    yas::file_ostream os(response_file);
+    yas::binary_oarchive<yas::file_ostream, YasBinF()> oa(os);
+    oa.serialize(response);
+  } catch (std::exception&) {
+    return false;
+  }
+
+  return true;
+}
+
+EXPORT bool E_TableOtBatch3SessionOnNegoResponse(handle_t c_session,
+                                                 char const* response_file) {
+  using namespace scheme::table;
+  using namespace scheme::table::otbatch3;
+  SessionPtr session = GetSessionPtr(c_session);
+  if (!session) return false;
+
+  try {
+    NegoAResponse response;
+    yas::file_istream is(response_file);
+    yas::binary_iarchive<yas::file_istream, YasBinF()> ia(is);
+    ia.serialize(response);
+
+    if (!session->OnNegoResponse(response)) return false;
+  } catch (std::exception&) {
+    return false;
+  }
+
+  return true;
+}
+
+EXPORT bool E_TableOtBatch3SessionOnRequest(handle_t c_session,
+                                            char const* request_file,
+                                            char const* response_file) {
+  using namespace scheme::table;
+  using namespace scheme::table::otbatch3;
+  SessionPtr session = GetSessionPtr(c_session);
+  if (!session) return false;
+
+  try {
+    Request request;
+    yas::file_istream is(request_file);
+    yas::binary_iarchive<yas::file_istream, YasBinF()> ia(is);
+    ia.serialize(request);
+
+    Response response;
+    if (!session->OnRequest(request, response)) return false;
+
+    yas::file_ostream os(response_file);
+    yas::binary_oarchive<yas::file_ostream, YasBinF()> oa(os);
+    oa.serialize(response);
+  } catch (std::exception&) {
+    return false;
+  }
+
+  return true;
+}
+
+EXPORT bool E_TableOtBatch3SessionOnReceipt(handle_t c_session,
+                                            char const* receipt_file,
+                                            char const* secret_file) {
+  using namespace scheme::table;
+  using namespace scheme::table::otbatch3;
+  SessionPtr session = GetSessionPtr(c_session);
+  if (!session) return false;
+
+  try {
+    Receipt receipt;
+    yas::file_istream is(receipt_file);
+    yas::json_iarchive<yas::file_istream> ia(is);
+    ia.serialize(receipt);
+
+    Secret secret;
+    if (!session->OnReceipt(receipt, secret)) return false;
+
+    yas::file_ostream os(secret_file);
+    yas::json_oarchive<yas::file_ostream> oa(os);
+    oa.serialize(secret);
+  } catch (std::exception&) {
+    return false;
+  }
+
+  return true;
+}
+
+EXPORT bool E_TableOtBatch3SessionFree(handle_t h) {
+  using namespace scheme::table::otbatch3;
+  return DelSession((Session*)h);
+}
+
+EXPORT handle_t E_TableOtBatch3ClientNew(handle_t c_b, uint8_t const* c_self_id,
+                                         uint8_t const* c_peer_id,
+                                         range_t const* c_demand,
+                                         uint64_t c_demand_count,
+                                         range_t const* c_phantom,
+                                         uint64_t c_phantom_count) {
+  using namespace scheme::table;
+  using namespace scheme::table::otbatch3;
+  BPtr b = GetBPtr(c_b);
+  if (!b) return nullptr;
+
+  h256_t self_id;
+  memcpy(self_id.data(), c_self_id, h256_t::size_value);
+  h256_t peer_id;
+  memcpy(peer_id.data(), c_peer_id, h256_t::size_value);
+
+  std::vector<Range> demands(c_demand_count);
+  for (uint64_t i = 0; i < c_demand_count; ++i) {
+    demands[i].start = c_demand[i].start;
+    demands[i].count = c_demand[i].count;
+  }
+
+  std::vector<Range> phantoms(c_phantom_count);
+  for (uint64_t i = 0; i < c_phantom_count; ++i) {
+    phantoms[i].start = c_phantom[i].start;
+    phantoms[i].count = c_phantom[i].count;
+  }
+
+  try {
+    auto p = new Client(b, self_id, peer_id, std::move(demands),
+                        std::move(phantoms));
+    AddClient(p);
+    return p;
+  } catch (std::exception&) {
+    return nullptr;
+  }
+}
+
+EXPORT bool E_TableOtBatch3ClientGetNegoRequest(handle_t c_client,
+                                                char const* request_file) {
+  using namespace scheme::table;
+  using namespace scheme::table::otbatch3;
+  ClientPtr client = GetClientPtr(c_client);
+  if (!client) return false;
+
+  try {
+    NegoBRequest request;
+    client->GetNegoReqeust(request);
+    yas::file_ostream os(request_file);
+    yas::binary_oarchive<yas::file_ostream, YasBinF()> oa(os);
+    oa.serialize(request);
+  } catch (std::exception&) {
+    return false;
+  }
+
+  return true;
+}
+
+EXPORT bool E_TableOtBatch3ClientOnNegoRequest(handle_t c_client,
+                                               char const* request_file,
+                                               char const* response_file) {
+  using namespace scheme::table;
+  using namespace scheme::table::otbatch3;
+  ClientPtr client = GetClientPtr(c_client);
+  if (!client) return false;
+
+  try {
+    NegoARequest request;
+    yas::file_istream is(request_file);
+    yas::binary_iarchive<yas::file_istream, YasBinF()> ia(is);
+    ia.serialize(request);
+
+    NegoAResponse response;
+    if (!client->OnNegoRequest(request, response)) return false;
+
+    yas::file_ostream os(response_file);
+    yas::binary_oarchive<yas::file_ostream, YasBinF()> oa(os);
+    oa.serialize(response);
+  } catch (std::exception&) {
+    return false;
+  }
+
+  return true;
+}
+
+EXPORT bool E_TableOtBatch3ClientOnNegoResponse(handle_t c_client,
+                                                char const* response_file) {
+  using namespace scheme::table;
+  using namespace scheme::table::otbatch3;
+  ClientPtr client = GetClientPtr(c_client);
+  if (!client) return false;
+
+  try {
+    NegoBResponse response;
+    yas::file_istream is(response_file);
+    yas::binary_iarchive<yas::file_istream, YasBinF()> ia(is);
+    ia.serialize(response);
+    return client->OnNegoResponse(response);
+  } catch (std::exception&) {
+    return false;
+  }
+
+  return true;
+}
+
+EXPORT bool E_TableOtBatch3ClientGetRequest(handle_t c_client,
+                                            char const* request_file) {
+  using namespace scheme::table;
+  using namespace scheme::table::otbatch3;
+  ClientPtr client = GetClientPtr(c_client);
+  if (!client) return false;
+
+  try {
+    Request request;
+    client->GetRequest(request);
+    yas::file_ostream os(request_file);
+    yas::binary_oarchive<yas::file_ostream, YasBinF()> oa(os);
+    oa.serialize(request);
+  } catch (std::exception&) {
+    return false;
+  }
+
+  return true;
+}
+
+EXPORT bool E_TableOtBatch3ClientOnResponse(handle_t c_client,
+                                            char const* response_file,
+                                            char const* receipt_file) {
+  using namespace scheme::table;
+  using namespace scheme::table::otbatch3;
+  ClientPtr client = GetClientPtr(c_client);
+  if (!client) return false;
+
+  try {
+    Response response;
+    yas::file_istream is(response_file);
+    yas::binary_iarchive<yas::file_istream, YasBinF()> ia(is);
+    ia.serialize(response);
+
+    Receipt receipt;
+    if (!client->OnResponse(std::move(response), receipt)) return false;
+
+    yas::file_ostream os(receipt_file);
+    yas::json_oarchive<yas::file_ostream> oa(os);
+    oa.serialize(receipt);
+  } catch (std::exception&) {
+    return false;
+  }
+
+  return true;
+}
+
+EXPORT bool E_TableOtBatch3ClientOnSecret(handle_t c_client,
+                                          char const* secret_file) {
+  using namespace scheme::table;
+  using namespace scheme::table::otbatch3;
+  ClientPtr client = GetClientPtr(c_client);
+  if (!client) return false;
+
+  try {
+    Secret secret;
+    yas::file_istream is(secret_file);
+    yas::json_iarchive<yas::file_istream> ia(is);
+    ia.serialize(secret);
+    return client->OnSecret(secret);
+  } catch (std::exception&) {
+    return false;
+  }
+
+  return true;
+}
+
+EXPORT bool E_TableOtBatch3ClientSaveDecrypted(handle_t c_client,
+                                               char const* file) {
+  using namespace scheme::table;
+  using namespace scheme::table::otbatch3;
+  ClientPtr client = GetClientPtr(c_client);
+  if (!client) return false;
+
+  try {
+    return client->SaveDecrypted(file);
+  } catch (std::exception&) {
+    return false;
+  }
+}
+
+EXPORT bool E_TableOtBatch3ClientFree(handle_t h) {
+  using namespace scheme::table::otbatch3;
+  return DelClient((Client*)h);
+}
+}  // extern "C" otbatch3
 
 // otbatch
 extern "C" {

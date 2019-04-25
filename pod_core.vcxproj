@@ -110,6 +110,7 @@
     <ClCompile Include="pod_core\capi\c_api_plain.cc" />
     <ClCompile Include="pod_core\capi\c_api_table.cc" />
     <ClCompile Include="pod_core\capi\scheme_plain_batch3_test_capi.cc" />
+    <ClCompile Include="pod_core\capi\scheme_plain_otbatch3_test_capi.cc" />
     <ClCompile Include="pod_core\capi\scheme_plain_otrange_test_capi.cc" />
     <ClCompile Include="pod_core\capi\scheme_plain_range_test_capi.cc" />
     <ClCompile Include="pod_core\capi\scheme_table_batch2_test_capi.cc" />
@@ -127,6 +128,11 @@
     <ClCompile Include="pod_core\scheme_plain_batch3_notary.cc" />
     <ClCompile Include="pod_core\scheme_plain_batch3_session.cc" />
     <ClCompile Include="pod_core\scheme_plain_batch3_test.cc" />
+    <ClCompile Include="pod_core\scheme_plain_otbatch3_client.cc" />
+    <ClCompile Include="pod_core\scheme_plain_otbatch3_misc.cc" />
+    <ClCompile Include="pod_core\scheme_plain_otbatch3_notary.cc" />
+    <ClCompile Include="pod_core\scheme_plain_otbatch3_session.cc" />
+    <ClCompile Include="pod_core\scheme_plain_otbatch3_test.cc" />
     <ClCompile Include="pod_core\scheme_plain_otrange_client.cc" />
     <ClCompile Include="pod_core\scheme_plain_otrange_session.cc" />
     <ClCompile Include="pod_core\scheme_plain_otrange_test.cc" />
@@ -180,6 +186,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="pod_core\capi\scheme_plain_batch3_test_capi.h" />
+    <ClInclude Include="pod_core\capi\scheme_plain_otbatch3_test_capi.h" />
     <ClInclude Include="pod_core\capi\scheme_table_batch3_test_capi.h" />
     <ClInclude Include="pod_core\capi\scheme_table_otbatch3_test_capi.h" />
     <ClInclude Include="pod_core\matrix_fr_serialize.h" />
@@ -191,6 +198,13 @@
     <ClInclude Include="pod_core\scheme_plain_batch3_session.h" />
     <ClInclude Include="pod_core\scheme_plain_batch3_test.h" />
     <ClInclude Include="pod_core\scheme_plain_batch_protocol.h" />
+    <ClInclude Include="pod_core\scheme_plain_otbatch3_client.h" />
+    <ClInclude Include="pod_core\scheme_plain_otbatch3_misc.h" />
+    <ClInclude Include="pod_core\scheme_plain_otbatch3_notary.h" />
+    <ClInclude Include="pod_core\scheme_plain_otbatch3_protocol.h" />
+    <ClInclude Include="pod_core\scheme_plain_otbatch3_serialize.h" />
+    <ClInclude Include="pod_core\scheme_plain_otbatch3_session.h" />
+    <ClInclude Include="pod_core\scheme_plain_otbatch3_test.h" />
     <ClInclude Include="pod_core\scheme_plain_otbatch_protocol.h" />
     <ClInclude Include="pod_core\scheme_plain_otrange_protocol.h" />
     <ClInclude Include="pod_core\scheme_plain_otrange_notary.h" />
@@ -343,6 +357,7 @@
   <ItemGroup>
     <None Include="pod_core\capi\scheme_plain.inc" />
     <None Include="pod_core\capi\scheme_plain_batch3.inc" />
+    <None Include="pod_core\capi\scheme_plain_otbatch3.inc" />
     <None Include="pod_core\capi\scheme_plain_otrange.inc" />
     <None Include="pod_core\capi\scheme_plain_range.inc" />
     <None Include="pod_core\capi\scheme_table.inc" />

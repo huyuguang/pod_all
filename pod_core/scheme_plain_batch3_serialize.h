@@ -8,19 +8,19 @@ namespace scheme::plain::batch3 {
 // save to bin
 template <typename Ar>
 void serialize(Ar &ar, Request const &t) {
-  ar &YAS_OBJECT_NVP("spb3::Request", ("d", t.demands));
+  ar &YAS_OBJECT_NVP("Request", ("d", t.demands));
 }
 
 // load from bin
 template <typename Ar>
 void serialize(Ar &ar, Request &t) {
-  ar &YAS_OBJECT_NVP("spb3::Request", ("d", t.demands));
+  ar &YAS_OBJECT_NVP("Request", ("d", t.demands));
 }
 
 // save to bin
 template <typename Ar>
 void serialize(Ar &ar, Response const &t) {
-  ar &YAS_OBJECT_NVP("spb3::Response", ("uk", t.uk), ("ux0", t.ux0),
+  ar &YAS_OBJECT_NVP("Response", ("uk", t.uk), ("ux0", t.ux0),
                      ("u0x", t.u0x), ("g2x0", t.g2x0), ("ud", t.ud),
                      ("g2d", t.g2d), ("m", t.m), ("ek", t.ek), ("ex", t.ex));
 }
@@ -28,7 +28,7 @@ void serialize(Ar &ar, Response const &t) {
 // load from bin
 template <typename Ar>
 void serialize(Ar &ar, Response &t) {
-  ar &YAS_OBJECT_NVP("spb3::Response", ("uk", t.uk), ("ux0", t.ux0),
+  ar &YAS_OBJECT_NVP("Response", ("uk", t.uk), ("ux0", t.ux0),
                      ("u0x", t.u0x), ("g2x0", t.g2x0), ("ud", t.ud),
                      ("g2d", t.g2d), ("m", t.m), ("ek", t.ek), ("ex", t.ex));
 }
@@ -36,14 +36,14 @@ void serialize(Ar &ar, Response &t) {
 // save to json
 template <typename Ar>
 void serialize(Ar &ar, Receipt const &t) {
-  ar &YAS_OBJECT_NVP("spb3::Receipt", ("u0_x0_lgs", t.u0_x0_lgs),
+  ar &YAS_OBJECT_NVP("Receipt", ("u0_x0_lgs", t.u0_x0_lgs),
                      ("u0d", t.u0d));
 }
 
 // load from json
 template <typename Ar>
 void serialize(Ar &ar, Receipt &t) {
-  ar &YAS_OBJECT_NVP("spb3::Receipt", ("u0_x0_lgs", t.u0_x0_lgs),
+  ar &YAS_OBJECT_NVP("Receipt", ("u0_x0_lgs", t.u0_x0_lgs),
                      ("u0d", t.u0d));
 }
 
@@ -51,10 +51,10 @@ void serialize(Ar &ar, Receipt &t) {
 template <typename Ar>
 void serialize(Ar &ar, Secret const &t) {
 //#ifdef _DEBUG
-//  ar &YAS_OBJECT_NVP("spb3::Secret", ("x0_lgs", t.x0_lgs), ("d", t.d),
+//  ar &YAS_OBJECT_NVP("Secret", ("x0_lgs", t.x0_lgs), ("d", t.d),
 //                     ("k", t.k), ("m", t.m), ("x", t.x));
 //#else
-  ar &YAS_OBJECT_NVP("spb3::Secret", ("x0_lgs", t.x0_lgs), ("d", t.d));
+  ar &YAS_OBJECT_NVP("Secret", ("x0_lgs", t.x0_lgs), ("d", t.d));
 //#endif
 }
 
@@ -62,10 +62,10 @@ void serialize(Ar &ar, Secret const &t) {
 template <typename Ar>
 void serialize(Ar &ar, Secret &t) {
 //#ifdef _DEBUG
-//  ar &YAS_OBJECT_NVP("spb3::Secret", ("x0_lgs", t.x0_lgs), ("d", t.d),
+//  ar &YAS_OBJECT_NVP("Secret", ("x0_lgs", t.x0_lgs), ("d", t.d),
 //                     ("k", t.k), ("m", t.m), ("x", t.x));
 //#else
-  ar &YAS_OBJECT_NVP("spb3::Secret", ("x0_lgs", t.x0_lgs), ("d", t.d));
+  ar &YAS_OBJECT_NVP("Secret", ("x0_lgs", t.x0_lgs), ("d", t.d));
 //#endif
 }
 }  // namespace scheme::plain::batch3

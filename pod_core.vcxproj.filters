@@ -95,6 +95,12 @@
     <Filter Include="capi\table_otbatch3">
       <UniqueIdentifier>{07eb92a8-56be-43cb-86f6-be649b4781e4}</UniqueIdentifier>
     </Filter>
+    <Filter Include="local\plain_otbatch3">
+      <UniqueIdentifier>{017792e9-55bd-4a96-948a-124a94429d65}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="capi\plain_otbatch3">
+      <UniqueIdentifier>{0d7d869f-e2be-48f3-9bdb-3da0f3b4d735}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pod_core\main.cc">
@@ -309,6 +315,24 @@
     </ClCompile>
     <ClCompile Include="pod_core\scheme_table_otbatch3_test.cc">
       <Filter>local\table_otbatch3</Filter>
+    </ClCompile>
+    <ClCompile Include="pod_core\scheme_plain_otbatch3_client.cc">
+      <Filter>local\plain_otbatch3</Filter>
+    </ClCompile>
+    <ClCompile Include="pod_core\scheme_plain_otbatch3_misc.cc">
+      <Filter>local\plain_otbatch3</Filter>
+    </ClCompile>
+    <ClCompile Include="pod_core\scheme_plain_otbatch3_notary.cc">
+      <Filter>local\plain_otbatch3</Filter>
+    </ClCompile>
+    <ClCompile Include="pod_core\scheme_plain_otbatch3_session.cc">
+      <Filter>local\plain_otbatch3</Filter>
+    </ClCompile>
+    <ClCompile Include="pod_core\scheme_plain_otbatch3_test.cc">
+      <Filter>local\plain_otbatch3</Filter>
+    </ClCompile>
+    <ClCompile Include="pod_core\capi\scheme_plain_otbatch3_test_capi.cc">
+      <Filter>capi\plain_otbatch3</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -792,6 +816,30 @@
     <ClInclude Include="pod_core\scheme_table_otbatch3_test.h">
       <Filter>local\table_otbatch3</Filter>
     </ClInclude>
+    <ClInclude Include="pod_core\scheme_plain_otbatch3_client.h">
+      <Filter>local\plain_otbatch3</Filter>
+    </ClInclude>
+    <ClInclude Include="pod_core\scheme_plain_otbatch3_misc.h">
+      <Filter>local\plain_otbatch3</Filter>
+    </ClInclude>
+    <ClInclude Include="pod_core\scheme_plain_otbatch3_notary.h">
+      <Filter>local\plain_otbatch3</Filter>
+    </ClInclude>
+    <ClInclude Include="pod_core\scheme_plain_otbatch3_protocol.h">
+      <Filter>local\plain_otbatch3</Filter>
+    </ClInclude>
+    <ClInclude Include="pod_core\scheme_plain_otbatch3_serialize.h">
+      <Filter>local\plain_otbatch3</Filter>
+    </ClInclude>
+    <ClInclude Include="pod_core\scheme_plain_otbatch3_session.h">
+      <Filter>local\plain_otbatch3</Filter>
+    </ClInclude>
+    <ClInclude Include="pod_core\scheme_plain_otbatch3_test.h">
+      <Filter>local\plain_otbatch3</Filter>
+    </ClInclude>
+    <ClInclude Include="pod_core\capi\scheme_plain_otbatch3_test_capi.h">
+      <Filter>capi\plain_otbatch3</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="pod_core\README.md" />
@@ -831,6 +879,9 @@
     </None>
     <None Include="pod_core\capi\scheme_table_otbatch3.inc">
       <Filter>capi\table_otbatch3</Filter>
+    </None>
+    <None Include="pod_core\capi\scheme_plain_otbatch3.inc">
+      <Filter>capi\plain_otbatch3</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

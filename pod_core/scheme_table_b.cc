@@ -1,5 +1,6 @@
 #include "scheme_table_b.h"
 #include "misc.h"
+#include "scheme_table.h"
 
 namespace scheme::table {
 
@@ -102,4 +103,11 @@ void B::LoadData() {
   }
 }
 
+bool B::SaveDecryped(std::string const& file, std::vector<Range> const& demands,
+                  std::vector<Fr> const& decrypted) {
+  Tick _tick_(__FUNCTION__);
+
+  return DecryptedRangeMToFile(file, bulletin_.s, vrf_meta_, demands,
+                               decrypted);
+}
 }  // namespace scheme::table

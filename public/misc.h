@@ -2,6 +2,7 @@
 
 #include "public.h"
 #include "mpz.h"
+#include "basic_types.h"
 
 namespace misc {
 inline std::string HexToStr(void const* p, size_t len) {

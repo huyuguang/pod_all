@@ -74,7 +74,10 @@ void DumpPositions(std::string const& query_key,
 bool Test(APtr a, BPtr b, std::string const& query_key,
           std::vector<std::string> const& query_values) {
   auto vrf_key = GetKeyMetaByName(b->vrf_meta(), query_key);
-  if (!vrf_key) return false;
+  if (!vrf_key) {
+    std::cerr << "query_key: " << query_key << " not exist\n";
+    return false;
+  }
   bool unique = vrf_key->unique;
 
   if (unique) {

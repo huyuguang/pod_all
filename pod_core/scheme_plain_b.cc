@@ -1,5 +1,6 @@
 #include "scheme_plain_b.h"
 #include "misc.h"
+#include "scheme_plain.h"
 
 namespace scheme::plain {
 B::B(Bulletin const& bulletin, std::string const& public_path)
@@ -59,4 +60,22 @@ void B::LoadData() {
   }
 }
 
+bool B::SaveDecryped(std::string const& file, std::vector<Range> const& demands,
+                     std::vector<Fr> const& decrypted) {
+  Tick _tick_(__FUNCTION__);
+  std::vector<Fr>::const_iterator m_begin = decrypted.begin();
+  std::vector<Fr>::const_iterator m_end;
+  for (auto const& demand : demands) {
+    std::string range_file = file + "_" + std::to_string(demand.start) + "_" +
+                             std::to_string(demand.count);
+    m_end = m_begin + demand.count * bulletin_.s;
+    if (!DecryptedRangeMToFile(range_file, bulletin_.size, bulletin_.s,
+                               demand.start, demand.count, m_begin, m_end)) {
+      assert(false);
+      return false;
+    }
+    m_begin = m_end;
+  }
+  return true;
+}
 }  // namespace scheme::plain

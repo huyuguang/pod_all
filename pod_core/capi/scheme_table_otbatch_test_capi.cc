@@ -4,8 +4,8 @@
 #include <iostream>
 #include <memory>
 
-#include "../scheme_table_otbatch_notary.h"
-#include "../scheme_table_otbatch_serialize.h"
+#include "../scheme_otbatch_notary.h"
+#include "../scheme_otbatch_serialize.h"
 #include "c_api.h"
 #include "tick.h"
 
@@ -197,6 +197,10 @@ bool Test(std::string const& output_path, WrapperA const& a, WrapperB const& b,
       assert(false);
       return false;
     }
+
+    using scheme::otbatch::Claim;
+    using scheme::otbatch::Receipt;
+    using scheme::otbatch::Secret;
 
     Claim claim;
     try {

@@ -16,7 +16,8 @@ class B {
   B(std::string const& bulletin_file, std::string const& public_path);
   Bulletin const& bulletin() const { return bulletin_; }
   std::vector<G1> sigmas() const { return sigmas_; }
-
+  bool SaveDecryped(std::string const& file, std::vector<Range> const& demands,
+                    std::vector<Fr> const& decrypted);
  private:
   void LoadData();
   bool NeedVerify();

@@ -4,8 +4,6 @@
 #include <iostream>
 #include <memory>
 
-#include "../scheme_table_otbatch3_notary.h"
-#include "../scheme_table_otbatch3_serialize.h"
 #include "c_api.h"
 #include "tick.h"
 

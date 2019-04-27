@@ -335,6 +335,94 @@ h256_t CalcSeed2(h256_t const& seed, h256_t const& k_mkl_root) {
   hash.Final(ret.data());
   return ret;
 }
+
+bool CheckDemandPhantoms(uint64_t n, std::vector<Range> const& demands,
+                         std::vector<Range> const& phantoms) {
+  if (demands.empty() || phantoms.empty()) return false;
+
+  for (auto const& demand : demands) {
+    if (!demand.count || demand.start >= n || demand.count > n ||
+        (demand.start + demand.count) > n)
+      return false;
+  }
+
+  for (auto const& phantom : phantoms) {
+    if (!phantom.count || phantom.start >= n || phantom.count > n ||
+        (phantom.start + phantom.count) > n)
+      return false;
+  }
+
+  for (size_t i = 1; i < demands.size(); ++i) {
+    if (demands[i].start <= demands[i - 1].start + demands[i - 1].count)
+      return false;
+  }
+
+  for (size_t i = 1; i < phantoms.size(); ++i) {
+    if (phantoms[i].start <= phantoms[i - 1].start + phantoms[i - 1].count)
+      return false;
+  }
+
+  for (size_t i = 0; i < demands.size(); ++i) {
+    auto d_start = demands[i].start;
+    auto d_end = d_start + demands[i].count;
+    bool find = false;
+    for (size_t j = 0; j < phantoms.size(); ++j) {
+      auto p_start = phantoms[j].start;
+      auto p_end = p_start + phantoms[j].count;
+      if (p_start <= d_start && p_end >= d_end) {
+        find = true;
+        break;
+      }
+    }
+    if (!find) return false;
+  }
+  return true;
+}
+
+uint64_t GetRangesOffsetByIndexOfM(std::vector<Range> const& ranges,
+                                   uint64_t index) {
+  uint64_t offset = 0;
+  for (auto const& range : ranges) {
+    if (index >= range.start && index < (range.start + range.count)) {
+      offset += index - range.start;
+      return offset;
+    }
+    offset += range.count;
+  }
+  assert(false);
+  throw std::runtime_error(__FUNCTION__);
+}
+
+bool CheckPhantoms(uint64_t n, std::vector<Range> const& phantoms) {
+  for (auto const& phantom : phantoms) {
+    if (!phantom.count || phantom.start >= n || phantom.count > n ||
+        (phantom.start + phantom.count) > n)
+      return false;
+  }
+
+  for (size_t i = 1; i < phantoms.size(); ++i) {
+    if (phantoms[i].start <= phantoms[i - 1].start + phantoms[i - 1].count)
+      return false;
+  }
+  return true;
+}
+
+bool CheckDemands(uint64_t n, std::vector<Range> const& demands) {
+  if (demands.empty()) return false;
+
+  for (auto const& demand : demands) {
+    if (!demand.count || demand.start >= n || demand.count > n ||
+        (demand.start + demand.count) > n) {
+      return false;
+    }
+  }
+
+  for (size_t i = 1; i < demands.size(); ++i) {
+    if (demands[i].start <= demands[i - 1].start + demands[i - 1].count)
+      return false;
+  }
+  return true;
+}
 }  // namespace scheme
 
 namespace std {
@@ -365,11 +453,7 @@ std::ostream& operator<<(std::ostream& os, scheme::Mode const& t) {
 std::istream& operator>>(std::istream& in, scheme::Action& t) {
   std::string token;
   in >> token;
-  if (token == "range_pod") {
-    t = scheme::Action::kRangePod;
-  } else if (token == "ot_range_pod") {
-    t = scheme::Action::kOtRangePod;
-  } else if (token == "vrf_query") {
+  if (token == "vrf_query") {
     t = scheme::Action::kVrfQuery;
   } else if (token == "ot_vrf_query") {
     t = scheme::Action::kOtVrfQuery;
@@ -394,11 +478,7 @@ std::istream& operator>>(std::istream& in, scheme::Action& t) {
 }
 
 std::ostream& operator<<(std::ostream& os, scheme::Action const& t) {
-  if (t == scheme::Action::kRangePod) {
-    os << "range_pod";
-  } else if (t == scheme::Action::kOtRangePod) {
-    os << "ot_range_pod";
-  } else if (t == scheme::Action::kVrfQuery) {
+  if (t == scheme::Action::kVrfQuery) {
     os << "vrf_query";
   } else if (t == scheme::Action::kOtVrfQuery) {
     os << "ot_vrf_query";

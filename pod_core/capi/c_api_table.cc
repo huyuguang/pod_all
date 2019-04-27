@@ -11,38 +11,37 @@
 #include "../../public/scheme_table.h"
 #include "../scheme_table_a.h"
 #include "../scheme_table_b.h"
-#include "../scheme_table_batch2_client.h"
-#include "../scheme_table_batch2_serialize.h"
-#include "../scheme_table_batch2_session.h"
-#include "../scheme_table_batch3_client.h"
-#include "../scheme_table_batch3_serialize.h"
-#include "../scheme_table_batch3_session.h"
-#include "../scheme_table_batch_client.h"
-#include "../scheme_table_batch_serialize.h"
-#include "../scheme_table_batch_session.h"
-#include "../scheme_table_otbatch_client.h"
-#include "../scheme_table_otbatch_serialize.h"
-#include "../scheme_table_otbatch_session.h"
-#include "../scheme_table_otbatch3_client.h"
-#include "../scheme_table_otbatch3_serialize.h"
-#include "../scheme_table_otbatch3_session.h"
 #include "../scheme_table_otvrfq_client.h"
 #include "../scheme_table_otvrfq_serialize.h"
 #include "../scheme_table_otvrfq_session.h"
 #include "../scheme_table_vrfq_client.h"
 #include "../scheme_table_vrfq_serialize.h"
 #include "../scheme_table_vrfq_session.h"
+
+#include "../scheme_otbatch3_client.h"
+#include "../scheme_otbatch3_serialize.h"
+#include "../scheme_otbatch3_session.h"
+
+#include "../scheme_batch3_client.h"
+#include "../scheme_batch3_serialize.h"
+#include "../scheme_batch3_session.h"
+
+#include "../scheme_batch2_client.h"
+#include "../scheme_batch2_serialize.h"
+#include "../scheme_batch2_session.h"
+
+#include "../scheme_batch_client.h"
+#include "../scheme_batch_serialize.h"
+#include "../scheme_batch_session.h"
+
+#include "../scheme_otbatch_client.h"
+#include "../scheme_otbatch_serialize.h"
+#include "../scheme_otbatch_session.h"
+
 #include "ecc.h"
 #include "ecc_pub.h"
 
-#include "scheme_table.inc"
-#include "scheme_table_batch.inc"
-#include "scheme_table_batch2.inc"
-#include "scheme_table_batch3.inc"
-#include "scheme_table_otbatch3.inc"
-#include "scheme_table_otbatch.inc"
-#include "scheme_table_otvrfq.inc"
-#include "scheme_table_vrfq.inc"
+#include "c_api_object.h"
 
 extern "C" {
 
@@ -50,7 +49,7 @@ EXPORT handle_t E_TableANew(char const* publish_path) {
   using namespace scheme::table;
   try {
     auto p = new A(publish_path);
-    AddA(p);
+    CapiObject<A>::Add(p);
     return p;
   } catch (std::exception&) {
     return nullptr;
@@ -62,7 +61,7 @@ EXPORT handle_t E_TableBNew(char const* bulletin_file,
   using namespace scheme::table;
   try {
     auto p = new B(bulletin_file, public_path);
-    AddB(p);
+    CapiObject<B>::Add(p);
     return p;
   } catch (std::exception&) {
     return nullptr;
@@ -71,7 +70,7 @@ EXPORT handle_t E_TableBNew(char const* bulletin_file,
 
 EXPORT bool E_TableABulletin(handle_t h, table_bulletin_t* bulletin) {
   using namespace scheme::table;
-  APtr a = GetAPtr(h);
+  APtr a = CapiObject<A>::Get(h);
   if (!a) return false;
   Bulletin const& v = a->bulletin();
   bulletin->n = v.n;
@@ -83,7 +82,7 @@ EXPORT bool E_TableABulletin(handle_t h, table_bulletin_t* bulletin) {
 
 EXPORT bool E_TableBBulletin(handle_t h, table_bulletin_t* bulletin) {
   using namespace scheme::table;
-  BPtr b = GetBPtr(h);
+  BPtr b = CapiObject<B>::Get(h);
   if (!b) return false;
   Bulletin const& v = b->bulletin();
   bulletin->n = v.n;
@@ -96,7 +95,7 @@ EXPORT bool E_TableBBulletin(handle_t h, table_bulletin_t* bulletin) {
 EXPORT bool E_TableBIsKeyUnique(handle_t h, char const* query_key,
                                 bool* unique) {
   using namespace scheme::table;
-  BPtr b = GetBPtr(h);
+  BPtr b = CapiObject<B>::Get(h);
   if (!b) return false;
   auto vrf_key = GetKeyMetaByName(b->vrf_meta(), query_key);
   if (!vrf_key) return false;
@@ -106,12 +105,12 @@ EXPORT bool E_TableBIsKeyUnique(handle_t h, char const* query_key,
 
 EXPORT bool E_TableAFree(handle_t h) {
   using namespace scheme::table;
-  return DelA((A*)h);
+  return CapiObject<A>::Del(h);
 }
 
 EXPORT bool E_TableBFree(handle_t h) {
   using namespace scheme::table;
-  return DelB((B*)h);
+  return CapiObject<B>::Del(h);
 }
 
 }  // extern "C"
@@ -121,8 +120,8 @@ extern "C" {
 EXPORT handle_t E_TableBatchSessionNew(handle_t c_a, uint8_t const* c_self_id,
                                        uint8_t const* c_peer_id) {
   using namespace scheme::table;
-  using namespace scheme::table::batch;
-  APtr a = GetAPtr(c_a);
+  using namespace scheme::batch;
+  APtr a = CapiObject<A>::Get(c_a);
   if (!a) return nullptr;
 
   h256_t self_id;
@@ -131,8 +130,8 @@ EXPORT handle_t E_TableBatchSessionNew(handle_t c_a, uint8_t const* c_self_id,
   memcpy(peer_id.data(), c_peer_id, h256_t::size_value);
 
   try {
-    auto p = new Session(a, self_id, peer_id);
-    AddSession(p);
+    auto p = new Session<A>(a, self_id, peer_id);
+    CapiObject<Session<A>>::Add(p);
     return p;
   } catch (std::exception&) {
     return nullptr;
@@ -143,8 +142,8 @@ EXPORT bool E_TableBatchSessionOnRequest(handle_t c_session,
                                          char const* request_file,
                                          char const* response_file) {
   using namespace scheme::table;
-  using namespace scheme::table::batch;
-  SessionPtr session = GetSessionPtr(c_session);
+  using namespace scheme::batch;
+  auto session = CapiObject<Session<A>>::Get(c_session);
   if (!session) return false;
 
   try {
@@ -170,8 +169,8 @@ EXPORT bool E_TableBatchSessionOnReceipt(handle_t c_session,
                                          char const* receipt_file,
                                          char const* secret_file) {
   using namespace scheme::table;
-  using namespace scheme::table::batch;
-  SessionPtr session = GetSessionPtr(c_session);
+  using namespace scheme::batch;
+  auto session = CapiObject<Session<A>>::Get(c_session);
   if (!session) return false;
 
   try {
@@ -195,16 +194,17 @@ EXPORT bool E_TableBatchSessionOnReceipt(handle_t c_session,
 
 EXPORT bool E_TableBatchSessionSetEvil(handle_t c_session) {
   using namespace scheme::table;
-  using namespace scheme::table::batch;
-  SessionPtr session = GetSessionPtr(c_session);
+  using namespace scheme::batch;
+  auto session = CapiObject<Session<A>>::Get(c_session);
   if (!session) return false;
   session->TestSetEvil();
   return true;
 }
 
 EXPORT bool E_TableBatchSessionFree(handle_t h) {
-  using namespace scheme::table::batch;
-  return DelSession((Session*)h);
+  using namespace scheme::table;
+  using namespace scheme::batch;
+  return CapiObject<Session<A>>::Del(h);
 }
 
 EXPORT handle_t E_TableBatchClientNew(handle_t c_b, uint8_t const* c_self_id,
@@ -212,8 +212,8 @@ EXPORT handle_t E_TableBatchClientNew(handle_t c_b, uint8_t const* c_self_id,
                                       range_t const* c_demand,
                                       uint64_t c_demand_count) {
   using namespace scheme::table;
-  using namespace scheme::table::batch;
-  BPtr b = GetBPtr(c_b);
+  using namespace scheme::batch;
+  BPtr b = CapiObject<B>::Get(c_b);
   if (!b) return nullptr;
 
   h256_t self_id;
@@ -228,8 +228,8 @@ EXPORT handle_t E_TableBatchClientNew(handle_t c_b, uint8_t const* c_self_id,
   }
 
   try {
-    auto p = new Client(b, self_id, peer_id, std::move(demands));
-    AddClient(p);
+    auto p = new Client<B>(b, self_id, peer_id, std::move(demands));
+    CapiObject<Client<B>>::Add(p);
     return p;
   } catch (std::exception&) {
     return nullptr;
@@ -239,8 +239,8 @@ EXPORT handle_t E_TableBatchClientNew(handle_t c_b, uint8_t const* c_self_id,
 EXPORT bool E_TableBatchClientGetRequest(handle_t c_client,
                                          char const* request_file) {
   using namespace scheme::table;
-  using namespace scheme::table::batch;
-  ClientPtr client = GetClientPtr(c_client);
+  using namespace scheme::batch;
+  auto client = CapiObject<Client<B>>::Get(c_client);
   if (!client) return false;
 
   try {
@@ -260,8 +260,8 @@ EXPORT bool E_TableBatchClientOnResponse(handle_t c_client,
                                          char const* response_file,
                                          char const* receipt_file) {
   using namespace scheme::table;
-  using namespace scheme::table::batch;
-  ClientPtr client = GetClientPtr(c_client);
+  using namespace scheme::batch;
+  auto client = CapiObject<Client<B>>::Get(c_client);
   if (!client) return false;
 
   try {
@@ -286,8 +286,8 @@ EXPORT bool E_TableBatchClientOnResponse(handle_t c_client,
 EXPORT bool E_TableBatchClientOnSecret(handle_t c_client,
                                        char const* secret_file) {
   using namespace scheme::table;
-  using namespace scheme::table::batch;
-  ClientPtr client = GetClientPtr(c_client);
+  using namespace scheme::batch;
+  auto client = CapiObject<Client<B>>::Get(c_client);
   if (!client) return false;
 
   try {
@@ -306,8 +306,8 @@ EXPORT bool E_TableBatchClientOnSecret(handle_t c_client,
 EXPORT bool E_TableBatchClientGenerateClaim(handle_t c_client,
                                             char const* claim_file) {
   using namespace scheme::table;
-  using namespace scheme::table::batch;
-  ClientPtr client = GetClientPtr(c_client);
+  using namespace scheme::batch;
+  auto client = CapiObject<Client<B>>::Get(c_client);
   if (!client) return false;
 
   try {
@@ -327,8 +327,8 @@ EXPORT bool E_TableBatchClientGenerateClaim(handle_t c_client,
 EXPORT bool E_TableBatchClientSaveDecrypted(handle_t c_client,
                                             char const* file) {
   using namespace scheme::table;
-  using namespace scheme::table::batch;
-  ClientPtr client = GetClientPtr(c_client);
+  using namespace scheme::batch;
+  auto client = CapiObject<Client<B>>::Get(c_client);
   if (!client) return false;
 
   try {
@@ -339,8 +339,9 @@ EXPORT bool E_TableBatchClientSaveDecrypted(handle_t c_client,
 }
 
 EXPORT bool E_TableBatchClientFree(handle_t h) {
-  using namespace scheme::table::batch;
-  return DelClient((Client*)h);
+  using namespace scheme::table;
+  using namespace scheme::batch;
+  return CapiObject<Client<B>>::Del(h);
 }
 }  // extern "C" batch
 
@@ -349,8 +350,8 @@ extern "C" {
 EXPORT handle_t E_TableBatch2SessionNew(handle_t c_a, uint8_t const* c_self_id,
                                         uint8_t const* c_peer_id) {
   using namespace scheme::table;
-  using namespace scheme::table::batch2;
-  APtr a = GetAPtr(c_a);
+  using namespace scheme::batch2;
+  APtr a = CapiObject<A>::Get(c_a);
   if (!a) return nullptr;
 
   h256_t self_id;
@@ -359,8 +360,8 @@ EXPORT handle_t E_TableBatch2SessionNew(handle_t c_a, uint8_t const* c_self_id,
   memcpy(peer_id.data(), c_peer_id, h256_t::size_value);
 
   try {
-    auto p = new Session(a, self_id, peer_id);
-    AddSession(p);
+    auto p = new Session<A>(a, self_id, peer_id);
+    CapiObject<Session<A>>::Add(p);
     return p;
   } catch (std::exception&) {
     return nullptr;
@@ -371,8 +372,8 @@ EXPORT bool E_TableBatch2SessionOnRequest(handle_t c_session,
                                           char const* request_file,
                                           char const* response_file) {
   using namespace scheme::table;
-  using namespace scheme::table::batch2;
-  SessionPtr session = GetSessionPtr(c_session);
+  using namespace scheme::batch2;
+  auto session = CapiObject<Session<A>>::Get(c_session);
   if (!session) return false;
 
   try {
@@ -398,8 +399,8 @@ EXPORT bool E_TableBatch2SessionOnReceipt(handle_t c_session,
                                           char const* receipt_file,
                                           char const* secret_file) {
   using namespace scheme::table;
-  using namespace scheme::table::batch2;
-  SessionPtr session = GetSessionPtr(c_session);
+  using namespace scheme::batch2;
+  auto session = CapiObject<Session<A>>::Get(c_session);
   if (!session) return false;
 
   try {
@@ -423,16 +424,17 @@ EXPORT bool E_TableBatch2SessionOnReceipt(handle_t c_session,
 
 EXPORT bool E_TableBatch2SessionSetEvil(handle_t c_session) {
   using namespace scheme::table;
-  using namespace scheme::table::batch2;
-  SessionPtr session = GetSessionPtr(c_session);
+  using namespace scheme::batch2;
+  auto session = CapiObject<Session<A>>::Get(c_session);
   if (!session) return false;
   session->TestSetEvil();
   return true;
 }
 
 EXPORT bool E_TableBatch2SessionFree(handle_t h) {
-  using namespace scheme::table::batch2;
-  return DelSession((Session*)h);
+  using namespace scheme::table;
+  using namespace scheme::batch2;
+  return CapiObject<Session<A>>::Del(h);
 }
 
 EXPORT handle_t E_TableBatch2ClientNew(handle_t c_b, uint8_t const* c_self_id,
@@ -440,8 +442,8 @@ EXPORT handle_t E_TableBatch2ClientNew(handle_t c_b, uint8_t const* c_self_id,
                                        range_t const* c_demand,
                                        uint64_t c_demand_count) {
   using namespace scheme::table;
-  using namespace scheme::table::batch2;
-  BPtr b = GetBPtr(c_b);
+  using namespace scheme::batch2;
+  BPtr b = CapiObject<B>::Get(c_b);
   if (!b) return nullptr;
 
   h256_t self_id;
@@ -456,8 +458,8 @@ EXPORT handle_t E_TableBatch2ClientNew(handle_t c_b, uint8_t const* c_self_id,
   }
 
   try {
-    auto p = new Client(b, self_id, peer_id, std::move(demands));
-    AddClient(p);
+    auto p = new Client<B>(b, self_id, peer_id, std::move(demands));
+    CapiObject<Client<B>>::Add(p);
     return p;
   } catch (std::exception&) {
     return nullptr;
@@ -467,8 +469,8 @@ EXPORT handle_t E_TableBatch2ClientNew(handle_t c_b, uint8_t const* c_self_id,
 EXPORT bool E_TableBatch2ClientGetRequest(handle_t c_client,
                                           char const* request_file) {
   using namespace scheme::table;
-  using namespace scheme::table::batch2;
-  ClientPtr client = GetClientPtr(c_client);
+  using namespace scheme::batch2;
+  auto client = CapiObject<Client<B>>::Get(c_client);
   if (!client) return false;
 
   try {
@@ -488,8 +490,8 @@ EXPORT bool E_TableBatch2ClientOnResponse(handle_t c_client,
                                           char const* response_file,
                                           char const* receipt_file) {
   using namespace scheme::table;
-  using namespace scheme::table::batch2;
-  ClientPtr client = GetClientPtr(c_client);
+  using namespace scheme::batch2;
+  auto client = CapiObject<Client<B>>::Get(c_client);
   if (!client) return false;
 
   try {
@@ -514,8 +516,8 @@ EXPORT bool E_TableBatch2ClientOnResponse(handle_t c_client,
 EXPORT bool E_TableBatch2ClientOnSecret(handle_t c_client,
                                         char const* secret_file) {
   using namespace scheme::table;
-  using namespace scheme::table::batch2;
-  ClientPtr client = GetClientPtr(c_client);
+  using namespace scheme::batch2;
+  auto client = CapiObject<Client<B>>::Get(c_client);
   if (!client) return false;
 
   try {
@@ -534,8 +536,8 @@ EXPORT bool E_TableBatch2ClientOnSecret(handle_t c_client,
 EXPORT bool E_TableBatch2ClientSaveDecrypted(handle_t c_client,
                                              char const* file) {
   using namespace scheme::table;
-  using namespace scheme::table::batch2;
-  ClientPtr client = GetClientPtr(c_client);
+  using namespace scheme::batch2;
+  auto client = CapiObject<Client<B>>::Get(c_client);
   if (!client) return false;
 
   try {
@@ -546,8 +548,9 @@ EXPORT bool E_TableBatch2ClientSaveDecrypted(handle_t c_client,
 }
 
 EXPORT bool E_TableBatch2ClientFree(handle_t h) {
-  using namespace scheme::table::batch2;
-  return DelClient((Client*)h);
+  using namespace scheme::table;
+  using namespace scheme::batch2;
+  return CapiObject<Client<B>>::Del(h);
 }
 }  // extern "C" batch2
 
@@ -556,8 +559,8 @@ extern "C" {
 EXPORT handle_t E_TableBatch3SessionNew(handle_t c_a, uint8_t const* c_self_id,
                                         uint8_t const* c_peer_id) {
   using namespace scheme::table;
-  using namespace scheme::table::batch3;
-  APtr a = GetAPtr(c_a);
+  using namespace scheme::batch3;
+  APtr a = CapiObject<A>::Get(c_a);
   if (!a) return nullptr;
 
   h256_t self_id;
@@ -566,8 +569,8 @@ EXPORT handle_t E_TableBatch3SessionNew(handle_t c_a, uint8_t const* c_self_id,
   memcpy(peer_id.data(), c_peer_id, h256_t::size_value);
 
   try {
-    auto p = new Session(a, self_id, peer_id);
-    AddSession(p);
+    auto p = new Session<A>(a, self_id, peer_id);
+    CapiObject<Session<A>>::Add(p);
     return p;
   } catch (std::exception&) {
     return nullptr;
@@ -578,8 +581,8 @@ EXPORT bool E_TableBatch3SessionOnRequest(handle_t c_session,
                                           char const* request_file,
                                           char const* response_file) {
   using namespace scheme::table;
-  using namespace scheme::table::batch3;
-  SessionPtr session = GetSessionPtr(c_session);
+  using namespace scheme::batch3;
+  auto session = CapiObject<Session<A>>::Get(c_session);
   if (!session) return false;
 
   try {
@@ -605,8 +608,8 @@ EXPORT bool E_TableBatch3SessionOnReceipt(handle_t c_session,
                                           char const* receipt_file,
                                           char const* secret_file) {
   using namespace scheme::table;
-  using namespace scheme::table::batch3;
-  SessionPtr session = GetSessionPtr(c_session);
+  using namespace scheme::batch3;
+  auto session = CapiObject<Session<A>>::Get(c_session);
   if (!session) return false;
 
   try {
@@ -629,8 +632,9 @@ EXPORT bool E_TableBatch3SessionOnReceipt(handle_t c_session,
 }
 
 EXPORT bool E_TableBatch3SessionFree(handle_t h) {
-  using namespace scheme::table::batch3;
-  return DelSession((Session*)h);
+  using namespace scheme::table;
+  using namespace scheme::batch3;
+  return CapiObject<Session<A>>::Del(h);
 }
 
 EXPORT handle_t E_TableBatch3ClientNew(handle_t c_b, uint8_t const* c_self_id,
@@ -638,8 +642,8 @@ EXPORT handle_t E_TableBatch3ClientNew(handle_t c_b, uint8_t const* c_self_id,
                                        range_t const* c_demand,
                                        uint64_t c_demand_count) {
   using namespace scheme::table;
-  using namespace scheme::table::batch3;
-  BPtr b = GetBPtr(c_b);
+  using namespace scheme::batch3;
+  BPtr b = CapiObject<B>::Get(c_b);
   if (!b) return nullptr;
 
   h256_t self_id;
@@ -654,8 +658,8 @@ EXPORT handle_t E_TableBatch3ClientNew(handle_t c_b, uint8_t const* c_self_id,
   }
 
   try {
-    auto p = new Client(b, self_id, peer_id, std::move(demands));
-    AddClient(p);
+    auto p = new Client<B>(b, self_id, peer_id, std::move(demands));
+    CapiObject<Client<B>>::Add(p);
     return p;
   } catch (std::exception&) {
     return nullptr;
@@ -665,8 +669,8 @@ EXPORT handle_t E_TableBatch3ClientNew(handle_t c_b, uint8_t const* c_self_id,
 EXPORT bool E_TableBatch3ClientGetRequest(handle_t c_client,
                                           char const* request_file) {
   using namespace scheme::table;
-  using namespace scheme::table::batch3;
-  ClientPtr client = GetClientPtr(c_client);
+  using namespace scheme::batch3;
+  auto client = CapiObject<Client<B>>::Get(c_client);
   if (!client) return false;
 
   try {
@@ -686,8 +690,8 @@ EXPORT bool E_TableBatch3ClientOnResponse(handle_t c_client,
                                           char const* response_file,
                                           char const* receipt_file) {
   using namespace scheme::table;
-  using namespace scheme::table::batch3;
-  ClientPtr client = GetClientPtr(c_client);
+  using namespace scheme::batch3;
+  auto client = CapiObject<Client<B>>::Get(c_client);
   if (!client) return false;
 
   try {
@@ -712,8 +716,8 @@ EXPORT bool E_TableBatch3ClientOnResponse(handle_t c_client,
 EXPORT bool E_TableBatch3ClientOnSecret(handle_t c_client,
                                         char const* secret_file) {
   using namespace scheme::table;
-  using namespace scheme::table::batch3;
-  ClientPtr client = GetClientPtr(c_client);
+  using namespace scheme::batch3;
+  auto client = CapiObject<Client<B>>::Get(c_client);
   if (!client) return false;
 
   try {
@@ -733,8 +737,8 @@ EXPORT bool E_TableBatch3ClientOnSecret(handle_t c_client,
 EXPORT bool E_TableBatch3ClientSaveDecrypted(handle_t c_client,
                                              char const* file) {
   using namespace scheme::table;
-  using namespace scheme::table::batch3;
-  ClientPtr client = GetClientPtr(c_client);
+  using namespace scheme::batch3;
+  auto client = CapiObject<Client<B>>::Get(c_client);
   if (!client) return false;
 
   try {
@@ -745,8 +749,9 @@ EXPORT bool E_TableBatch3ClientSaveDecrypted(handle_t c_client,
 }
 
 EXPORT bool E_TableBatch3ClientFree(handle_t h) {
-  using namespace scheme::table::batch3;
-  return DelClient((Client*)h);
+  using namespace scheme::table;
+  using namespace scheme::batch3;
+  return CapiObject<Client<B>>::Del(h);
 }
 }  // extern "C" batch3
 
@@ -756,8 +761,8 @@ EXPORT handle_t E_TableOtBatch3SessionNew(handle_t c_a,
                                           uint8_t const* c_self_id,
                                           uint8_t const* c_peer_id) {
   using namespace scheme::table;
-  using namespace scheme::table::otbatch3;
-  APtr a = GetAPtr(c_a);
+  using namespace scheme::otbatch3;
+  APtr a = CapiObject<A>::Get(c_a);
   if (!a) return nullptr;
 
   h256_t self_id;
@@ -766,8 +771,8 @@ EXPORT handle_t E_TableOtBatch3SessionNew(handle_t c_a,
   memcpy(peer_id.data(), c_peer_id, h256_t::size_value);
 
   try {
-    auto p = new Session(a, self_id, peer_id);
-    AddSession(p);
+    auto p = new Session<A>(a, self_id, peer_id);
+    CapiObject<Session<A>>::Add(p);
     return p;
   } catch (std::exception&) {
     return nullptr;
@@ -777,8 +782,8 @@ EXPORT handle_t E_TableOtBatch3SessionNew(handle_t c_a,
 EXPORT bool E_TableOtBatch3SessionGetNegoRequest(handle_t c_session,
                                                  char const* request_file) {
   using namespace scheme::table;
-  using namespace scheme::table::otbatch3;
-  SessionPtr session = GetSessionPtr(c_session);
+  using namespace scheme::otbatch3;
+  auto session = CapiObject<Session<A>>::Get(c_session);
   if (!session) return false;
 
   try {
@@ -798,8 +803,8 @@ EXPORT bool E_TableOtBatch3SessionOnNegoRequest(handle_t c_session,
                                                 char const* request_file,
                                                 char const* response_file) {
   using namespace scheme::table;
-  using namespace scheme::table::otbatch3;
-  SessionPtr session = GetSessionPtr(c_session);
+  using namespace scheme::otbatch3;
+  auto session = CapiObject<Session<A>>::Get(c_session);
   if (!session) return false;
 
   try {
@@ -824,8 +829,8 @@ EXPORT bool E_TableOtBatch3SessionOnNegoRequest(handle_t c_session,
 EXPORT bool E_TableOtBatch3SessionOnNegoResponse(handle_t c_session,
                                                  char const* response_file) {
   using namespace scheme::table;
-  using namespace scheme::table::otbatch3;
-  SessionPtr session = GetSessionPtr(c_session);
+  using namespace scheme::otbatch3;
+  auto session = CapiObject<Session<A>>::Get(c_session);
   if (!session) return false;
 
   try {
@@ -846,8 +851,8 @@ EXPORT bool E_TableOtBatch3SessionOnRequest(handle_t c_session,
                                             char const* request_file,
                                             char const* response_file) {
   using namespace scheme::table;
-  using namespace scheme::table::otbatch3;
-  SessionPtr session = GetSessionPtr(c_session);
+  using namespace scheme::otbatch3;
+  auto session = CapiObject<Session<A>>::Get(c_session);
   if (!session) return false;
 
   try {
@@ -873,8 +878,8 @@ EXPORT bool E_TableOtBatch3SessionOnReceipt(handle_t c_session,
                                             char const* receipt_file,
                                             char const* secret_file) {
   using namespace scheme::table;
-  using namespace scheme::table::otbatch3;
-  SessionPtr session = GetSessionPtr(c_session);
+  using namespace scheme::otbatch3;
+  auto session = CapiObject<Session<A>>::Get(c_session);
   if (!session) return false;
 
   try {
@@ -897,8 +902,9 @@ EXPORT bool E_TableOtBatch3SessionOnReceipt(handle_t c_session,
 }
 
 EXPORT bool E_TableOtBatch3SessionFree(handle_t h) {
-  using namespace scheme::table::otbatch3;
-  return DelSession((Session*)h);
+  using namespace scheme::table;
+  using namespace scheme::otbatch3;
+  return CapiObject<Session<A>>::Del(h);
 }
 
 EXPORT handle_t E_TableOtBatch3ClientNew(handle_t c_b, uint8_t const* c_self_id,
@@ -908,8 +914,8 @@ EXPORT handle_t E_TableOtBatch3ClientNew(handle_t c_b, uint8_t const* c_self_id,
                                          range_t const* c_phantom,
                                          uint64_t c_phantom_count) {
   using namespace scheme::table;
-  using namespace scheme::table::otbatch3;
-  BPtr b = GetBPtr(c_b);
+  using namespace scheme::otbatch3;
+  BPtr b = CapiObject<B>::Get(c_b);
   if (!b) return nullptr;
 
   h256_t self_id;
@@ -930,9 +936,9 @@ EXPORT handle_t E_TableOtBatch3ClientNew(handle_t c_b, uint8_t const* c_self_id,
   }
 
   try {
-    auto p = new Client(b, self_id, peer_id, std::move(demands),
+    auto p = new Client<B>(b, self_id, peer_id, std::move(demands),
                         std::move(phantoms));
-    AddClient(p);
+    CapiObject<Client<B>>::Add(p);
     return p;
   } catch (std::exception&) {
     return nullptr;
@@ -942,8 +948,8 @@ EXPORT handle_t E_TableOtBatch3ClientNew(handle_t c_b, uint8_t const* c_self_id,
 EXPORT bool E_TableOtBatch3ClientGetNegoRequest(handle_t c_client,
                                                 char const* request_file) {
   using namespace scheme::table;
-  using namespace scheme::table::otbatch3;
-  ClientPtr client = GetClientPtr(c_client);
+  using namespace scheme::otbatch3;
+  auto client = CapiObject<Client<B>>::Get(c_client);
   if (!client) return false;
 
   try {
@@ -963,8 +969,8 @@ EXPORT bool E_TableOtBatch3ClientOnNegoRequest(handle_t c_client,
                                                char const* request_file,
                                                char const* response_file) {
   using namespace scheme::table;
-  using namespace scheme::table::otbatch3;
-  ClientPtr client = GetClientPtr(c_client);
+  using namespace scheme::otbatch3;
+  auto client = CapiObject<Client<B>>::Get(c_client);
   if (!client) return false;
 
   try {
@@ -989,8 +995,8 @@ EXPORT bool E_TableOtBatch3ClientOnNegoRequest(handle_t c_client,
 EXPORT bool E_TableOtBatch3ClientOnNegoResponse(handle_t c_client,
                                                 char const* response_file) {
   using namespace scheme::table;
-  using namespace scheme::table::otbatch3;
-  ClientPtr client = GetClientPtr(c_client);
+  using namespace scheme::otbatch3;
+  auto client = CapiObject<Client<B>>::Get(c_client);
   if (!client) return false;
 
   try {
@@ -1009,8 +1015,8 @@ EXPORT bool E_TableOtBatch3ClientOnNegoResponse(handle_t c_client,
 EXPORT bool E_TableOtBatch3ClientGetRequest(handle_t c_client,
                                             char const* request_file) {
   using namespace scheme::table;
-  using namespace scheme::table::otbatch3;
-  ClientPtr client = GetClientPtr(c_client);
+  using namespace scheme::otbatch3;
+  auto client = CapiObject<Client<B>>::Get(c_client);
   if (!client) return false;
 
   try {
@@ -1030,8 +1036,8 @@ EXPORT bool E_TableOtBatch3ClientOnResponse(handle_t c_client,
                                             char const* response_file,
                                             char const* receipt_file) {
   using namespace scheme::table;
-  using namespace scheme::table::otbatch3;
-  ClientPtr client = GetClientPtr(c_client);
+  using namespace scheme::otbatch3;
+  auto client = CapiObject<Client<B>>::Get(c_client);
   if (!client) return false;
 
   try {
@@ -1056,8 +1062,8 @@ EXPORT bool E_TableOtBatch3ClientOnResponse(handle_t c_client,
 EXPORT bool E_TableOtBatch3ClientOnSecret(handle_t c_client,
                                           char const* secret_file) {
   using namespace scheme::table;
-  using namespace scheme::table::otbatch3;
-  ClientPtr client = GetClientPtr(c_client);
+  using namespace scheme::otbatch3;
+  auto client = CapiObject<Client<B>>::Get(c_client);
   if (!client) return false;
 
   try {
@@ -1076,8 +1082,8 @@ EXPORT bool E_TableOtBatch3ClientOnSecret(handle_t c_client,
 EXPORT bool E_TableOtBatch3ClientSaveDecrypted(handle_t c_client,
                                                char const* file) {
   using namespace scheme::table;
-  using namespace scheme::table::otbatch3;
-  ClientPtr client = GetClientPtr(c_client);
+  using namespace scheme::otbatch3;
+  auto client = CapiObject<Client<B>>::Get(c_client);
   if (!client) return false;
 
   try {
@@ -1088,8 +1094,9 @@ EXPORT bool E_TableOtBatch3ClientSaveDecrypted(handle_t c_client,
 }
 
 EXPORT bool E_TableOtBatch3ClientFree(handle_t h) {
-  using namespace scheme::table::otbatch3;
-  return DelClient((Client*)h);
+  using namespace scheme::table;
+  using namespace scheme::otbatch3;
+  return CapiObject<Client<B>>::Del(h);
 }
 }  // extern "C" otbatch3
 
@@ -1098,8 +1105,8 @@ extern "C" {
 EXPORT handle_t E_TableOtBatchSessionNew(handle_t c_a, uint8_t const* c_self_id,
                                          uint8_t const* c_peer_id) {
   using namespace scheme::table;
-  using namespace scheme::table::otbatch;
-  APtr a = GetAPtr(c_a);
+  using namespace scheme::otbatch;
+  APtr a = CapiObject<A>::Get(c_a);
   if (!a) return nullptr;
 
   h256_t self_id;
@@ -1108,8 +1115,8 @@ EXPORT handle_t E_TableOtBatchSessionNew(handle_t c_a, uint8_t const* c_self_id,
   memcpy(peer_id.data(), c_peer_id, h256_t::size_value);
 
   try {
-    auto p = new Session(a, self_id, peer_id);
-    AddSession(p);
+    auto p = new Session<A>(a, self_id, peer_id);
+    CapiObject<Session<A>>::Add(p);
     return p;
   } catch (std::exception&) {
     return nullptr;
@@ -1119,8 +1126,8 @@ EXPORT handle_t E_TableOtBatchSessionNew(handle_t c_a, uint8_t const* c_self_id,
 EXPORT bool E_TableOtBatchSessionGetNegoRequest(handle_t c_session,
                                                 char const* request_file) {
   using namespace scheme::table;
-  using namespace scheme::table::otbatch;
-  SessionPtr session = GetSessionPtr(c_session);
+  using namespace scheme::otbatch;
+  auto session = CapiObject<Session<A>>::Get(c_session);
   if (!session) return false;
 
   try {
@@ -1140,8 +1147,8 @@ EXPORT bool E_TableOtBatchSessionOnNegoRequest(handle_t c_session,
                                                char const* request_file,
                                                char const* response_file) {
   using namespace scheme::table;
-  using namespace scheme::table::otbatch;
-  SessionPtr session = GetSessionPtr(c_session);
+  using namespace scheme::otbatch;
+  auto session = CapiObject<Session<A>>::Get(c_session);
   if (!session) return false;
 
   try {
@@ -1166,8 +1173,8 @@ EXPORT bool E_TableOtBatchSessionOnNegoRequest(handle_t c_session,
 EXPORT bool E_TableOtBatchSessionOnNegoResponse(handle_t c_session,
                                                 char const* response_file) {
   using namespace scheme::table;
-  using namespace scheme::table::otbatch;
-  SessionPtr session = GetSessionPtr(c_session);
+  using namespace scheme::otbatch;
+  auto session = CapiObject<Session<A>>::Get(c_session);
   if (!session) return false;
 
   try {
@@ -1188,8 +1195,8 @@ EXPORT bool E_TableOtBatchSessionOnRequest(handle_t c_session,
                                            char const* request_file,
                                            char const* response_file) {
   using namespace scheme::table;
-  using namespace scheme::table::otbatch;
-  SessionPtr session = GetSessionPtr(c_session);
+  using namespace scheme::otbatch;
+  auto session = CapiObject<Session<A>>::Get(c_session);
   if (!session) return false;
 
   try {
@@ -1215,8 +1222,8 @@ EXPORT bool E_TableOtBatchSessionOnReceipt(handle_t c_session,
                                            char const* receipt_file,
                                            char const* secret_file) {
   using namespace scheme::table;
-  using namespace scheme::table::otbatch;
-  SessionPtr session = GetSessionPtr(c_session);
+  using namespace scheme::otbatch;
+  auto session = CapiObject<Session<A>>::Get(c_session);
   if (!session) return false;
 
   try {
@@ -1240,16 +1247,17 @@ EXPORT bool E_TableOtBatchSessionOnReceipt(handle_t c_session,
 
 EXPORT bool E_TableOtBatchSessionSetEvil(handle_t c_session) {
   using namespace scheme::table;
-  using namespace scheme::table::otbatch;
-  SessionPtr session = GetSessionPtr(c_session);
+  using namespace scheme::otbatch;
+  auto session = CapiObject<Session<A>>::Get(c_session);
   if (!session) return false;
   session->TestSetEvil();
   return true;
 }
 
 EXPORT bool E_TableOtBatchSessionFree(handle_t h) {
-  using namespace scheme::table::otbatch;
-  return DelSession((Session*)h);
+  using namespace scheme::table;
+  using namespace scheme::otbatch;
+  return CapiObject<Session<A>>::Del(h);
 }
 
 EXPORT handle_t E_TableOtBatchClientNew(handle_t c_b, uint8_t const* c_self_id,
@@ -1259,8 +1267,8 @@ EXPORT handle_t E_TableOtBatchClientNew(handle_t c_b, uint8_t const* c_self_id,
                                         range_t const* c_phantom,
                                         uint64_t c_phantom_count) {
   using namespace scheme::table;
-  using namespace scheme::table::otbatch;
-  BPtr b = GetBPtr(c_b);
+  using namespace scheme::otbatch;
+  BPtr b = CapiObject<B>::Get(c_b);
   if (!b) return nullptr;
 
   h256_t self_id;
@@ -1281,9 +1289,9 @@ EXPORT handle_t E_TableOtBatchClientNew(handle_t c_b, uint8_t const* c_self_id,
   }
 
   try {
-    auto p = new Client(b, self_id, peer_id, std::move(demands),
+    auto p = new Client<B>(b, self_id, peer_id, std::move(demands),
                         std::move(phantoms));
-    AddClient(p);
+    CapiObject<Client<B>>::Add(p);
     return p;
   } catch (std::exception&) {
     return nullptr;
@@ -1293,8 +1301,8 @@ EXPORT handle_t E_TableOtBatchClientNew(handle_t c_b, uint8_t const* c_self_id,
 EXPORT bool E_TableOtBatchClientGetNegoRequest(handle_t c_client,
                                                char const* request_file) {
   using namespace scheme::table;
-  using namespace scheme::table::otbatch;
-  ClientPtr client = GetClientPtr(c_client);
+  using namespace scheme::otbatch;
+  auto client = CapiObject<Client<B>>::Get(c_client);
   if (!client) return false;
 
   try {
@@ -1314,8 +1322,8 @@ EXPORT bool E_TableOtBatchClientOnNegoRequest(handle_t c_client,
                                               char const* request_file,
                                               char const* response_file) {
   using namespace scheme::table;
-  using namespace scheme::table::otbatch;
-  ClientPtr client = GetClientPtr(c_client);
+  using namespace scheme::otbatch;
+  auto client = CapiObject<Client<B>>::Get(c_client);
   if (!client) return false;
 
   try {
@@ -1340,8 +1348,8 @@ EXPORT bool E_TableOtBatchClientOnNegoRequest(handle_t c_client,
 EXPORT bool E_TableOtBatchClientOnNegoResponse(handle_t c_client,
                                                char const* response_file) {
   using namespace scheme::table;
-  using namespace scheme::table::otbatch;
-  ClientPtr client = GetClientPtr(c_client);
+  using namespace scheme::otbatch;
+  auto client = CapiObject<Client<B>>::Get(c_client);
   if (!client) return false;
 
   try {
@@ -1360,8 +1368,8 @@ EXPORT bool E_TableOtBatchClientOnNegoResponse(handle_t c_client,
 EXPORT bool E_TableOtBatchClientGetRequest(handle_t c_client,
                                            char const* request_file) {
   using namespace scheme::table;
-  using namespace scheme::table::otbatch;
-  ClientPtr client = GetClientPtr(c_client);
+  using namespace scheme::otbatch;
+  auto client = CapiObject<Client<B>>::Get(c_client);
   if (!client) return false;
 
   try {
@@ -1381,8 +1389,8 @@ EXPORT bool E_TableOtBatchClientOnResponse(handle_t c_client,
                                            char const* response_file,
                                            char const* receipt_file) {
   using namespace scheme::table;
-  using namespace scheme::table::otbatch;
-  ClientPtr client = GetClientPtr(c_client);
+  using namespace scheme::otbatch;
+  auto client = CapiObject<Client<B>>::Get(c_client);
   if (!client) return false;
 
   try {
@@ -1407,8 +1415,8 @@ EXPORT bool E_TableOtBatchClientOnResponse(handle_t c_client,
 EXPORT bool E_TableOtBatchClientOnSecret(handle_t c_client,
                                          char const* secret_file) {
   using namespace scheme::table;
-  using namespace scheme::table::otbatch;
-  ClientPtr client = GetClientPtr(c_client);
+  using namespace scheme::otbatch;
+  auto client = CapiObject<Client<B>>::Get(c_client);
   if (!client) return false;
 
   try {
@@ -1427,8 +1435,8 @@ EXPORT bool E_TableOtBatchClientOnSecret(handle_t c_client,
 EXPORT bool E_TableOtBatchClientGenerateClaim(handle_t c_client,
                                               char const* claim_file) {
   using namespace scheme::table;
-  using namespace scheme::table::otbatch;
-  ClientPtr client = GetClientPtr(c_client);
+  using namespace scheme::otbatch;
+  auto client = CapiObject<Client<B>>::Get(c_client);
   if (!client) return false;
 
   try {
@@ -1448,8 +1456,8 @@ EXPORT bool E_TableOtBatchClientGenerateClaim(handle_t c_client,
 EXPORT bool E_TableOtBatchClientSaveDecrypted(handle_t c_client,
                                               char const* file) {
   using namespace scheme::table;
-  using namespace scheme::table::otbatch;
-  ClientPtr client = GetClientPtr(c_client);
+  using namespace scheme::otbatch;
+  auto client = CapiObject<Client<B>>::Get(c_client);
   if (!client) return false;
 
   try {
@@ -1460,8 +1468,9 @@ EXPORT bool E_TableOtBatchClientSaveDecrypted(handle_t c_client,
 }
 
 EXPORT bool E_TableOtBatchClientFree(handle_t h) {
-  using namespace scheme::table::otbatch;
-  return DelClient((Client*)h);
+  using namespace scheme::table;
+  using namespace scheme::otbatch;
+  return CapiObject<Client<B>>::Del(h);
 }
 }  // extern "C" otbatch
 
@@ -1471,7 +1480,7 @@ EXPORT handle_t E_TableOtVrfqSessionNew(handle_t c_a, uint8_t const* c_self_id,
                                         uint8_t const* c_peer_id) {
   using namespace scheme::table;
   using namespace scheme::table::otvrfq;
-  APtr a = GetAPtr(c_a);
+  APtr a = CapiObject<A>::Get(c_a);
   if (!a) return nullptr;
 
   h256_t self_id;
@@ -1481,7 +1490,7 @@ EXPORT handle_t E_TableOtVrfqSessionNew(handle_t c_a, uint8_t const* c_self_id,
 
   try {
     auto p = new Session(a, self_id, peer_id);
-    AddSession(p);
+    CapiObject<Session>::Add(p);
     return p;
   } catch (std::exception&) {
     return nullptr;
@@ -1492,7 +1501,7 @@ EXPORT bool E_TableOtVrfqSessionGetNegoRequest(handle_t c_session,
                                                char const* request_file) {
   using namespace scheme::table;
   using namespace scheme::table::otvrfq;
-  SessionPtr session = GetSessionPtr(c_session);
+  SessionPtr session = CapiObject<Session>::Get(c_session);
   if (!session) return false;
 
   try {
@@ -1513,7 +1522,7 @@ EXPORT bool E_TableOtVrfqSessionOnNegoRequest(handle_t c_session,
                                               char const* response_file) {
   using namespace scheme::table;
   using namespace scheme::table::otvrfq;
-  SessionPtr session = GetSessionPtr(c_session);
+  SessionPtr session = CapiObject<Session>::Get(c_session);
   if (!session) return false;
 
   try {
@@ -1539,7 +1548,7 @@ EXPORT bool E_TableOtVrfqSessionOnNegoResponse(handle_t c_session,
                                                char const* response_file) {
   using namespace scheme::table;
   using namespace scheme::table::otvrfq;
-  SessionPtr session = GetSessionPtr(c_session);
+  SessionPtr session = CapiObject<Session>::Get(c_session);
   if (!session) return false;
 
   try {
@@ -1561,7 +1570,7 @@ EXPORT bool E_TableOtVrfqSessionOnRequest(handle_t c_session,
                                           char const* response_file) {
   using namespace scheme::table;
   using namespace scheme::table::otvrfq;
-  SessionPtr session = GetSessionPtr(c_session);
+  SessionPtr session = CapiObject<Session>::Get(c_session);
   if (!session) return false;
 
   try {
@@ -1588,7 +1597,7 @@ EXPORT bool E_TableOtVrfqSessionOnReceipt(handle_t c_session,
                                           char const* secret_file) {
   using namespace scheme::table;
   using namespace scheme::table::otvrfq;
-  SessionPtr session = GetSessionPtr(c_session);
+  SessionPtr session = CapiObject<Session>::Get(c_session);
   if (!session) return false;
 
   try {
@@ -1612,7 +1621,7 @@ EXPORT bool E_TableOtVrfqSessionOnReceipt(handle_t c_session,
 
 EXPORT bool E_TableOtVrfqSessionFree(handle_t h) {
   using namespace scheme::table::otvrfq;
-  return DelSession((Session*)h);
+  return CapiObject<Session>::Del((Session*)h);
 }
 
 EXPORT handle_t E_TableOtVrfqClientNew(handle_t c_b, uint8_t const* c_self_id,
@@ -1624,7 +1633,7 @@ EXPORT handle_t E_TableOtVrfqClientNew(handle_t c_b, uint8_t const* c_self_id,
                                        uint64_t c_phantom_count) {
   using namespace scheme::table;
   using namespace scheme::table::otvrfq;
-  BPtr b = GetBPtr(c_b);
+  BPtr b = CapiObject<B>::Get(c_b);
   if (!b) return nullptr;
 
   h256_t self_id;
@@ -1645,7 +1654,7 @@ EXPORT handle_t E_TableOtVrfqClientNew(handle_t c_b, uint8_t const* c_self_id,
   try {
     auto p =
         new Client(b, self_id, peer_id, c_query_key, query_values, phantoms);
-    AddClient(p);
+    CapiObject<Client>::Add(p);
     return p;
   } catch (std::exception&) {
     return nullptr;
@@ -1656,7 +1665,7 @@ EXPORT bool E_TableOtVrfqClientGetNegoRequest(handle_t c_client,
                                               char const* request_file) {
   using namespace scheme::table;
   using namespace scheme::table::otvrfq;
-  ClientPtr client = GetClientPtr(c_client);
+  ClientPtr client = CapiObject<Client>::Get(c_client);
   if (!client) return false;
 
   try {
@@ -1677,7 +1686,7 @@ EXPORT bool E_TableOtVrfqClientOnNegoRequest(handle_t c_client,
                                              char const* response_file) {
   using namespace scheme::table;
   using namespace scheme::table::otvrfq;
-  ClientPtr client = GetClientPtr(c_client);
+  ClientPtr client = CapiObject<Client>::Get(c_client);
   if (!client) return false;
 
   try {
@@ -1703,7 +1712,7 @@ EXPORT bool E_TableOtVrfqClientOnNegoResponse(handle_t c_client,
                                               char const* response_file) {
   using namespace scheme::table;
   using namespace scheme::table::otvrfq;
-  ClientPtr client = GetClientPtr(c_client);
+  ClientPtr client = CapiObject<Client>::Get(c_client);
   if (!client) return false;
 
   try {
@@ -1723,7 +1732,7 @@ EXPORT bool E_TableOtVrfqClientGetRequest(handle_t c_client,
                                           char const* request_file) {
   using namespace scheme::table;
   using namespace scheme::table::otvrfq;
-  ClientPtr client = GetClientPtr(c_client);
+  ClientPtr client = CapiObject<Client>::Get(c_client);
   if (!client) return false;
 
   try {
@@ -1744,7 +1753,7 @@ EXPORT bool E_TableOtVrfqClientOnResponse(handle_t c_client,
                                           char const* receipt_file) {
   using namespace scheme::table;
   using namespace scheme::table::otvrfq;
-  ClientPtr client = GetClientPtr(c_client);
+  ClientPtr client = CapiObject<Client>::Get(c_client);
   if (!client) return false;
 
   try {
@@ -1771,7 +1780,7 @@ EXPORT bool E_TableOtVrfqClientOnSecret(handle_t c_client,
                                         char const* positions_file) {
   using namespace scheme::table;
   using namespace scheme::table::otvrfq;
-  ClientPtr client = GetClientPtr(c_client);
+  ClientPtr client = CapiObject<Client>::Get(c_client);
   if (!client) return false;
 
   try {
@@ -1799,7 +1808,7 @@ EXPORT bool E_TableOtVrfqClientOnSecret(handle_t c_client,
 
 EXPORT bool E_TableOtVrfqClientFree(handle_t h) {
   using namespace scheme::table::otvrfq;
-  return DelClient((Client*)h);
+  return CapiObject<Client>::Del((Client*)h);
 }
 }  // extern "C" otvrfq
 
@@ -1809,7 +1818,7 @@ EXPORT handle_t E_TableVrfqSessionNew(handle_t c_a, uint8_t const* c_self_id,
                                       uint8_t const* c_peer_id) {
   using namespace scheme::table;
   using namespace scheme::table::vrfq;
-  APtr a = GetAPtr(c_a);
+  APtr a = CapiObject<A>::Get(c_a);
   if (!a) return nullptr;
 
   h256_t self_id;
@@ -1819,7 +1828,7 @@ EXPORT handle_t E_TableVrfqSessionNew(handle_t c_a, uint8_t const* c_self_id,
 
   try {
     auto p = new Session(a, self_id, peer_id);
-    AddSession(p);
+    CapiObject<Session>::Add(p);
     return p;
   } catch (std::exception&) {
     return nullptr;
@@ -1831,7 +1840,7 @@ EXPORT bool E_TableVrfqSessionOnRequest(handle_t c_session,
                                         char const* response_file) {
   using namespace scheme::table;
   using namespace scheme::table::vrfq;
-  SessionPtr session = GetSessionPtr(c_session);
+  SessionPtr session = CapiObject<Session>::Get(c_session);
   if (!session) return false;
 
   try {
@@ -1858,7 +1867,7 @@ EXPORT bool E_TableVrfqSessionOnReceipt(handle_t c_session,
                                         char const* secret_file) {
   using namespace scheme::table;
   using namespace scheme::table::vrfq;
-  SessionPtr session = GetSessionPtr(c_session);
+  SessionPtr session = CapiObject<Session>::Get(c_session);
   if (!session) return false;
 
   try {
@@ -1882,7 +1891,7 @@ EXPORT bool E_TableVrfqSessionOnReceipt(handle_t c_session,
 
 EXPORT bool E_TableVrfqSessionFree(handle_t h) {
   using namespace scheme::table::vrfq;
-  return DelSession((Session*)h);
+  return CapiObject<Session>::Del((Session*)h);
 }
 
 EXPORT handle_t E_TableVrfqClientNew(handle_t c_b, uint8_t const* c_self_id,
@@ -1892,7 +1901,7 @@ EXPORT handle_t E_TableVrfqClientNew(handle_t c_b, uint8_t const* c_self_id,
                                      uint64_t c_query_value_count) {
   using namespace scheme::table;
   using namespace scheme::table::vrfq;
-  BPtr b = GetBPtr(c_b);
+  BPtr b = CapiObject<B>::Get(c_b);
   if (!b) return nullptr;
 
   h256_t self_id;
@@ -1907,7 +1916,7 @@ EXPORT handle_t E_TableVrfqClientNew(handle_t c_b, uint8_t const* c_self_id,
 
   try {
     auto p = new Client(b, self_id, peer_id, c_query_key, query_values);
-    AddClient(p);
+    CapiObject<Client>::Add(p);
     return p;
   } catch (std::exception&) {
     return nullptr;
@@ -1918,7 +1927,7 @@ EXPORT bool E_TableVrfqClientGetRequest(handle_t c_client,
                                         char const* request_file) {
   using namespace scheme::table;
   using namespace scheme::table::vrfq;
-  ClientPtr client = GetClientPtr(c_client);
+  ClientPtr client = CapiObject<Client>::Get(c_client);
   if (!client) return false;
 
   try {
@@ -1939,7 +1948,7 @@ EXPORT bool E_TableVrfqClientOnResponse(handle_t c_client,
                                         char const* receipt_file) {
   using namespace scheme::table;
   using namespace scheme::table::vrfq;
-  ClientPtr client = GetClientPtr(c_client);
+  ClientPtr client = CapiObject<Client>::Get(c_client);
   if (!client) return false;
 
   try {
@@ -1966,7 +1975,7 @@ EXPORT bool E_TableVrfqClientOnSecret(handle_t c_client,
                                       char const* positions_file) {
   using namespace scheme::table;
   using namespace scheme::table::vrfq;
-  ClientPtr client = GetClientPtr(c_client);
+  ClientPtr client = CapiObject<Client>::Get(c_client);
   if (!client) return false;
 
   try {
@@ -1994,6 +2003,6 @@ EXPORT bool E_TableVrfqClientOnSecret(handle_t c_client,
 
 EXPORT bool E_TableVrfqClientFree(handle_t h) {
   using namespace scheme::table::vrfq;
-  return DelClient((Client*)h);
+  return CapiObject<Client>::Del((Client*)h);
 }
 }  // extern "C" vrfq

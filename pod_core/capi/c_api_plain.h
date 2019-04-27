@@ -20,105 +20,84 @@ EXPORT bool E_PlainABulletin(handle_t h, plain_bulletin_t* bulletin);
 EXPORT bool E_PlainBBulletin(handle_t h, plain_bulletin_t* bulletin);
 }
 
-// range
+// batch
 extern "C" {
-EXPORT handle_t E_PlainRangeSessionNew(handle_t c_a, uint8_t const* c_self_id,
+EXPORT handle_t E_PlainBatchSessionNew(handle_t c_a, uint8_t const* c_self_id,
                                        uint8_t const* c_peer_id);
 
-EXPORT bool E_PlainRangeSessionOnRequest(handle_t c_session,
+EXPORT bool E_PlainBatchSessionOnRequest(handle_t c_session,
                                          char const* request_file,
                                          char const* response_file);
 
-EXPORT bool E_PlainRangeSessionOnReceipt(handle_t c_session,
+EXPORT bool E_PlainBatchSessionOnReceipt(handle_t c_session,
                                          char const* receipt_file,
                                          char const* secret_file);
 
-EXPORT bool E_PlainRangeSessionSetEvil(handle_t c_session);
+EXPORT bool E_PlainBatchSessionSetEvil(handle_t c_session);
 
-EXPORT bool E_PlainRangeSessionFree(handle_t h);
+EXPORT bool E_PlainBatchSessionFree(handle_t h);
 
-EXPORT handle_t E_PlainRangeClientNew(handle_t c_b, uint8_t const* c_self_id,
+EXPORT handle_t E_PlainBatchClientNew(handle_t c_b, uint8_t const* c_self_id,
                                       uint8_t const* c_peer_id,
-                                      range_t c_demand);
+                                      range_t const* c_demand,
+                                      uint64_t c_demand_count);
 
-EXPORT bool E_PlainRangeClientGetRequest(handle_t c_client,
+EXPORT bool E_PlainBatchClientGetRequest(handle_t c_client,
                                          char const* request_file);
 
-EXPORT bool E_PlainRangeClientOnResponse(handle_t c_client,
+EXPORT bool E_PlainBatchClientOnResponse(handle_t c_client,
                                          char const* response_file,
                                          char const* receipt_file);
 
-EXPORT bool E_PlainRangeClientOnSecret(handle_t c_client,
+EXPORT bool E_PlainBatchClientOnSecret(handle_t c_client,
                                        char const* secret_file);
 
-EXPORT bool E_PlainRangeClientGenerateClaim(handle_t c_client,
+EXPORT bool E_PlainBatchClientGenerateClaim(handle_t c_client,
                                             char const* claim_file);
 
-EXPORT bool E_PlainRangeClientSaveDecrypted(handle_t c_client,
+EXPORT bool E_PlainBatchClientSaveDecrypted(handle_t c_client,
                                             char const* file);
 
-EXPORT bool E_PlainRangeClientFree(handle_t h);
-}  // extern "C" range
+EXPORT bool E_PlainBatchClientFree(handle_t h);
+}  // extern "C" batch
 
-// otrange
+// batch2
 extern "C" {
-EXPORT handle_t E_PlainOtRangeSessionNew(handle_t c_a, uint8_t const* c_self_id,
-                                         uint8_t const* c_peer_id);
+EXPORT handle_t E_PlainBatch2SessionNew(handle_t c_a, uint8_t const* c_self_id,
+                                        uint8_t const* c_peer_id);
 
-EXPORT bool E_PlainOtRangeSessionGetNegoRequest(handle_t c_session,
-                                                char const* request_file);
+EXPORT bool E_PlainBatch2SessionOnRequest(handle_t c_session,
+                                          char const* request_file,
+                                          char const* response_file);
 
-EXPORT bool E_PlainOtRangeSessionOnNegoRequest(handle_t c_session,
-                                               char const* request_file,
-                                               char const* response_file);
+EXPORT bool E_PlainBatch2SessionOnReceipt(handle_t c_session,
+                                          char const* receipt_file,
+                                          char const* secret_file);
 
-EXPORT bool E_PlainOtRangeSessionOnNegoResponse(handle_t c_session,
-                                                char const* response_file);
+EXPORT bool E_PlainBatch2SessionSetEvil(handle_t c_session);
 
-EXPORT bool E_PlainOtRangeSessionOnRequest(handle_t c_session,
-                                           char const* request_file,
-                                           char const* response_file);
+EXPORT bool E_PlainBatch2SessionFree(handle_t h);
 
-EXPORT bool E_PlainOtRangeSessionOnReceipt(handle_t c_session,
-                                           char const* receipt_file,
-                                           char const* secret_file);
+EXPORT handle_t E_PlainBatch2ClientNew(handle_t c_b, uint8_t const* c_self_id,
+                                       uint8_t const* c_peer_id,
+                                       range_t const* c_demand,
+                                       uint64_t c_demand_count);
 
-EXPORT bool E_PlainOtRangeSessionSetEvil(handle_t c_session);
+EXPORT bool E_PlainBatch2ClientGetRequest(handle_t c_client,
+                                          char const* request_file);
 
-EXPORT bool E_PlainOtRangeSessionFree(handle_t h);
+EXPORT bool E_PlainBatch2ClientOnResponse(handle_t c_client,
+                                          char const* response_file,
+                                          char const* receipt_file);
 
-EXPORT handle_t E_PlainOtRangeClientNew(handle_t c_b, uint8_t const* c_self_id,
-                                        uint8_t const* c_peer_id,
-                                        range_t c_demand, range_t c_phantom);
+EXPORT bool E_PlainBatch2ClientOnSecret(handle_t c_client,
+                                        char const* secret_file);
 
-EXPORT bool E_PlainOtRangeClientGetNegoRequest(handle_t c_client,
-                                               char const* request_file);
+EXPORT bool E_PlainBatch2ClientSaveDecrypted(handle_t c_client,
+                                             char const* file);
 
-EXPORT bool E_PlainOtRangeClientOnNegoRequest(handle_t c_client,
-                                              char const* request_file,
-                                              char const* response_file);
-
-EXPORT bool E_PlainOtRangeClientOnNegoResponse(handle_t c_client,
-                                               char const* response_file);
-
-EXPORT bool E_PlainOtRangeClientGetRequest(handle_t c_client,
-                                           char const* request_file);
-
-EXPORT bool E_PlainOtRangeClientOnResponse(handle_t c_client,
-                                           char const* response_file,
-                                           char const* receipt_file);
-
-EXPORT bool E_PlainOtRangeClientOnSecret(handle_t c_client,
-                                         char const* secret_file);
-
-EXPORT bool E_PlainOtRangeClientGenerateClaim(handle_t c_client,
-                                              char const* claim_file);
-
-EXPORT bool E_PlainOtRangeClientSaveDecrypted(handle_t c_client,
-                                              char const* file);
-
-EXPORT bool E_PlainOtRangeClientFree(handle_t h);
-}  // extern "C" otrange
+EXPORT bool E_PlainBatch2ClientFree(handle_t h);
+}  // extern "C" batch2
 
 // batch3
 extern "C" {
@@ -214,3 +193,66 @@ EXPORT bool E_PlainOtBatch3ClientSaveDecrypted(handle_t c_client,
 
 EXPORT bool E_PlainOtBatch3ClientFree(handle_t h);
 }  // extern "C" otbatch3
+
+// otbatch
+extern "C" {
+EXPORT handle_t E_PlainOtBatchSessionNew(handle_t c_a, uint8_t const* c_self_id,
+                                         uint8_t const* c_peer_id);
+
+EXPORT bool E_PlainOtBatchSessionGetNegoRequest(handle_t c_session,
+                                                char const* request_file);
+
+EXPORT bool E_PlainOtBatchSessionOnNegoRequest(handle_t c_session,
+                                               char const* request_file,
+                                               char const* response_file);
+
+EXPORT bool E_PlainOtBatchSessionOnNegoResponse(handle_t c_session,
+                                                char const* response_file);
+
+EXPORT bool E_PlainOtBatchClientGetNegoRequest(handle_t c_client,
+                                               char const* request_file);
+
+EXPORT bool E_PlainOtBatchClientOnNegoRequest(handle_t c_client,
+                                              char const* request_file,
+                                              char const* response_file);
+
+EXPORT bool E_PlainOtBatchClientOnNegoResponse(handle_t c_client,
+                                               char const* response_file);
+
+EXPORT bool E_PlainOtBatchSessionOnRequest(handle_t c_session,
+                                           char const* request_file,
+                                           char const* response_file);
+
+EXPORT bool E_PlainOtBatchSessionOnReceipt(handle_t c_session,
+                                           char const* receipt_file,
+                                           char const* secret_file);
+
+EXPORT bool E_PlainOtBatchSessionSetEvil(handle_t c_session);
+
+EXPORT bool E_PlainOtBatchSessionFree(handle_t h);
+
+EXPORT handle_t E_PlainOtBatchClientNew(handle_t c_b, uint8_t const* c_self_id,
+                                        uint8_t const* c_peer_id,
+                                        range_t const* c_demand,
+                                        uint64_t c_demand_count,
+                                        range_t const* c_phantom,
+                                        uint64_t c_phantom_count);
+
+EXPORT bool E_PlainOtBatchClientGetRequest(handle_t c_client,
+                                           char const* request_file);
+
+EXPORT bool E_PlainOtBatchClientOnResponse(handle_t c_client,
+                                           char const* response_file,
+                                           char const* receipt_file);
+
+EXPORT bool E_PlainOtBatchClientOnSecret(handle_t c_client,
+                                         char const* secret_file);
+
+EXPORT bool E_PlainOtBatchClientGenerateClaim(handle_t c_client,
+                                              char const* claim_file);
+
+EXPORT bool E_PlainOtBatchClientSaveDecrypted(handle_t c_client,
+                                              char const* file);
+
+EXPORT bool E_PlainOtBatchClientFree(handle_t h);
+}  // extern "C" otbatch

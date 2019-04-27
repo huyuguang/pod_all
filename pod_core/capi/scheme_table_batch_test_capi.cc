@@ -4,8 +4,9 @@
 #include <iostream>
 #include <memory>
 
-#include "../scheme_table_batch_notary.h"
-#include "../scheme_table_batch_serialize.h"
+#include "../scheme_batch_notary.h"
+#include "../scheme_batch_serialize.h"
+#include "../scheme_batch_protocol.h"
 #include "c_api.h"
 #include "tick.h"
 
@@ -145,6 +146,10 @@ bool Test(std::string const& output_path, WrapperA const& a, WrapperB const& b,
       assert(false);
       return false;
     }
+
+    using scheme::batch::Claim;
+    using scheme::batch::Receipt;
+    using scheme::batch::Secret;
 
     Claim claim;
     try {

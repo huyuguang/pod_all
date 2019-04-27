@@ -22,7 +22,8 @@ class B {
   VrfMeta const& vrf_meta() const { return vrf_meta_; }
   std::vector<G1> sigmas() const { return sigmas_; }
   std::vector<std::vector<Fr>> const& key_m() const { return key_m_; }
-
+  bool SaveDecryped(std::string const& file, std::vector<Range> const& demands,
+                    std::vector<Fr> const& decrypted);
  private:
   void LoadData();
   bool NeedVerify();

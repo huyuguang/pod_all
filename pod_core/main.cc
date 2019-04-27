@@ -1,28 +1,25 @@
+#include "capi/scheme_plain_batch2_test_capi.h"
 #include "capi/scheme_plain_batch3_test_capi.h"
-#include "capi/scheme_plain_otrange_test_capi.h"
-#include "capi/scheme_plain_range_test_capi.h"
+#include "capi/scheme_plain_batch_test_capi.h"
+#include "capi/scheme_plain_otbatch3_test_capi.h"
+#include "capi/scheme_plain_otbatch_test_capi.h"
 #include "capi/scheme_table_batch2_test_capi.h"
 #include "capi/scheme_table_batch3_test_capi.h"
 #include "capi/scheme_table_batch_test_capi.h"
-#include "capi/scheme_table_otbatch_test_capi.h"
 #include "capi/scheme_table_otbatch3_test_capi.h"
-#include "capi/scheme_plain_otbatch3_test_capi.h"
+#include "capi/scheme_table_otbatch_test_capi.h"
 #include "capi/scheme_table_otvrfq_test_capi.h"
 #include "capi/scheme_table_vrfq_test_capi.h"
 #include "ecc_pub.h"
 #include "public.h"
+#include "scheme_batch2_test.h"
+#include "scheme_batch3_test.h"
+#include "scheme_batch_test.h"
 #include "scheme_misc.h"
-#include "scheme_plain_batch3_test.h"
-#include "scheme_plain_otrange_test.h"
-#include "scheme_plain_range_test.h"
-#include "scheme_table_batch2_test.h"
-#include "scheme_table_batch3_test.h"
-#include "scheme_table_batch_test.h"
-#include "scheme_table_otbatch_test.h"
+#include "scheme_otbatch3_test.h"
+#include "scheme_otbatch_test.h"
 #include "scheme_table_otvrfq_test.h"
 #include "scheme_table_vrfq_test.h"
-#include "scheme_table_otbatch3_test.h"
-#include "scheme_plain_otbatch3_test.h"
 
 namespace {
 void DumpEccPub() {
@@ -53,8 +50,6 @@ int main(int argc, char** argv) {
   std::string publish_path;
   std::string output_path;
   std::string ecc_pub_file;
-  Range demand_range;
-  Range phantom_range;
   std::string query_key;
   std::vector<std::string> query_values;
   std::vector<std::string> phantom_values;
@@ -77,10 +72,6 @@ int main(int argc, char** argv) {
         "Provide the publish path")("output_path,o",
                                     po::value<std::string>(&output_path),
                                     "Provide the output path")(
-        "demand_range,d", po::value<Range>(&demand_range),
-        "Provide the demand range")("phantom_range,g",
-                                    po::value<Range>(&phantom_range),
-                                    "Provide the phantom range")(
         "demand_ranges",
         po::value<std::vector<Range>>(&demand_ranges)->multitoken(),
         "Provide the demand ranges")(
@@ -179,75 +170,90 @@ int main(int argc, char** argv) {
   if (mode == Mode::kPlain) {
     if (action == Action::kVrfQuery || action == Action::kOtVrfQuery ||
         action == Action::kVrfPod || action == Action::kOtVrfPod) {
-      std::cerr << "Plain mode does not support vrf query&pod action\n";
+      std::cerr << "Plain mode does not support vrf query action\n";
       return -1;
     }
   }
 
-  if (mode == Mode::kPlain) {
-    if (action == Action::kRangePod) {
-      auto func = use_capi ? scheme::plain::range::capi::Test
-                           : scheme::plain::range::Test;
-      return func(publish_path, output_path, demand_range, test_evil) ? 0 : -1;
-    } else if (action == Action::kOtRangePod) {
-      auto func = use_capi ? scheme::plain::otrange::capi::Test
-                           : scheme::plain::otrange::Test;
-      return func(publish_path, output_path, demand_range, phantom_range,
-                  test_evil)
-                 ? 0
-                 : -1;
-    } else if (action == Action::kBatch3Pod) {
-      auto func = use_capi ? scheme::plain::batch3::capi::Test
-                           : scheme::plain::batch3::Test;
-      return func(publish_path, output_path, demand_ranges) ? 0 : -1;
-    } else if (action == Action::kOtBatch3Pod) {
-      auto func = use_capi ? scheme::plain::otbatch3::capi::Test
-                           : scheme::plain::otbatch3::Test;
-      return func(publish_path, output_path, demand_ranges, phantom_ranges) ? 0 : -1;
-    } else {
-      std::cerr << "Not implement yet.\n";
-      return -1;
-    }
-  } else {
-    if (action == Action::kVrfQuery) {
-      auto func = use_capi ? scheme::table::vrfq::capi::Test
-                           : scheme::table::vrfq::Test;
-      return func(publish_path, output_path, query_key, query_values) ? 0 : -1;
-    } else if (action == Action::kOtVrfQuery) {
-      auto func = use_capi ? scheme::table::otvrfq::capi::Test
-                           : scheme::table::otvrfq::Test;
-      return func(publish_path, output_path, query_key, query_values,
-                  phantom_values)
-                 ? 0
-                 : -1;
-    } else if (action == Action::kBatchPod) {
-      auto func = use_capi ? scheme::table::batch::capi::Test
-                           : scheme::table::batch::Test;
-      return func(publish_path, output_path, demand_ranges, test_evil) ? 0 : -1;
-    } else if (action == Action::kOtBatchPod) {
-      auto func = use_capi ? scheme::table::otbatch::capi::Test
-                           : scheme::table::otbatch::Test;
-      return func(publish_path, output_path, demand_ranges, phantom_ranges,
-                  test_evil)
-                 ? 0
-                 : -1;
-    } else if (action == Action::kBatch2Pod) {
-      auto func = use_capi ? scheme::table::batch2::capi::Test
-                           : scheme::table::batch2::Test;
-      return func(publish_path, output_path, demand_ranges, test_evil) ? 0 : -1;
-    } else if (action == Action::kBatch3Pod) {
-      auto func = use_capi ? scheme::table::batch3::capi::Test
-                           : scheme::table::batch3::Test;
-      return func(publish_path, output_path, demand_ranges) ? 0 : -1;
-      return 0;
-    } else if (action == Action::kOtBatch3Pod) {
-      auto func = use_capi ? scheme::table::otbatch3::capi::Test
-                           : scheme::table::otbatch3::Test;
-      return func(publish_path, output_path, demand_ranges, phantom_ranges) ? 0 : -1;
-      return 0;
-    } else {
-      std::cerr << "Not implement yet.\n";
-      return -1;
-    }
+  if (action == Action::kVrfQuery) {
+    auto func =
+        use_capi ? scheme::table::vrfq::capi::Test : scheme::table::vrfq::Test;
+    return func(publish_path, output_path, query_key, query_values) ? 0 : -1;
   }
+
+  if (action == Action::kOtVrfQuery) {
+    auto func = use_capi ? scheme::table::otvrfq::capi::Test
+                         : scheme::table::otvrfq::Test;
+    return func(publish_path, output_path, query_key, query_values,
+                phantom_values)
+               ? 0
+               : -1;
+  }
+
+  if (action == Action::kBatchPod) {
+    decltype(scheme::table::batch::Test)* func;
+    if (mode == Mode::kPlain) {
+      func = use_capi ? scheme::plain::batch::capi::Test
+                      : scheme::plain::batch::Test;
+    } else {
+      func = use_capi ? scheme::table::batch::capi::Test
+                      : scheme::table::batch::Test;
+    }
+    return func(publish_path, output_path, demand_ranges, test_evil) ? 0 : -1;
+  }
+
+  if (action == Action::kOtBatchPod) {
+    decltype(scheme::table::otbatch::Test)* func;
+    if (mode == Mode::kPlain) {
+      func = use_capi ? scheme::plain::otbatch::capi::Test
+                      : scheme::plain::otbatch::Test;
+    } else {
+      func = use_capi ? scheme::table::otbatch::capi::Test
+                      : scheme::table::otbatch::Test;
+    }
+    return func(publish_path, output_path, demand_ranges, phantom_ranges,
+                test_evil)
+               ? 0
+               : -1;
+  }
+
+  if (action == Action::kBatch2Pod) {
+    decltype(scheme::table::batch2::Test)* func;
+    if (mode == Mode::kPlain) {
+      func = use_capi ? scheme::plain::batch2::capi::Test
+                      : scheme::plain::batch2::Test;
+    } else {
+      func = use_capi ? scheme::table::batch2::capi::Test
+                      : scheme::table::batch2::Test;
+    }
+    return func(publish_path, output_path, demand_ranges, test_evil) ? 0 : -1;
+  }
+
+  if (action == Action::kBatch3Pod) {
+    decltype(scheme::table::batch3::Test)* func;
+    if (mode == Mode::kPlain) {
+      func = use_capi ? scheme::plain::batch3::capi::Test
+                      : scheme::plain::batch3::Test;
+    } else {
+      func = use_capi ? scheme::table::batch3::capi::Test
+                      : scheme::table::batch3::Test;
+    }
+    return func(publish_path, output_path, demand_ranges) ? 0 : -1;
+  }
+
+  if (action == Action::kOtBatch3Pod) {
+    decltype(scheme::table::otbatch3::Test)* func;
+    if (mode == Mode::kPlain) {
+      func = use_capi ? scheme::plain::otbatch3::capi::Test
+                      : scheme::table::otbatch3::Test;
+    } else {
+      func = use_capi ? scheme::plain::otbatch3::capi::Test
+                      : scheme::table::otbatch3::Test;
+    }
+    return func(publish_path, output_path, demand_ranges, phantom_ranges) ? 0
+                                                                          : -1;
+  }
+
+  std::cerr << "Not implement yet.\n";
+  return -1;
 }

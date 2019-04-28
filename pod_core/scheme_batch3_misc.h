@@ -11,8 +11,7 @@ namespace details {
 template <typename Bulletin, typename Request, typename Response>
 h256_t ComputeSeed(h256_t const& client_id, h256_t const& session_id,
                    Bulletin const& bulletin, Request const& request,
-                   Response const& response) {
-  Tick _tick_(__FUNCTION__);
+                   Response const& response) {  
   CryptoPP::Keccak_256 hash;
 
   // client_id and session_id
@@ -89,6 +88,7 @@ template <typename Bulletin, typename Request, typename Response>
 void ComputeChallenge(RomChallenge& challenge, h256_t const& client_id,
                       h256_t const& session_id, Bulletin const& bulletin,
                       Request const& request, Response const& response) {
+  Tick _tick_(__FUNCTION__);
   auto seed =
       details::ComputeSeed(client_id, session_id, bulletin, request, response);
   details::ComputeChallenge(seed, challenge);

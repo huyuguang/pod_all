@@ -34,15 +34,21 @@ typedef mcl::fp::WindowMethod<G2> G2WM;
 
 void InitEcc();
 
+void FpRand(Fp* f);
+
 Fp FpRand();
 
 void FpRand(Fp* r, size_t n);
 
 Fp2 Fp2Rand();
 
+void FrRand(Fr* f);
+
 Fr FrRand();
 
 void FrRand(Fr* r, size_t n);
+
+void FrRand(std::vector<Fr*>& f);
 
 Fr FrInv(Fr const& r);
 

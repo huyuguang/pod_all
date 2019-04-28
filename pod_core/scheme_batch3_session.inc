@@ -115,16 +115,23 @@ void Session<A>::BuildK() {
   Tick _tick_(__FUNCTION__);
   k_.resize(log_c_ + 1);
 
+  std::vector<Fr*> items;
+  items.reserve(align_s_ * (align_c_ * 2 - 1));
+
   for (size_t p = 0; p < k_.size(); ++p) {
     auto& kp = k_[p];
     size_t rows = align_c_ / (1ULL << p);
     size_t cols = align_s_;
     kp.resize(rows * cols);
-    //#pragma omp parallel for (system random generator has internal lock)
-    for (size_t i = 0; i < kp.size(); ++i) {
-      kp[i] = FrRand();
-    }
+    for (auto& i : kp) {
+      items.resize(items.size() + 1);
+      items.back() = &i;
+    }    
   }
+
+  assert(items.size() == (align_s_ * (align_c_ * 2 - 1)));
+
+  FrRand(items);
 }
 
 template <typename A>
@@ -142,7 +149,7 @@ void Session<A>::BuildX() {
     size_t cols = align_s_ / (1ULL << p);
     xp.resize(cols);
     for (auto& i : xp) {
-      i = FrRand();
+      FrRand(&i);
     }
   }
 }

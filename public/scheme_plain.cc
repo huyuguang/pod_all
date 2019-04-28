@@ -1,8 +1,8 @@
 #include "scheme_plain.h"
 #include "ecc.h"
+#include "mkl_tree.h"
 #include "public.h"
 #include "scheme_misc.h"
-#include "mkl_tree.h"
 
 namespace scheme::plain {
 

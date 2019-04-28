@@ -12,6 +12,8 @@
 #include "multiexp.h"
 #include "public.h"
 #include "scheme_misc.h"
+#include "scheme_plain.h"
+#include "scheme_table.h"
 #include "vrf_meta.h"
 
 namespace {

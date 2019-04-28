@@ -1,8 +1,8 @@
 #pragma once
 
 #include "scheme_otbatch3_notary.h"
+#include "func_alias.h"
 
 namespace scheme::batch3 {
-template <typename Receipt, typename Secret>
-constexpr auto VerifyProof = scheme::otbatch3::VerifyProof<Receipt, Secret>;
+ALIAS_TEMPLATE_FUNCTION(VerifyProof, scheme::otbatch3::VerifyProof)
 }  // namespace scheme::batch3

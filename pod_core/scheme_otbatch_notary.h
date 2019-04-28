@@ -6,12 +6,11 @@
 #include "chain.h"
 #include "mkl_tree.h"
 #include "scheme_misc.h"
-#include "scheme_otbatch_protocol.h"
 
 namespace scheme::otbatch {
-template<typename Receipt, typename Secret, typename Claim>
-bool VerifyClaim(uint64_t s, Receipt const& receipt,
-                        Secret const& secret, Claim const& claim) {
+template <typename Receipt, typename Secret, typename Claim>
+bool VerifyClaim(uint64_t s, Receipt const& receipt, Secret const& secret,
+                 Claim const& claim) {
   // same with the scheme::plain::range::VerifyClaim
   if (!VerifyPathOfK(claim.kij, claim.i * s + claim.j, receipt.count * s,
                      receipt.k_mkl_root, claim.mkl_path)) {

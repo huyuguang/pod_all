@@ -684,6 +684,9 @@
     <ClInclude Include="pod_core\capi\scheme_plain_otbatch_test_capi.h">
       <Filter>capi\plain_otbatch</Filter>
     </ClInclude>
+    <ClInclude Include="public\func_alias.h">
+      <Filter>public</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="pod_core\README.md" />

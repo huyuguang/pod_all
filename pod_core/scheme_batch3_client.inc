@@ -232,7 +232,7 @@ bool Client<B>::OnSecret(Secret secret) {
 
   secret_ = std::move(secret);
 
-  if (!VerifyProof<Receipt, Secret>(receipt_, secret_)) {
+  if (!VerifyProof(receipt_, secret_)) {
     assert(false);
     return false;
   }

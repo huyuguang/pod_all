@@ -52,7 +52,7 @@ void FrRand(Fr* r, size_t n) {
 
 #pragma omp parallel for
   for (size_t i = 0; i < 8; ++i) {
-    CryptoPP::AutoSeededRandomPool rng;
+    CryptoPP::NonblockingRng rng; //CryptoPP::AutoSeededRandomPool rng;
     rng.GenerateBlock(h.data() + 4 * i * n, 4 * n);
   }
 
@@ -67,7 +67,7 @@ void FrRand(std::vector<Fr*>& f) {
 
 #pragma omp parallel for
   for (int i = 0; i < 8; ++i) {
-    CryptoPP::AutoSeededRandomPool rng;
+    CryptoPP::NonblockingRng rng; // CryptoPP::AutoSeededRandomPool rng;
     rng.GenerateBlock(h.data() + 4 * i * f.size(), 4 * f.size());
   }
 

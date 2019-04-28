@@ -1,5 +1,7 @@
 #pragma once
 
+#include <cryptopp/osrng.h>
+
 #include "public.h"
 #include "mpz.h"
 #include "basic_types.h"
@@ -46,33 +48,9 @@ std::array<uint8_t, T> StrToH(std::string const& s) {
   return ret;
 }
 
-template <typename T>
-T FakeRand(T begin, T end) {
-  static std::mt19937_64 mt_rand(
-      std::chrono::high_resolution_clock::now().time_since_epoch().count());
-  return std::uniform_int_distribution<T>(begin, end)(mt_rand);
-}
-
-// NOTE: NOT safe enough
 inline void RandomBytes(uint8_t* x, uint64_t xlen) {
-  // Try to fetch some more data from the kernel high quality
-  // / dev / random.There may not be enough data available at this point,
-  // so use non - blocking read to avoid blocking the application
-  // completely.
-  int64_t res = 0;
-#ifndef _WIN32
-  int fd = open("/dev/urandom", O_RDONLY | O_NONBLOCK);
-  if (fd != -1) {
-    res = read(fd, x, xlen);
-    if (res < 0) res = 0;
-    close(fd);
-    if (res == (int64_t)xlen) {
-      return;
-    }
-  }
-#endif
-  for (int64_t i = res; i < (int64_t)xlen; ++i)
-    x[i] = (unsigned char)FakeRand(0, 255);
+  CryptoPP::NonblockingRng rng; //CryptoPP::AutoSeededRandomPool rng;
+  rng.GenerateBlock(x, xlen);
 }
 
 inline h256_t RandH256() {

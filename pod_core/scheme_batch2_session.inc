@@ -43,6 +43,7 @@ bool Session<A>::OnRequest(Request request, Response& response) {
   H2(seed0_, (demands_count_ + 1) * s_, v_);
 
   if (evil_) {
+    // NOTE: use rand() for test
     uint64_t evil_i = rand() % demands_count_;
     uint64_t evil_j = s_ - 1;  // last col
     v_[evil_i * s_ + evil_j] = FrRand();

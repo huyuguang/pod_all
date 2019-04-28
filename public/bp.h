@@ -496,7 +496,7 @@ inline bool Test() {
     i = FrRand();
   }
 
-  Challenge challenge(count, rand(), false);
+  Challenge challenge(count, rand(), false); // NOTE: use rand() for test
 
   auto get_g = [&g](uint64_t i) {
     if (i < g.size())

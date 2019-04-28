@@ -169,7 +169,7 @@ inline bool Test() {
   Generate<>(pk, sk);
   std::array<uint8_t, 32> x;
   for (auto& i : x) {
-    i = (uint8_t)rand();
+    i = (uint8_t)rand(); // NOTE: use rand() for test
   }
 
   Fsk fsk = Vrf<>(sk, x.data());

@@ -8,7 +8,9 @@
 #include "msvc_hack.h"
 
 namespace {
-
+// NOTE: NonblockingRng should enough for linux & windows
+// thread_local CryptoPP::AutoSeededRandomPool rng;
+thread_local CryptoPP::NonblockingRng rng;
 }  // namespace
 
 void InitEcc() {
@@ -20,7 +22,9 @@ void InitEcc() {
 }
 
 void FpRand(Fp* f) {
-  f->setByCSPRNG();
+  uint8_t buf[32];
+  rng.GenerateBlock(buf, 32);
+  f->setArrayMask(buf, 32);
 }
 
 Fp FpRand() {
@@ -29,16 +33,12 @@ Fp FpRand() {
   return r;
 }
 
-void FpRand(Fp* r, size_t n) {
-  for (size_t i = 0; i < n; ++i) {
-    FpRand(&r[i]);
-  }
-}
-
 Fp2 Fp2Rand() { return Fp2(FpRand(), FpRand()); }
 
 void FrRand(Fr* f) {
-  f->setByCSPRNG();
+  uint8_t buf[32];
+  rng.GenerateBlock(buf, 32);
+  f->setArrayMask(buf, 32);
 }
 
 Fr FrRand() {
@@ -51,9 +51,8 @@ void FrRand(Fr* r, size_t n) {
   std::vector<uint8_t> h(n * 32);
 
 #pragma omp parallel for
-  for (size_t i = 0; i < 8; ++i) {
-    CryptoPP::NonblockingRng rng; //CryptoPP::AutoSeededRandomPool rng;
-    rng.GenerateBlock(h.data() + 4 * i * n, 4 * n);
+  for (size_t i = 0; i < 4; ++i) {
+    rng.GenerateBlock(h.data() + 8 * i * n, 8 * n);
   }
 
 #pragma omp parallel for
@@ -63,12 +62,11 @@ void FrRand(Fr* r, size_t n) {
 }
 
 void FrRand(std::vector<Fr*>& f) {
-  std::vector<uint8_t> h(f.size() * 32);
-
+  auto n = f.size();
+  std::vector<uint8_t> h(n * 32);
 #pragma omp parallel for
-  for (int i = 0; i < 8; ++i) {
-    CryptoPP::NonblockingRng rng; // CryptoPP::AutoSeededRandomPool rng;
-    rng.GenerateBlock(h.data() + 4 * i * f.size(), 4 * f.size());
+  for (size_t i = 0; i < 4; ++i) {
+    rng.GenerateBlock(h.data() + 8 * i * n, 8 * n);
   }
 
 #pragma omp parallel for
@@ -98,7 +96,7 @@ void G1Rand(G1* r, size_t n) {
   Fp f;
   for (size_t i = 0; i < n; ++i) {
     for (;;) {
-      f.setByCSPRNG();
+      FpRand(&f);
       mcl::bn256::mapToG1(&b, r[i], f);
       if (b) break;
     }

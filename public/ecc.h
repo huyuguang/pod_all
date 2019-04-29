@@ -38,8 +38,6 @@ void FpRand(Fp* f);
 
 Fp FpRand();
 
-void FpRand(Fp* r, size_t n);
-
 Fp2 Fp2Rand();
 
 void FrRand(Fr* f);

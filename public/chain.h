@@ -35,8 +35,13 @@ inline Fr Chain(uint8_t const* seed_buf, uint64_t seed_len, uint64_t index) {
     digest_le.data()[i] = digest_be.data()[digest_be.size() - i - 1];
   }
 
-  Fr r;
-  r.setArrayMaskMod(digest_le.data(), digest_le.size());
+  // use setArray(Mod) instead of setArrayMaskMod because of gas limit
+  Fr r;  
+  bool success = false;
+  r.setArray(&success, digest_le.data(), digest_le.size(), mcl::fp::Mod);
+  assert(success);
+  //r.setArrayMaskMod(digest_le.data(), digest_le.size());
+
   return r;
 }
 

@@ -164,6 +164,8 @@ bool PairingMatch(G1 const& a, G1 const& c, G2 const& d);
 
 bool PairingMatch(G1 const& a, G2 const& b, G1 const& c, G2 const& d);
 
+Fr FrPower(Fr const& base, mpz_class const& exp);
+
 inline bool operator==(G1WM const& a, G1WM const& b) {
   if (a.bitSize_ != b.bitSize_) return false;
   if (a.winSize_ != b.winSize_) return false;

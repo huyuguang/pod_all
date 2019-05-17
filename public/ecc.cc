@@ -514,21 +514,21 @@ Fr FrPower(Fr const& base, mpz_class const& exp) {
   Fr z;
   Fr::pow(z, base, exp);
   return z;
-  // Fr result(0);
-  // bool begin = false;
-  // auto e = exp.get_mpz_t();
-  // ssize_t n = mpz_sizeinbase(e, 2);
-  // for (ssize_t i = n - 1; i >= 0; --i) {
+  //Fr result(1);
+  //bool begin = false;
+  //auto e = exp.get_mpz_t();
+  //ssize_t n = mpz_sizeinbase(e, 2);
+  //for (ssize_t i = n - 1; i >= 0; --i) {
   //  if (begin) {
   //    result = result * result;
   //  }
 
   //  if (mpz_tstbit(e, i)) {
   //    begin = true;
-  //    result += base;
+  //    result *= base;
   //  }
   //}
-  // return result;
+  //return result;
 }
 
 Fr MapToFr(void const* b, size_t n) {

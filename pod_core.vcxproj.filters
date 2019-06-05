@@ -691,6 +691,7 @@
   <ItemGroup>
     <None Include="pod_core\README.md" />
     <None Include="pod_core\Makefile" />
+    <None Include="pod_core\Makefile.clang" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="bak.txt" />

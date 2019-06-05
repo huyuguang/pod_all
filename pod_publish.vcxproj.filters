@@ -299,6 +299,7 @@
     <None Include="pod_publish\Makefile" />
     <None Include="pod_publish\README.md" />
     <None Include="pod_publish\test.csv" />
+    <None Include="pod_publish\Makefile.clang" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="pod_publish\todo.txt" />

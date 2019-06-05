@@ -6,25 +6,22 @@ CXX11_HOME = /usr
 
 THIRD_PARTY_HOME = ../thirdparty
 MCL_HOME = ../thirdparty/mcl/include
-YAS_HOME = ../thirdparty/yas/include
 PUB_HOME = ../public
 
 CXXFLAGS := \
  -g3 \
  -fPIC \
- -fopenmp \
- -std=c++17 \
+ -fopenmp=libiomp5 \
+ -std=c++14 \
  -Wall \
  -Wextra \
  -gdwarf-2 \
  -gstrict-dwarf \
  -Wno-parentheses \
- -Wno-unused-private-field \
  -Wdeprecated-declarations \
  -fmerge-all-constants  \
  -I $(CXX11_HOME)/include \
  -I $(MCL_HOME) \
- -I $(YAS_HOME) \
  -I $(THIRD_PARTY_HOME) \
  -I $(PUB_HOME) \
  -I. \
@@ -32,11 +29,9 @@ CXXFLAGS := \
 MCL_FLAGS := \
  -DMCL_DONT_USE_OPENSSL
 
-BOOST_FLAGS := \
- -DBOOST_SPIRIT_THREADSAFE 
-
 RELEASE_FLAGS := \
  -O3 \
+ -DDTREE_ICASE \
  -DNDEBUG \
  -DLINUX \
 
@@ -45,14 +40,11 @@ DEBUG_FLAGS := \
  -D_DEBUG \
  -DLINUX \
  
-#LDFLAGS += \
-# -static-libstdc++ -static-libgcc \
-# -fmerge-all-constants \
-# -L${CXX11_HOME}/lib64
-
 LDFLAGS += \
  -fmerge-all-constants \
  -L${CXX11_HOME}/lib64
+
+ 
 
 LIBS := \
  -lpthread \
@@ -60,7 +52,7 @@ LIBS := \
  -lgmpxx \
  -lgmp \
  -lcryptopp \
- -lgomp \
+ -lomp \
  -lboost_filesystem \
  -lboost_system \
  -lboost_iostreams \
@@ -68,38 +60,37 @@ LIBS := \
 
 BUILD := ./build/self
 BUILDPUB := ./build/public
-BUILDCAPI := ./build/self/capi
-BUILD3RD := ./build/thirdparty
+
 $(shell mkdir -p $(BUILD))
 $(shell mkdir -p $(BUILDPUB))
-$(shell mkdir -p $(BUILDCAPI))
-$(shell mkdir -p $(BUILD3RD))
 
-DIR := . ../public capi
+DIR := . 
 
 SRC := $(foreach d, $(DIR), $(wildcard $(d)/*.cc))
+
+SRC += ../public/ecc.cc
+SRC += ../public/fp.cc
 
 RELEASE_OBJ := $(patsubst %.cc, %.o, $(SRC))
 
 DEBUG_OBJ := $(patsubst %.cc, %.d.o, $(SRC))
 
-CXX := export LD_LIBRARY_PATH=${CXX11_HOME}/lib; ${CXX11_HOME}/bin/g++
+CXX := export LD_LIBRARY_PATH=${CXX11_HOME}/lib; ${CXX11_HOME}/bin/clang++
 
-all: pod_cored_l pod_core_l
+all: pod_setupd pod_setup
 
 %.o : %.cc
-	$(CXX) -c $^ $(CXXFLAGS) $(RELEASE_FLAGS) $(MCL_FLAGS) $(BOOST_FLAGS) -o $(BUILD)/$@
+	$(CXX) -c $^ $(CXXFLAGS) $(RELEASE_FLAGS) $(MCL_FLAGS) -o $(BUILD)/$@
 
 
 %.d.o : %.cc
-	$(CXX) -c $^ $(CXXFLAGS) $(DEBUG_FLAGS) $(MCL_FLAGS) $(BOOST_FLAGS) -o $(BUILD)/$@
+	$(CXX) -c $^ $(CXXFLAGS) $(DEBUG_FLAGS) $(MCL_FLAGS) -o $(BUILD)/$@
 
 
-
-pod_cored_l : $(DEBUG_OBJ)
+pod_setupd : $(DEBUG_OBJ)
 	$(CXX) $(addprefix $(BUILD)/, $^) -o $@.exe $(LDFLAGS) $(LIBS)
 
-pod_core_l : $(RELEASE_OBJ)
+pod_setup : $(RELEASE_OBJ)
 	$(CXX) $(addprefix $(BUILD)/, $^) -o $@.exe $(LDFLAGS) $(LIBS)
 
 clean:

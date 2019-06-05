@@ -485,6 +485,7 @@ bool P1Verify(P1Proof const& p1_proof, GET_G const& get_g, uint64_t count) {
   return p1_proof.p2_proof.q == p1_proof.committment.q(challenge.u());
 }
 
+
 inline bool Test() {
   size_t count = 1024;  // * 1024;
   std::vector<G1> g(count);

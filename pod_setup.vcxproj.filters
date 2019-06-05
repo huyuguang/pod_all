@@ -211,5 +211,6 @@
   <ItemGroup>
     <None Include="pod_setup\Makefile" />
     <None Include="pod_setup\README.md" />
+    <None Include="pod_setup\Makefile.clang" />
   </ItemGroup>
 </Project>

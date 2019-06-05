@@ -328,6 +328,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="pod_core\Makefile" />
+    <None Include="pod_core\Makefile.clang" />
     <None Include="pod_core\README.md" />
   </ItemGroup>
   <ItemGroup>

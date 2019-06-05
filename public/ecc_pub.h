@@ -93,7 +93,7 @@ class EccPub : boost::noncopyable {
     Tick tick(__FUNCTION__);
 
     assert(u1_size && u2_size);
-    Fr::getOp().p;
+    //Fr::getOp().p;
 
     auto fr_bits = Fr::getBitSize();
     u1_.resize(u1_size);

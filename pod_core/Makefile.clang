@@ -12,7 +12,7 @@ PUB_HOME = ../public
 CXXFLAGS := \
  -g3 \
  -fPIC \
- -fopenmp \
+ -fopenmp=libiomp5 \
  -std=c++17 \
  -Wall \
  -Wextra \
@@ -45,11 +45,6 @@ DEBUG_FLAGS := \
  -D_DEBUG \
  -DLINUX \
  
-#LDFLAGS += \
-# -static-libstdc++ -static-libgcc \
-# -fmerge-all-constants \
-# -L${CXX11_HOME}/lib64
-
 LDFLAGS += \
  -fmerge-all-constants \
  -L${CXX11_HOME}/lib64
@@ -60,7 +55,7 @@ LIBS := \
  -lgmpxx \
  -lgmp \
  -lcryptopp \
- -lgomp \
+ -lomp \
  -lboost_filesystem \
  -lboost_system \
  -lboost_iostreams \
@@ -83,7 +78,7 @@ RELEASE_OBJ := $(patsubst %.cc, %.o, $(SRC))
 
 DEBUG_OBJ := $(patsubst %.cc, %.d.o, $(SRC))
 
-CXX := export LD_LIBRARY_PATH=${CXX11_HOME}/lib; ${CXX11_HOME}/bin/g++
+CXX := export LD_LIBRARY_PATH=${CXX11_HOME}/lib; ${CXX11_HOME}/bin/clang++
 
 all: pod_cored_l pod_core_l
 

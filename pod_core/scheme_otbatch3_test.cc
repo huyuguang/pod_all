@@ -13,8 +13,8 @@
 namespace {
 // The session id must be hash(addr_A), and the client id must be hash(addr_B).
 // Here just use two dummy values for test.
-const h256_t kDummySessionId = h256_t{1};
-const h256_t kDummyClientId = h256_t{2};
+const h256_t kDummySessionId = h256_t{{1}};
+const h256_t kDummyClientId = h256_t{{2}};
 }  // namespace
 
 namespace scheme::otbatch3 {

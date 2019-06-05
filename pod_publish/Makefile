@@ -45,8 +45,12 @@ DEBUG_FLAGS := \
  -D_DEBUG \
  -DLINUX \
  
+#LDFLAGS += \
+# -static-libstdc++ -static-libgcc \
+# -fmerge-all-constants \
+# -L${CXX11_HOME}/lib64
+
 LDFLAGS += \
- -static-libstdc++ -static-libgcc \
  -fmerge-all-constants \
  -L${CXX11_HOME}/lib64
 

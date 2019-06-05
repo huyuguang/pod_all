@@ -142,14 +142,6 @@ struct json_istream {
         :is(is)
 	{}
 
-	template<typename T = std::size_t>
-	T read_seq_size() {
-		T size{};
-		read(size);
-
-		return size;
-	}
-
 	bool empty() const { return is.empty(); }
 	char peekch() const { return is.peekch(); }
 	char getch() { return is.getch(); }
@@ -247,6 +239,13 @@ struct json_istream {
 		v = Trait::template atod<T>(buf, n);
 	}
 
+	template<typename T = std::size_t>
+	T read_seq_size() {
+		T size{};
+		read(size);
+
+		return size;
+	}
 private:
 	IS &is;
 };

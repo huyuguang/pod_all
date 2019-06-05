@@ -1,6 +1,7 @@
 #sudo apt-get install libomp-dev
 #sudo apt-get install libcrypto++-dev
 #sudo apt-get install libboost-all-dev
+#sudo apt-get install libiomp5
 
 CXX11_HOME = /usr
 

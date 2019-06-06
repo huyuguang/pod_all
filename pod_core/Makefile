@@ -20,6 +20,7 @@ CXXFLAGS := \
  -gstrict-dwarf \
  -Wno-parentheses \
  -Wno-unused-private-field \
+ -Wno-unused-lambda-capture \
  -Wdeprecated-declarations \
  -fmerge-all-constants  \
  -I $(CXX11_HOME)/include \
@@ -28,6 +29,7 @@ CXXFLAGS := \
  -I $(THIRD_PARTY_HOME) \
  -I $(PUB_HOME) \
  -I. \
+ -isystem $(CXX11_HOME)/include/boost \
 
 MCL_FLAGS := \
  -DMCL_DONT_USE_OPENSSL

@@ -196,7 +196,7 @@ struct json_istream {
 
 	// for unsigned 16/32/64 bits
 	template<typename T>
-	void read(T &v, __YAS_ENABLE_IF_IS_ANY_OF(T, std::uint16_t, std::uint32_t, std::uint64_t)) {
+	void read(T &v, __YAS_ENABLE_IF_IS_ANY_OF(T, std::uint16_t, std::uint32_t, std::uint64_t, std::size_t)) {
 		char buf[sizeof(T)*4];
 		const std::size_t n = json_read_num(is, buf, sizeof(buf));
 

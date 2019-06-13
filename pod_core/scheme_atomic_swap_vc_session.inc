@@ -1,5 +1,5 @@
 
-namespace scheme::atomic_swap {
+namespace scheme::atomic_swap_vc {
 
 template <typename AliceData>
 Session<AliceData>::Session(std::shared_ptr<AliceData> a, h256_t const& self_id,
@@ -57,8 +57,6 @@ bool Session<AliceData>::OnRequest(Request request, Response& response) {
                                CalcRootOfK(response.k)}};
   seed2_ = CalcSeed2(seed2_h);
 
-  H2(seed2_, demands_count_, w_);
-
   // compute mij' = vij + wi * mij
   auto const& m = a_->m();
   response.m.resize(demands_count_ * s_);
@@ -110,4 +108,4 @@ bool Session<AliceData>::OnReceipt(Receipt const& receipt, Secret& secret) {
   return true;
 }
 
-}  // namespace scheme::atomic_swap
+}  // namespace scheme::atomic_swap_vc

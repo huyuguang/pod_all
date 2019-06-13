@@ -68,6 +68,9 @@
     <Filter Include="local\atomic_swap">
       <UniqueIdentifier>{a74efd45-7646-48ed-b203-26f58c259d8c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="local\atomic_swap_vc">
+      <UniqueIdentifier>{1bf890f4-9efc-4173-8bde-e1d69741b9f3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pod_core\main.cc">
@@ -183,6 +186,12 @@
     </ClCompile>
     <ClCompile Include="pod_core\scheme_table_bob_data.cc">
       <Filter>local</Filter>
+    </ClCompile>
+    <ClCompile Include="pod_core\scheme_atomic_swap_vc_notary.cc">
+      <Filter>local\atomic_swap_vc</Filter>
+    </ClCompile>
+    <ClCompile Include="pod_core\scheme_atomic_swap_vc_test.cc">
+      <Filter>local\atomic_swap_vc</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -579,11 +588,35 @@
     <ClInclude Include="pod_core\scheme_table_bob_data.h">
       <Filter>local</Filter>
     </ClInclude>
+    <ClInclude Include="pod_core\scheme_atomic_swap_vc_client.h">
+      <Filter>local\atomic_swap_vc</Filter>
+    </ClInclude>
+    <ClInclude Include="pod_core\scheme_atomic_swap_vc_notary.h">
+      <Filter>local\atomic_swap_vc</Filter>
+    </ClInclude>
+    <ClInclude Include="pod_core\scheme_atomic_swap_vc_protocol.h">
+      <Filter>local\atomic_swap_vc</Filter>
+    </ClInclude>
+    <ClInclude Include="pod_core\scheme_atomic_swap_vc_serialize.h">
+      <Filter>local\atomic_swap_vc</Filter>
+    </ClInclude>
+    <ClInclude Include="pod_core\scheme_atomic_swap_vc_session.h">
+      <Filter>local\atomic_swap_vc</Filter>
+    </ClInclude>
+    <ClInclude Include="pod_core\scheme_atomic_swap_vc_test.h">
+      <Filter>local\atomic_swap_vc</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="pod_core\README.md" />
     <None Include="pod_core\Makefile" />
     <None Include="pod_core\Makefile.clang" />
+    <None Include="pod_core\scheme_atomic_swap_vc_client.inc">
+      <Filter>local\atomic_swap_vc</Filter>
+    </None>
+    <None Include="pod_core\scheme_atomic_swap_vc_session.inc">
+      <Filter>local\atomic_swap_vc</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Text Include="bak.txt" />

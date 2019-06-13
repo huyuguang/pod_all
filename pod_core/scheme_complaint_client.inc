@@ -57,7 +57,10 @@ bool Client<BobData>::OnResponse(Response response, Receipt& receipt) {
 
   k_ = std::move(response.k);
   k_mkl_root_ = CalcRootOfK(k_);
-  seed2_ = CalcSeed2(seed2_seed_, k_mkl_root_);
+
+  std::vector<h256_t> seed2_h{{self_id_, peer_id_, seed2_seed_,
+                               CalcRangesDigest(demands_), k_mkl_root_}};
+  seed2_ = CalcSeed2(seed2_h);
 
   H2(seed2_, demands_count_, w_);
 

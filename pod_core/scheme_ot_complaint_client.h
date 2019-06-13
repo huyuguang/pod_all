@@ -14,7 +14,6 @@ template <typename BobData>
 class Client {
  public:
   typedef std::shared_ptr<BobData> BobDataPtr;
-  // The self_id and peer_id are useless now, just for later convenience.
   Client(BobDataPtr b, h256_t const& self_id, h256_t const& peer_id,
          std::vector<Range> demands, std::vector<Range> phantoms);
 
@@ -54,6 +53,7 @@ class Client {
   uint64_t phantoms_count_ = 0;
 
  private:
+  Request request_;
   std::vector<G1> k_;      // sizeof() = L
   std::vector<G1> ot_ui_;  // sizeof() = K
   h256_t seed2_seed_;

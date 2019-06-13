@@ -1,5 +1,5 @@
 
-namespace scheme::atomic_swap {
+namespace scheme::atomic_swap_vc {
 
 template <typename BobData>
 Client<BobData>::Client(std::shared_ptr<BobData> b, h256_t const& self_id,
@@ -201,4 +201,4 @@ bool Client<BobData>::SaveDecrypted(std::string const& file) {
   Tick _tick_(__FUNCTION__);
   return b_->SaveDecryped(file, demands_, decrypted_m_);
 }
-}  // namespace scheme::atomic_swap
+}  // namespace scheme::atomic_swap_vc

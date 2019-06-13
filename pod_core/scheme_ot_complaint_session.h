@@ -10,7 +10,6 @@ template <typename AliceData>
 class Session {
  public:
   typedef std::shared_ptr<AliceData> AliceDataPtr;
-  // The self_id and peer_id are useless now, just for later convenience.
   Session(AliceDataPtr a, h256_t const& self_id, h256_t const& peer_id);
 
  public:

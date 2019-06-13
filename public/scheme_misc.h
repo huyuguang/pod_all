@@ -58,12 +58,18 @@ h256_t CalcRootOfK(std::vector<G1> const& k);
 h256_t CalcPathOfK(std::vector<G1> const& k, uint64_t ij,
                    std::vector<h256_t>& path);
 
+h256_t CalcRangesDigest(std::vector<Range> const& r);
+
+h256_t CalcFrDataDigest(std::vector<Fr> const& m);
+
+h256_t CalcG1DataDigest(std::vector<G1> const& d);
+
 bool VerifyPathOfK(G1 const& kij, uint64_t ij, uint64_t ns, h256_t const& root,
                    std::vector<h256_t> const& path);
 
 void BuildK(std::vector<Fr> const& v, std::vector<G1>& k, uint64_t s);
 
-h256_t CalcSeed2(h256_t const& seed, h256_t const& k_mkl_root);
+h256_t CalcSeed2(std::vector<h256_t> const& h);
 
 bool CheckDemandPhantoms(uint64_t n, std::vector<Range> const& demands,
                          std::vector<Range> const& phantoms);

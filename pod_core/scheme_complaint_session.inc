@@ -54,7 +54,9 @@ bool Session<AliceData>::OnRequest(Request request, Response& response) {
 
   k_mkl_root_ = CalcRootOfK(response.k);
 
-  seed2_ = CalcSeed2(seed2_seed_, k_mkl_root_);
+  std::vector<h256_t> seed2_h{{peer_id_, self_id_, seed2_seed_,
+                               CalcRangesDigest(demands_), k_mkl_root_}};
+  seed2_ = CalcSeed2(seed2_h);
 
   H2(seed2_, demands_count_, w_);
 

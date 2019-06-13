@@ -90,7 +90,12 @@ bool Session<AliceData>::OnRequest(Request request, Response& response) {
     response.ot_ui[j] = ot_vi_[j] * ot_rand_c_;
   }
 
-  seed2_ = CalcSeed2(seed2_seed_, k_mkl_root_);
+  std::vector<h256_t> seed2_h{
+      {peer_id_, self_id_, seed2_seed_, CalcRangesDigest(phantoms_),
+       CalcG1DataDigest(ot_vi_), G1ToBin(ot_v_),
+       CalcG1DataDigest(response.ot_ui), k_mkl_root_}};
+  seed2_ = CalcSeed2(seed2_h);
+  //std::cout << "session seed: " << misc::HexToStr(seed2_) << "\n";
 
   H2(seed2_, phantoms_count_, w_);
 

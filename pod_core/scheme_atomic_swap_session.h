@@ -12,7 +12,6 @@ namespace scheme::atomic_swap {
 template <typename AliceData>
 class Session {
  public:
-  // The self_id and peer_id are useless now, just for later convenience.
   Session(std::shared_ptr<AliceData> a, h256_t const& self_id,
           h256_t const& peer_id);
 

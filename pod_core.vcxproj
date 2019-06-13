@@ -122,6 +122,8 @@
     <ClInclude Include="pod_core\capi\scheme_plain_atomic_swap_test_capi.h" />
     <ClInclude Include="pod_core\capi\scheme_plain_complaint_test_capi.h" />
     <ClInclude Include="pod_core\capi\scheme_plain_ot_complaint_test_capi.h" />
+    <ClCompile Include="pod_core\scheme_atomic_swap_vc_notary.cc" />
+    <ClCompile Include="pod_core\scheme_atomic_swap_vc_test.cc" />
     <ClCompile Include="pod_core\scheme_plain_alice_data.cc" />
     <ClCompile Include="pod_core\scheme_plain_bob_data.cc" />
     <ClCompile Include="pod_core\scheme_table_alice_data.cc" />
@@ -134,6 +136,12 @@
       <FileType>Document</FileType>
     </ClInclude>
     <ClCompile Include="pod_core\scheme_atomic_swap_test.cc" />
+    <ClInclude Include="pod_core\scheme_atomic_swap_vc_client.h" />
+    <ClInclude Include="pod_core\scheme_atomic_swap_vc_notary.h" />
+    <ClInclude Include="pod_core\scheme_atomic_swap_vc_protocol.h" />
+    <ClInclude Include="pod_core\scheme_atomic_swap_vc_serialize.h" />
+    <ClInclude Include="pod_core\scheme_atomic_swap_vc_session.h" />
+    <ClInclude Include="pod_core\scheme_atomic_swap_vc_test.h" />
     <ClInclude Include="pod_core\scheme_complaint_client.inc">
       <FileType>Document</FileType>
     </ClInclude>
@@ -294,6 +302,8 @@
     <None Include="pod_core\Makefile" />
     <None Include="pod_core\Makefile.clang" />
     <None Include="pod_core\README.md" />
+    <None Include="pod_core\scheme_atomic_swap_vc_client.inc" />
+    <None Include="pod_core\scheme_atomic_swap_vc_session.inc" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="bak.txt" />

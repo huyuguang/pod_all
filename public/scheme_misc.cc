@@ -327,13 +327,49 @@ void BuildK(std::vector<Fr> const& v, std::vector<G1>& k, uint64_t s) {
   }
 }
 
-h256_t CalcSeed2(h256_t const& seed, h256_t const& k_mkl_root) {
-  h256_t ret;
+h256_t CalcRangesDigest(std::vector<Range> const& r) {
+  h256_t digest;
   CryptoPP::Keccak_256 hash;
-  hash.Update(seed.data(), seed.size());
-  hash.Update(k_mkl_root.data(), k_mkl_root.size());
-  hash.Final(ret.data());
-  return ret;
+  for (auto& i : r) {
+    auto a = boost::endian::native_to_big(i.start);
+    auto b = boost::endian::native_to_big(i.count);
+    hash.Update((uint8_t*)&a, sizeof(a));
+    hash.Update((uint8_t*)&b, sizeof(b));
+  }
+  hash.Final(digest.data());
+  return digest;
+}
+
+h256_t CalcFrDataDigest(std::vector<Fr> const& m) {
+  h256_t digest;
+  CryptoPP::Keccak_256 hash;
+  for (auto& i : m) {
+    h256_t bin = FrToBin(i);
+    hash.Update(bin.data(), bin.size());
+  }
+  hash.Final(digest.data());
+  return digest;
+}
+
+h256_t CalcG1DataDigest(std::vector<G1> const& d) {
+  h256_t digest;
+  CryptoPP::Keccak_256 hash;
+  for (auto& i : d) {
+    h256_t bin = G1ToBin(i);
+    hash.Update(bin.data(), bin.size());
+  }
+  hash.Final(digest.data());
+  return digest;  
+}
+
+h256_t CalcSeed2(std::vector<h256_t> const& h) {
+  h256_t digest;
+  CryptoPP::Keccak_256 hash;
+  for (auto& i : h) {
+    hash.Update(i.data(), i.size());
+  }
+  hash.Final(digest.data());
+  return digest;
 }
 
 bool CheckDemandPhantoms(uint64_t n, std::vector<Range> const& demands,

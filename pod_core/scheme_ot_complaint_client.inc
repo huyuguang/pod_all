@@ -74,6 +74,7 @@ void Client<BobData>::GetRequest(Request& request) {
     }
   }
   request.ot_v = ot_self_pk_ * (ot_rand_a_ * ot_rand_b_);
+  request_ = request;
 }
 
 template <typename BobData>
@@ -95,7 +96,13 @@ bool Client<BobData>::OnResponse(Response response, Receipt& receipt) {
   k_ = std::move(response.k);
   ot_ui_ = std::move(response.ot_ui);
   k_mkl_root_ = CalcRootOfK(k_);
-  seed2_ = CalcSeed2(seed2_seed_, k_mkl_root_);
+
+  std::vector<h256_t> seed2_h{
+      {self_id_, peer_id_, seed2_seed_, CalcRangesDigest(phantoms_),
+       CalcG1DataDigest(request_.ot_vi), G1ToBin(request_.ot_v),
+       CalcG1DataDigest(ot_ui_), k_mkl_root_}};
+  seed2_ = CalcSeed2(seed2_h);
+  //std::cout << "client seed: " << misc::HexToStr(seed2_) << "\n";
 
   H2(seed2_, phantoms_count_, w_);
 

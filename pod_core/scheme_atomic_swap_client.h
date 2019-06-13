@@ -13,7 +13,6 @@ namespace scheme::atomic_swap {
 template <typename BobData>
 class Client {
  public:
-  // The self_id and peer_id are useless now, just for later convenience.
   Client(std::shared_ptr<BobData> b, h256_t const& self_id,
          h256_t const& peer_id, std::vector<Range> demands);
 

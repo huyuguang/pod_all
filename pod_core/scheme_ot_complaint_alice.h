@@ -7,10 +7,10 @@
 namespace scheme::ot_complaint {
 
 template <typename AliceData>
-class Session {
+class Alice {
  public:
   typedef std::shared_ptr<AliceData> AliceDataPtr;
-  Session(AliceDataPtr a, h256_t const& self_id, h256_t const& peer_id);
+  Alice(AliceDataPtr a, h256_t const& self_id, h256_t const& peer_id);
 
  public:
   void GetNegoReqeust(NegoARequest& request);
@@ -66,8 +66,8 @@ class Session {
 };
 
 template <typename AliceData>
-using SessionPtr = std::shared_ptr<Session<AliceData>>;
+using AlicePtr = std::shared_ptr<Alice<AliceData>>;
 
 }  // namespace scheme::ot_complaint
 
-#include "scheme_ot_complaint_session.inc"
+#include "scheme_ot_complaint_alice.inc"

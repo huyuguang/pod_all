@@ -1,18 +1,18 @@
-#include "scheme_vrfq_session.h"
+#include "scheme_vrfq_alice.h"
 #include "public.h"
 #include "scheme_table_alice_data.h"
 #include "vrf.h"
 
 namespace scheme::table::vrfq {
 
-Session::Session(AliceDataPtr a, h256_t const& self_id, h256_t const& peer_id)
+Alice::Alice(AliceDataPtr a, h256_t const& self_id, h256_t const& peer_id)
     : a_(a), self_id_(self_id), peer_id_(peer_id) {
   auto const& ecc_pub = GetEccPub();
   r_ = FrRand();
   g_exp_r_ = ecc_pub.PowerG1(r_);
 }
 
-bool Session::OnRequest(Request const& request, Response& response) {
+bool Alice::OnRequest(Request const& request, Response& response) {
   if (request.value_digests.empty()) return false;
   auto key_meta = a_->GetKeyMetaByName(request.key_name);
   if (!key_meta) return false;
@@ -36,7 +36,7 @@ bool Session::OnRequest(Request const& request, Response& response) {
   return true;
 }
 
-bool Session::OnReceipt(Receipt const& receipt, Secret& secret) {
+bool Alice::OnReceipt(Receipt const& receipt, Secret& secret) {
   if (receipt.g_exp_r != g_exp_r_) return false;
   secret.r = r_;
   return true;

@@ -10,10 +10,10 @@
 
 namespace scheme::table::ot_vrfq {
 
-class Session {
+class Alice {
  public:
   // The self_id and peer_id are useless now, just for later convenience.
-  Session(AliceDataPtr a, h256_t const& self_id, h256_t const& peer_id);
+  Alice(AliceDataPtr a, h256_t const& self_id, h256_t const& peer_id);
 
  public:
   void GetNegoReqeust(NegoARequest& request);
@@ -40,5 +40,5 @@ class Session {
   Fr ot_alpha_;
 };
 
-typedef std::shared_ptr<Session> SessionPtr;
+typedef std::shared_ptr<Alice> AlicePtr;
 }  // namespace scheme::table::ot_vrfq

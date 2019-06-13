@@ -1,4 +1,4 @@
-#include "scheme_ot_vrfq_client.h"
+#include "scheme_ot_vrfq_bob.h"
 #include "misc.h"
 #include "public.h"
 #include "scheme_ot_vrfq_notary.h"
@@ -7,10 +7,10 @@
 
 namespace scheme::table::ot_vrfq {
 
-Client::Client(BobDataPtr b, h256_t const& self_id, h256_t const& peer_id,
-               std::string const& query_key,
-               std::vector<std::string> const& query_values,
-               std::vector<std::string> const& phantoms)
+Bob::Bob(BobDataPtr b, h256_t const& self_id, h256_t const& peer_id,
+         std::string const& query_key,
+         std::vector<std::string> const& query_values,
+         std::vector<std::string> const& phantoms)
     : b_(b),
       self_id_(self_id),
       peer_id_(peer_id),
@@ -53,21 +53,20 @@ Client::Client(BobDataPtr b, h256_t const& self_id, h256_t const& peer_id,
   ot_rand_b_ = FrRand();
 }
 
-void Client::GetNegoReqeust(NegoBRequest& request) { request.t = ot_self_pk_; }
+void Bob::GetNegoReqeust(NegoBRequest& request) { request.t = ot_self_pk_; }
 
-bool Client::OnNegoRequest(NegoARequest const& request,
-                           NegoAResponse& response) {
+bool Bob::OnNegoRequest(NegoARequest const& request, NegoAResponse& response) {
   ot_peer_pk_ = request.s;
   response.s_exp_beta = ot_peer_pk_ * ot_beta_;
   return true;
 }
 
-bool Client::OnNegoResponse(NegoBResponse const& response) {
+bool Bob::OnNegoResponse(NegoBResponse const& response) {
   ot_sk_ = response.t_exp_alpha * ot_beta_;
   return true;
 }
 
-void Client::GetRequest(Request& request) {
+void Bob::GetRequest(Request& request) {
   request.key_name = query_key_;
   request.shuffled_value_digests = std::move(shuffled_value_digests_);
 
@@ -80,7 +79,7 @@ void Client::GetRequest(Request& request) {
   request.ot_v = ot_self_pk_ * (ot_rand_a_ * ot_rand_b_);
 }
 
-bool Client::OnResponse(Response const& response, Receipt& receipt) {
+bool Bob::OnResponse(Response const& response, Receipt& receipt) {
   if (response.ot_ui.size() != value_digests_.size()) {
     assert(false);
     return false;
@@ -125,8 +124,8 @@ bool Client::OnResponse(Response const& response, Receipt& receipt) {
   return true;
 }
 
-bool Client::OnSecret(Secret const& query_secret,
-                      std::vector<std::vector<uint64_t>>& positions) {
+bool Bob::OnSecret(Secret const& query_secret,
+                   std::vector<std::vector<uint64_t>>& positions) {
   if (!VerifyProof(g_exp_r_, query_secret)) {
     assert(false);
     return false;

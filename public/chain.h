@@ -28,7 +28,7 @@ inline Fr Chain(uint8_t const* seed_buf, uint64_t seed_len, uint64_t index) {
   hash.Update(seed_buf, seed_len);
   hash.Update((uint8_t const*)&index_be, sizeof(index_be));
   hash.Final(digest_be.data());
-  
+
   // setArrayMaskMod want little endian
   h256_t digest_le;
   for (size_t i = 0; i < digest_be.size(); ++i) {
@@ -36,11 +36,11 @@ inline Fr Chain(uint8_t const* seed_buf, uint64_t seed_len, uint64_t index) {
   }
 
   // use setArray(Mod) instead of setArrayMaskMod because of gas limit
-  Fr r;  
+  Fr r;
   bool success = false;
   r.setArray(&success, digest_le.data(), digest_le.size(), mcl::fp::Mod);
   assert(success);
-  //r.setArrayMaskMod(digest_le.data(), digest_le.size());
+  // r.setArrayMaskMod(digest_le.data(), digest_le.size());
 
   return r;
 }

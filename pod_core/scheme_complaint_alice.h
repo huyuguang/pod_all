@@ -1,19 +1,16 @@
 #pragma once
 
-#include <memory>
-#include <string>
-#include <vector>
-
 #include "ecc.h"
-#include "scheme_atomic_swap_protocol.h"
+#include "public.h"
+#include "scheme_complaint_protocol.h"
 
-namespace scheme::atomic_swap {
+namespace scheme::complaint {
 
 template <typename AliceData>
-class Session {
+class Alice {
  public:
-  Session(std::shared_ptr<AliceData> a, h256_t const& self_id,
-          h256_t const& peer_id);
+  Alice(std::shared_ptr<AliceData> a, h256_t const& self_id,
+        h256_t const& peer_id);
 
  public:
   bool OnRequest(Request request, Response& response);
@@ -46,16 +43,17 @@ class Session {
 
  private:
   h256_t seed0_;
-  std::vector<Fr> v_;  // size() is (count + 1) * s_
+  std::vector<Fr> v_;  // size() is count * s_
   std::vector<Fr> w_;  // size() is count
-  Fr sigma_vw_;
+  h256_t k_mkl_root_;
 
  private:
   bool evil_ = false;
 };
 
 template <typename AliceData>
-using SessionPtr = std::shared_ptr<Session<AliceData>>;
-}  // namespace scheme::atomic_swap
+using AlicePtr = std::shared_ptr<Alice<AliceData>>;
 
-#include "scheme_atomic_swap_session.inc"
+}  // namespace scheme::complaint
+
+#include "scheme_complaint_alice.inc"

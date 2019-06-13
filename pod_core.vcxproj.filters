@@ -127,25 +127,13 @@
     <ClCompile Include="pod_core\scheme_ot_complaint_test.cc">
       <Filter>local\ot_complaint</Filter>
     </ClCompile>
-    <ClCompile Include="pod_core\scheme_ot_vrfq_client.cc">
-      <Filter>local\ot_vrfq</Filter>
-    </ClCompile>
     <ClCompile Include="pod_core\scheme_ot_vrfq_notary.cc">
-      <Filter>local\ot_vrfq</Filter>
-    </ClCompile>
-    <ClCompile Include="pod_core\scheme_ot_vrfq_session.cc">
       <Filter>local\ot_vrfq</Filter>
     </ClCompile>
     <ClCompile Include="pod_core\scheme_ot_vrfq_test.cc">
       <Filter>local\ot_vrfq</Filter>
     </ClCompile>
-    <ClCompile Include="pod_core\scheme_vrfq_client.cc">
-      <Filter>local\vrfq</Filter>
-    </ClCompile>
     <ClCompile Include="pod_core\scheme_vrfq_notary.cc">
-      <Filter>local\vrfq</Filter>
-    </ClCompile>
-    <ClCompile Include="pod_core\scheme_vrfq_session.cc">
       <Filter>local\vrfq</Filter>
     </ClCompile>
     <ClCompile Include="pod_core\scheme_vrfq_test.cc">
@@ -192,6 +180,18 @@
     </ClCompile>
     <ClCompile Include="pod_core\scheme_atomic_swap_vc_test.cc">
       <Filter>local\atomic_swap_vc</Filter>
+    </ClCompile>
+    <ClCompile Include="pod_core\scheme_ot_vrfq_bob.cc">
+      <Filter>local\ot_vrfq</Filter>
+    </ClCompile>
+    <ClCompile Include="pod_core\scheme_ot_vrfq_alice.cc">
+      <Filter>local\ot_vrfq</Filter>
+    </ClCompile>
+    <ClCompile Include="pod_core\scheme_vrfq_bob.cc">
+      <Filter>local\vrfq</Filter>
+    </ClCompile>
+    <ClCompile Include="pod_core\scheme_vrfq_alice.cc">
+      <Filter>local\vrfq</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -444,12 +444,6 @@
     <ClInclude Include="public\func_alias.h">
       <Filter>public</Filter>
     </ClInclude>
-    <ClInclude Include="pod_core\scheme_complaint_client.h">
-      <Filter>local\complaint</Filter>
-    </ClInclude>
-    <ClInclude Include="pod_core\scheme_complaint_client.inc">
-      <Filter>local\complaint</Filter>
-    </ClInclude>
     <ClInclude Include="pod_core\scheme_complaint_notary.h">
       <Filter>local\complaint</Filter>
     </ClInclude>
@@ -459,20 +453,8 @@
     <ClInclude Include="pod_core\scheme_complaint_serialize.h">
       <Filter>local\complaint</Filter>
     </ClInclude>
-    <ClInclude Include="pod_core\scheme_complaint_session.h">
-      <Filter>local\complaint</Filter>
-    </ClInclude>
-    <ClInclude Include="pod_core\scheme_complaint_session.inc">
-      <Filter>local\complaint</Filter>
-    </ClInclude>
     <ClInclude Include="pod_core\scheme_complaint_test.h">
       <Filter>local\complaint</Filter>
-    </ClInclude>
-    <ClInclude Include="pod_core\scheme_atomic_swap_client.h">
-      <Filter>local\atomic_swap</Filter>
-    </ClInclude>
-    <ClInclude Include="pod_core\scheme_atomic_swap_client.inc">
-      <Filter>local\atomic_swap</Filter>
     </ClInclude>
     <ClInclude Include="pod_core\scheme_atomic_swap_notary.h">
       <Filter>local\atomic_swap</Filter>
@@ -483,20 +465,8 @@
     <ClInclude Include="pod_core\scheme_atomic_swap_serialize.h">
       <Filter>local\atomic_swap</Filter>
     </ClInclude>
-    <ClInclude Include="pod_core\scheme_atomic_swap_session.h">
-      <Filter>local\atomic_swap</Filter>
-    </ClInclude>
-    <ClInclude Include="pod_core\scheme_atomic_swap_session.inc">
-      <Filter>local\atomic_swap</Filter>
-    </ClInclude>
     <ClInclude Include="pod_core\scheme_atomic_swap_test.h">
       <Filter>local\atomic_swap</Filter>
-    </ClInclude>
-    <ClInclude Include="pod_core\scheme_ot_complaint_client.h">
-      <Filter>local\ot_complaint</Filter>
-    </ClInclude>
-    <ClInclude Include="pod_core\scheme_ot_complaint_client.inc">
-      <Filter>local\ot_complaint</Filter>
     </ClInclude>
     <ClInclude Include="pod_core\scheme_ot_complaint_notary.h">
       <Filter>local\ot_complaint</Filter>
@@ -507,17 +477,8 @@
     <ClInclude Include="pod_core\scheme_ot_complaint_serialize.h">
       <Filter>local\ot_complaint</Filter>
     </ClInclude>
-    <ClInclude Include="pod_core\scheme_ot_complaint_session.h">
-      <Filter>local\ot_complaint</Filter>
-    </ClInclude>
-    <ClInclude Include="pod_core\scheme_ot_complaint_session.inc">
-      <Filter>local\ot_complaint</Filter>
-    </ClInclude>
     <ClInclude Include="pod_core\scheme_ot_complaint_test.h">
       <Filter>local\ot_complaint</Filter>
-    </ClInclude>
-    <ClInclude Include="pod_core\scheme_ot_vrfq_client.h">
-      <Filter>local\ot_vrfq</Filter>
     </ClInclude>
     <ClInclude Include="pod_core\scheme_ot_vrfq_notary.h">
       <Filter>local\ot_vrfq</Filter>
@@ -528,14 +489,8 @@
     <ClInclude Include="pod_core\scheme_ot_vrfq_serialize.h">
       <Filter>local\ot_vrfq</Filter>
     </ClInclude>
-    <ClInclude Include="pod_core\scheme_ot_vrfq_session.h">
-      <Filter>local\ot_vrfq</Filter>
-    </ClInclude>
     <ClInclude Include="pod_core\scheme_ot_vrfq_test.h">
       <Filter>local\ot_vrfq</Filter>
-    </ClInclude>
-    <ClInclude Include="pod_core\scheme_vrfq_client.h">
-      <Filter>local\vrfq</Filter>
     </ClInclude>
     <ClInclude Include="pod_core\scheme_vrfq_notary.h">
       <Filter>local\vrfq</Filter>
@@ -544,9 +499,6 @@
       <Filter>local\vrfq</Filter>
     </ClInclude>
     <ClInclude Include="pod_core\scheme_vrfq_serialize.h">
-      <Filter>local\vrfq</Filter>
-    </ClInclude>
-    <ClInclude Include="pod_core\scheme_vrfq_session.h">
       <Filter>local\vrfq</Filter>
     </ClInclude>
     <ClInclude Include="pod_core\scheme_vrfq_test.h">
@@ -588,9 +540,6 @@
     <ClInclude Include="pod_core\scheme_table_bob_data.h">
       <Filter>local</Filter>
     </ClInclude>
-    <ClInclude Include="pod_core\scheme_atomic_swap_vc_client.h">
-      <Filter>local\atomic_swap_vc</Filter>
-    </ClInclude>
     <ClInclude Include="pod_core\scheme_atomic_swap_vc_notary.h">
       <Filter>local\atomic_swap_vc</Filter>
     </ClInclude>
@@ -600,21 +549,72 @@
     <ClInclude Include="pod_core\scheme_atomic_swap_vc_serialize.h">
       <Filter>local\atomic_swap_vc</Filter>
     </ClInclude>
-    <ClInclude Include="pod_core\scheme_atomic_swap_vc_session.h">
-      <Filter>local\atomic_swap_vc</Filter>
-    </ClInclude>
     <ClInclude Include="pod_core\scheme_atomic_swap_vc_test.h">
       <Filter>local\atomic_swap_vc</Filter>
+    </ClInclude>
+    <ClInclude Include="pod_core\scheme_complaint_bob.h">
+      <Filter>local\complaint</Filter>
+    </ClInclude>
+    <ClInclude Include="pod_core\scheme_complaint_bob.inc">
+      <Filter>local\complaint</Filter>
+    </ClInclude>
+    <ClInclude Include="pod_core\scheme_complaint_alice.h">
+      <Filter>local\complaint</Filter>
+    </ClInclude>
+    <ClInclude Include="pod_core\scheme_complaint_alice.inc">
+      <Filter>local\complaint</Filter>
+    </ClInclude>
+    <ClInclude Include="pod_core\scheme_atomic_swap_bob.inc">
+      <Filter>local\atomic_swap</Filter>
+    </ClInclude>
+    <ClInclude Include="pod_core\scheme_atomic_swap_bob.h">
+      <Filter>local\atomic_swap</Filter>
+    </ClInclude>
+    <ClInclude Include="pod_core\scheme_atomic_swap_alice.h">
+      <Filter>local\atomic_swap</Filter>
+    </ClInclude>
+    <ClInclude Include="pod_core\scheme_atomic_swap_alice.inc">
+      <Filter>local\atomic_swap</Filter>
+    </ClInclude>
+    <ClInclude Include="pod_core\scheme_atomic_swap_vc_bob.h">
+      <Filter>local\atomic_swap_vc</Filter>
+    </ClInclude>
+    <ClInclude Include="pod_core\scheme_atomic_swap_vc_alice.h">
+      <Filter>local\atomic_swap_vc</Filter>
+    </ClInclude>
+    <ClInclude Include="pod_core\scheme_ot_complaint_bob.h">
+      <Filter>local\ot_complaint</Filter>
+    </ClInclude>
+    <ClInclude Include="pod_core\scheme_ot_complaint_bob.inc">
+      <Filter>local\ot_complaint</Filter>
+    </ClInclude>
+    <ClInclude Include="pod_core\scheme_ot_complaint_alice.h">
+      <Filter>local\ot_complaint</Filter>
+    </ClInclude>
+    <ClInclude Include="pod_core\scheme_ot_complaint_alice.inc">
+      <Filter>local\ot_complaint</Filter>
+    </ClInclude>
+    <ClInclude Include="pod_core\scheme_ot_vrfq_bob.h">
+      <Filter>local\ot_vrfq</Filter>
+    </ClInclude>
+    <ClInclude Include="pod_core\scheme_ot_vrfq_alice.h">
+      <Filter>local\ot_vrfq</Filter>
+    </ClInclude>
+    <ClInclude Include="pod_core\scheme_vrfq_bob.h">
+      <Filter>local\vrfq</Filter>
+    </ClInclude>
+    <ClInclude Include="pod_core\scheme_vrfq_alice.h">
+      <Filter>local\vrfq</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="pod_core\README.md" />
     <None Include="pod_core\Makefile" />
     <None Include="pod_core\Makefile.clang" />
-    <None Include="pod_core\scheme_atomic_swap_vc_client.inc">
+    <None Include="pod_core\scheme_atomic_swap_vc_bob.inc">
       <Filter>local\atomic_swap_vc</Filter>
     </None>
-    <None Include="pod_core\scheme_atomic_swap_vc_session.inc">
+    <None Include="pod_core\scheme_atomic_swap_vc_alice.inc">
       <Filter>local\atomic_swap_vc</Filter>
     </None>
   </ItemGroup>

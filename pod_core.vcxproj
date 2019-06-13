@@ -128,41 +128,41 @@
     <ClCompile Include="pod_core\scheme_plain_bob_data.cc" />
     <ClCompile Include="pod_core\scheme_table_alice_data.cc" />
     <ClCompile Include="pod_core\scheme_table_bob_data.cc" />
-    <ClInclude Include="pod_core\scheme_atomic_swap_client.inc">
+    <ClInclude Include="pod_core\scheme_atomic_swap_bob.inc">
       <FileType>Document</FileType>
     </ClInclude>
     <ClCompile Include="pod_core\scheme_atomic_swap_notary.cc" />
-    <ClInclude Include="pod_core\scheme_atomic_swap_session.inc">
+    <ClInclude Include="pod_core\scheme_atomic_swap_alice.inc">
       <FileType>Document</FileType>
     </ClInclude>
     <ClCompile Include="pod_core\scheme_atomic_swap_test.cc" />
-    <ClInclude Include="pod_core\scheme_atomic_swap_vc_client.h" />
+    <ClInclude Include="pod_core\scheme_atomic_swap_vc_bob.h" />
     <ClInclude Include="pod_core\scheme_atomic_swap_vc_notary.h" />
     <ClInclude Include="pod_core\scheme_atomic_swap_vc_protocol.h" />
     <ClInclude Include="pod_core\scheme_atomic_swap_vc_serialize.h" />
-    <ClInclude Include="pod_core\scheme_atomic_swap_vc_session.h" />
+    <ClInclude Include="pod_core\scheme_atomic_swap_vc_alice.h" />
     <ClInclude Include="pod_core\scheme_atomic_swap_vc_test.h" />
-    <ClInclude Include="pod_core\scheme_complaint_client.inc">
+    <ClInclude Include="pod_core\scheme_complaint_bob.inc">
       <FileType>Document</FileType>
     </ClInclude>
-    <ClInclude Include="pod_core\scheme_complaint_session.inc">
+    <ClInclude Include="pod_core\scheme_complaint_alice.inc">
       <FileType>Document</FileType>
     </ClInclude>
     <ClCompile Include="pod_core\scheme_complaint_test.cc" />
-    <ClInclude Include="pod_core\scheme_ot_complaint_client.inc">
+    <ClInclude Include="pod_core\scheme_ot_complaint_bob.inc">
       <FileType>Document</FileType>
     </ClInclude>
-    <ClInclude Include="pod_core\scheme_ot_complaint_session.inc">
+    <ClInclude Include="pod_core\scheme_ot_complaint_alice.inc">
       <FileType>Document</FileType>
     </ClInclude>
     <ClCompile Include="pod_core\scheme_ot_complaint_test.cc" />
-    <ClCompile Include="pod_core\scheme_ot_vrfq_client.cc" />
+    <ClCompile Include="pod_core\scheme_ot_vrfq_bob.cc" />
     <ClCompile Include="pod_core\scheme_ot_vrfq_notary.cc" />
-    <ClCompile Include="pod_core\scheme_ot_vrfq_session.cc" />
+    <ClCompile Include="pod_core\scheme_ot_vrfq_alice.cc" />
     <ClCompile Include="pod_core\scheme_ot_vrfq_test.cc" />
-    <ClCompile Include="pod_core\scheme_vrfq_client.cc" />
+    <ClCompile Include="pod_core\scheme_vrfq_bob.cc" />
     <ClCompile Include="pod_core\scheme_vrfq_notary.cc" />
-    <ClCompile Include="pod_core\scheme_vrfq_session.cc" />
+    <ClCompile Include="pod_core\scheme_vrfq_alice.cc" />
     <ClCompile Include="pod_core\scheme_vrfq_test.cc" />
     <ClCompile Include="public\bulletin_plain.cc" />
     <ClCompile Include="public\bulletin_table.cc" />
@@ -260,21 +260,21 @@
     <ClInclude Include="pod_core\scheme_plain_bob_data.h" />
     <ClInclude Include="pod_core\scheme_table_alice_data.h" />
     <ClInclude Include="pod_core\scheme_table_bob_data.h" />
-    <ClInclude Include="pod_core\scheme_atomic_swap_client.h" />
-    <ClInclude Include="pod_core\scheme_atomic_swap_session.h" />
+    <ClInclude Include="pod_core\scheme_atomic_swap_bob.h" />
+    <ClInclude Include="pod_core\scheme_atomic_swap_alice.h" />
     <ClInclude Include="pod_core\scheme_atomic_swap_test.h" />
-    <ClInclude Include="pod_core\scheme_complaint_client.h" />
-    <ClInclude Include="pod_core\scheme_complaint_session.h" />
+    <ClInclude Include="pod_core\scheme_complaint_bob.h" />
+    <ClInclude Include="pod_core\scheme_complaint_alice.h" />
     <ClInclude Include="pod_core\scheme_complaint_test.h" />
     <ClInclude Include="pod_core\scheme_ot_complaint_notary.h" />
-    <ClInclude Include="pod_core\scheme_ot_complaint_client.h" />
-    <ClInclude Include="pod_core\scheme_ot_complaint_session.h" />
+    <ClInclude Include="pod_core\scheme_ot_complaint_bob.h" />
+    <ClInclude Include="pod_core\scheme_ot_complaint_alice.h" />
     <ClInclude Include="pod_core\scheme_ot_complaint_test.h" />
-    <ClInclude Include="pod_core\scheme_ot_vrfq_client.h" />
-    <ClInclude Include="pod_core\scheme_ot_vrfq_session.h" />
+    <ClInclude Include="pod_core\scheme_ot_vrfq_bob.h" />
+    <ClInclude Include="pod_core\scheme_ot_vrfq_alice.h" />
     <ClInclude Include="pod_core\scheme_ot_vrfq_test.h" />
-    <ClInclude Include="pod_core\scheme_vrfq_client.h" />
-    <ClInclude Include="pod_core\scheme_vrfq_session.h" />
+    <ClInclude Include="pod_core\scheme_vrfq_bob.h" />
+    <ClInclude Include="pod_core\scheme_vrfq_alice.h" />
     <ClInclude Include="pod_core\scheme_vrfq_test.h" />
     <ClInclude Include="public\basic_types.h" />
     <ClInclude Include="public\bp.h" />
@@ -302,8 +302,8 @@
     <None Include="pod_core\Makefile" />
     <None Include="pod_core\Makefile.clang" />
     <None Include="pod_core\README.md" />
-    <None Include="pod_core\scheme_atomic_swap_vc_client.inc" />
-    <None Include="pod_core\scheme_atomic_swap_vc_session.inc" />
+    <None Include="pod_core\scheme_atomic_swap_vc_bob.inc" />
+    <None Include="pod_core\scheme_atomic_swap_vc_alice.inc" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="bak.txt" />

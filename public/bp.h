@@ -8,9 +8,9 @@
 #include <boost/endian/conversion.hpp>
 
 #include "ecc.h"
+#include "misc.h"
 #include "multiexp.h"
 #include "tick.h"
-#include "misc.h"
 
 namespace bp {
 
@@ -485,7 +485,6 @@ bool P1Verify(P1Proof const& p1_proof, GET_G const& get_g, uint64_t count) {
   return p1_proof.p2_proof.q == p1_proof.committment.q(challenge.u());
 }
 
-
 inline bool Test() {
   size_t count = 1024;  // * 1024;
   std::vector<G1> g(count);
@@ -497,7 +496,7 @@ inline bool Test() {
     i = FrRand();
   }
 
-  Challenge challenge(count, rand(), false); // NOTE: use rand() for test
+  Challenge challenge(count, rand(), false);  // NOTE: use rand() for test
 
   auto get_g = [&g](uint64_t i) {
     if (i < g.size())

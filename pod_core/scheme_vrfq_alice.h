@@ -10,10 +10,10 @@
 
 namespace scheme::table::vrfq {
 
-class Session {
+class Alice {
  public:
   // The self_id and peer_id are useless now, just for later convenience.
-  Session(AliceDataPtr a, h256_t const& self_id, h256_t const& peer_id);
+  Alice(AliceDataPtr a, h256_t const& self_id, h256_t const& peer_id);
 
  public:
   bool OnRequest(Request const& request, Response& response);
@@ -29,5 +29,5 @@ class Session {
   G1 g_exp_r_;
 };
 
-typedef std::shared_ptr<Session> SessionPtr;
+typedef std::shared_ptr<Alice> AlicePtr;
 }  // namespace scheme::table::vrfq

@@ -2,8 +2,8 @@
 namespace scheme::ot_complaint {
 
 template <typename AliceData>
-Session<AliceData>::Session(std::shared_ptr<AliceData> a, h256_t const& self_id,
-                            h256_t const& peer_id)
+Alice<AliceData>::Alice(std::shared_ptr<AliceData> a, h256_t const& self_id,
+                        h256_t const& peer_id)
     : a_(a),
       self_id_(self_id),
       peer_id_(peer_id),
@@ -15,7 +15,7 @@ Session<AliceData>::Session(std::shared_ptr<AliceData> a, h256_t const& self_id,
 }
 
 template <typename AliceData>
-void Session<AliceData>::BuildMapping() {
+void Alice<AliceData>::BuildMapping() {
   Tick _tick_(__FUNCTION__);
   mappings_.resize(phantoms_count_);
   size_t index = 0;
@@ -27,26 +27,26 @@ void Session<AliceData>::BuildMapping() {
 }
 
 template <typename AliceData>
-void Session<AliceData>::GetNegoReqeust(NegoARequest& request) {
+void Alice<AliceData>::GetNegoReqeust(NegoARequest& request) {
   request.s = ot_self_pk_;
 }
 
 template <typename AliceData>
-bool Session<AliceData>::OnNegoRequest(NegoBRequest const& request,
-                                       NegoBResponse& response) {
+bool Alice<AliceData>::OnNegoRequest(NegoBRequest const& request,
+                                     NegoBResponse& response) {
   ot_peer_pk_ = request.t;
   response.t_exp_alpha = ot_peer_pk_ * ot_alpha_;
   return true;
 }
 
 template <typename AliceData>
-bool Session<AliceData>::OnNegoResponse(NegoAResponse const& response) {
+bool Alice<AliceData>::OnNegoResponse(NegoAResponse const& response) {
   ot_sk_ = response.s_exp_beta * ot_alpha_;
   return true;
 }
 
 template <typename AliceData>
-bool Session<AliceData>::OnRequest(Request request, Response& response) {
+bool Alice<AliceData>::OnRequest(Request request, Response& response) {
   Tick _tick_(__FUNCTION__);
 
   phantoms_ = request.phantoms;       // sizeof() = L
@@ -90,12 +90,12 @@ bool Session<AliceData>::OnRequest(Request request, Response& response) {
     response.ot_ui[j] = ot_vi_[j] * ot_rand_c_;
   }
 
-  std::vector<h256_t> seed2_h{
-      {peer_id_, self_id_, seed2_seed_, CalcRangesDigest(phantoms_),
-       CalcG1DataDigest(ot_vi_), G1ToBin(ot_v_),
-       CalcG1DataDigest(response.ot_ui), k_mkl_root_}};
+  std::vector<h256_t> seed2_h{{peer_id_, self_id_, seed2_seed_,
+                               CalcRangesDigest(phantoms_),
+                               CalcG1DataDigest(ot_vi_), G1ToBin(ot_v_),
+                               CalcG1DataDigest(response.ot_ui), k_mkl_root_}};
   seed2_ = CalcSeed2(seed2_h);
-  //std::cout << "session seed: " << misc::HexToStr(seed2_) << "\n";
+  // std::cout << "alice seed: " << misc::HexToStr(seed2_) << "\n";
 
   H2(seed2_, phantoms_count_, w_);
 
@@ -132,7 +132,7 @@ bool Session<AliceData>::OnRequest(Request request, Response& response) {
 }
 
 template <typename AliceData>
-bool Session<AliceData>::OnReceipt(Receipt const& receipt, Secret& secret) {
+bool Alice<AliceData>::OnReceipt(Receipt const& receipt, Secret& secret) {
   if (receipt.seed2 != seed2_) {
     assert(false);
     return false;

@@ -13,9 +13,7 @@ struct h256_t : public std::array<uint8_t, 32> {
   static h256_t const& from_array(Base const& base) {
     return *static_cast<h256_t const*>(&base);
   }
-  static h256_t& from_array(Base& base) {
-    return *static_cast<h256_t*>(&base);
-  }
+  static h256_t& from_array(Base& base) { return *static_cast<h256_t*>(&base); }
 };
 
 static_assert(sizeof(h256_t) == sizeof(h256_t::Base), "");

@@ -359,7 +359,7 @@ h256_t CalcG1DataDigest(std::vector<G1> const& d) {
     hash.Update(bin.data(), bin.size());
   }
   hash.Final(digest.data());
-  return digest;  
+  return digest;
 }
 
 h256_t CalcSeed2(std::vector<h256_t> const& h) {

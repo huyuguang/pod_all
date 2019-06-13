@@ -5,15 +5,15 @@
 #include <vector>
 
 #include "ecc.h"
-#include "scheme_atomic_swap_vc_protocol.h"
+#include "scheme_atomic_swap_protocol.h"
 
-namespace scheme::atomic_swap_vc {
+namespace scheme::atomic_swap {
 
 template <typename AliceData>
-class Session {
+class Alice {
  public:
-  Session(std::shared_ptr<AliceData> a, h256_t const& self_id,
-          h256_t const& peer_id);
+  Alice(std::shared_ptr<AliceData> a, h256_t const& self_id,
+        h256_t const& peer_id);
 
  public:
   bool OnRequest(Request request, Response& response);
@@ -55,7 +55,7 @@ class Session {
 };
 
 template <typename AliceData>
-using SessionPtr = std::shared_ptr<Session<AliceData>>;
-}  // namespace scheme::atomic_swap_vc
+using AlicePtr = std::shared_ptr<Alice<AliceData>>;
+}  // namespace scheme::atomic_swap
 
-#include "scheme_atomic_swap_vc_session.inc"
+#include "scheme_atomic_swap_alice.inc"

@@ -4,29 +4,36 @@
 #include "ecc.h"
 #include "omp_helper.h"
 #include "public.h"
-#include "scheme_atomic_swap_vc_notary.h"
-#include "scheme_atomic_swap_vc_protocol.h"
+#include "scheme_complaint_notary.h"
+#include "scheme_complaint_protocol.h"
 #include "scheme_misc.h"
 
-namespace scheme::atomic_swap_vc {
+namespace scheme::complaint {
 
 template <typename BobData>
-class Client {
+class Bob {
  public:
-  Client(std::shared_ptr<BobData> b, h256_t const& self_id,
-         h256_t const& peer_id, std::vector<Range> demands);
+  Bob(std::shared_ptr<BobData> b, h256_t const& self_id, h256_t const& peer_id,
+      std::vector<Range> demands);
 
  public:
   void GetRequest(Request& request);
   bool OnResponse(Response response, Receipt& receipt);
   bool OnSecret(Secret const& secret);
+  bool GenerateClaim(Claim& claim);
   bool SaveDecrypted(std::string const& file);
 
  private:
   void BuildMapping();
   bool CheckEncryptedM();
-  bool CheckKVW();
+  bool CheckK(std::vector<Fr> const& v);
+  bool CheckKDirect(std::vector<Fr> const& v);
+  bool CheckKMultiExp(std::vector<Fr> const& v);
   void DecryptM(std::vector<Fr> const& v);
+  uint64_t FindMismatchI(uint64_t mismatch_j,
+                         std::vector<G1 const*> const& k_col,
+                         std::vector<Fr const*> const& v_col);
+  void BuildClaim(uint64_t i, uint64_t j, Claim& claim);
 
  private:
   std::shared_ptr<BobData> b_;
@@ -39,25 +46,26 @@ class Client {
   h256_t seed2_seed_;
 
  private:
-  std::vector<G1> k_;   // sizeof() = (count + 1) * s
-  std::vector<Fr> vw_;  // sizeof() = s
+  std::vector<G1> k_;
 
  private:
   struct Mapping {
     uint64_t global_index;
   };
   std::vector<Mapping> mappings_;
-  Fr sigma_vw_;
 
  private:
   h256_t seed2_;
-  std::vector<Fr> w_;  // size() = count
+  std::vector<Fr> w_;  // size() is L
+  h256_t k_mkl_root_;
   std::vector<Fr> decrypted_m_;
   std::vector<Fr> encrypted_m_;
+  int64_t claim_i_ = -1;
+  int64_t claim_j_ = -1;
 };
 
 template <typename BobData>
-using ClientPtr = std::shared_ptr<Client<BobData>>;
-}  // namespace scheme::atomic_swap_vc
+using BobPtr = std::shared_ptr<Bob<BobData>>;
+}  // namespace scheme::complaint
 
-#include "scheme_atomic_swap_vc_client.inc"
+#include "scheme_complaint_bob.inc"

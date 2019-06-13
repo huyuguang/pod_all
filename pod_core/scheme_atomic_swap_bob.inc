@@ -2,8 +2,8 @@
 namespace scheme::atomic_swap {
 
 template <typename BobData>
-Client<BobData>::Client(std::shared_ptr<BobData> b, h256_t const& self_id,
-                        h256_t const& peer_id, std::vector<Range> demands)
+Bob<BobData>::Bob(std::shared_ptr<BobData> b, h256_t const& self_id,
+                  h256_t const& peer_id, std::vector<Range> demands)
     : b_(b),
       self_id_(self_id),
       peer_id_(peer_id),
@@ -24,7 +24,7 @@ Client<BobData>::Client(std::shared_ptr<BobData> b, h256_t const& self_id,
 }
 
 template <typename BobData>
-void Client<BobData>::BuildMapping() {
+void Bob<BobData>::BuildMapping() {
   Tick _tick_(__FUNCTION__);
   mappings_.resize(demands_count_);
   size_t index = 0;
@@ -38,13 +38,13 @@ void Client<BobData>::BuildMapping() {
 }
 
 template <typename BobData>
-void Client<BobData>::GetRequest(Request& request) {
+void Bob<BobData>::GetRequest(Request& request) {
   request.seed2_seed = seed2_seed_;
   request.demands = demands_;
 }
 
 template <typename BobData>
-bool Client<BobData>::OnResponse(Response response, Receipt& receipt) {
+bool Bob<BobData>::OnResponse(Response response, Receipt& receipt) {
   Tick _tick_(__FUNCTION__);
   if (response.k.size() != (demands_count_ + 1) * s_) {
     assert(false);
@@ -94,7 +94,7 @@ bool Client<BobData>::OnResponse(Response response, Receipt& receipt) {
 }
 
 template <typename BobData>
-bool Client<BobData>::CheckEncryptedM() {
+bool Bob<BobData>::CheckEncryptedM() {
   Tick _tick_(__FUNCTION__);
 
   auto const& ecc_pub = GetEccPub();
@@ -131,7 +131,7 @@ bool Client<BobData>::CheckEncryptedM() {
 }
 
 template <typename BobData>
-bool Client<BobData>::CheckKVW() {
+bool Bob<BobData>::CheckKVW() {
   Tick _tick_(__FUNCTION__);
 
   auto const& ecc_pub = GetEccPub();
@@ -162,7 +162,7 @@ bool Client<BobData>::CheckKVW() {
 }
 
 template <typename BobData>
-bool Client<BobData>::OnSecret(Secret const& secret) {
+bool Bob<BobData>::OnSecret(Secret const& secret) {
   Tick _tick_(__FUNCTION__);
 
   // compute v
@@ -180,7 +180,7 @@ bool Client<BobData>::OnSecret(Secret const& secret) {
 }
 
 template <typename BobData>
-void Client<BobData>::DecryptM(std::vector<Fr> const& v) {
+void Bob<BobData>::DecryptM(std::vector<Fr> const& v) {
   Tick _tick_(__FUNCTION__);
 
 #pragma omp parallel for
@@ -197,7 +197,7 @@ void Client<BobData>::DecryptM(std::vector<Fr> const& v) {
 }
 
 template <typename BobData>
-bool Client<BobData>::SaveDecrypted(std::string const& file) {
+bool Bob<BobData>::SaveDecrypted(std::string const& file) {
   Tick _tick_(__FUNCTION__);
   return b_->SaveDecryped(file, demands_, decrypted_m_);
 }

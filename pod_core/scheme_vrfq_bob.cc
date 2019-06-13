@@ -1,4 +1,4 @@
-#include "scheme_vrfq_client.h"
+#include "scheme_vrfq_bob.h"
 #include "public.h"
 #include "scheme_table.h"
 #include "scheme_table_bob_data.h"
@@ -6,9 +6,9 @@
 
 namespace scheme::table::vrfq {
 
-Client::Client(BobDataPtr b, h256_t const& self_id, h256_t const& peer_id,
-               std::string const& query_key,
-               std::vector<std::string> const& query_values)
+Bob::Bob(BobDataPtr b, h256_t const& self_id, h256_t const& peer_id,
+         std::string const& query_key,
+         std::vector<std::string> const& query_values)
     : b_(b),
       self_id_(self_id),
       peer_id_(peer_id),
@@ -35,12 +35,12 @@ Client::Client(BobDataPtr b, h256_t const& self_id, h256_t const& peer_id,
   fsk_.resize(query_values.size());
 }
 
-void Client::GetRequest(Request& request) {
+void Bob::GetRequest(Request& request) {
   request.key_name = query_key_;
   request.value_digests = value_digests_;
 }
 
-bool Client::OnResponse(Response const& response, Receipt& receipt) {
+bool Bob::OnResponse(Response const& response, Receipt& receipt) {
   if (response.psk_exp_r.size() != query_values_.size()) {
     assert(false);
     return false;
@@ -63,8 +63,8 @@ bool Client::OnResponse(Response const& response, Receipt& receipt) {
   return true;
 }
 
-bool Client::OnSecret(Secret const& query_secret,
-                      std::vector<std::vector<uint64_t>>& positions) {
+bool Bob::OnSecret(Secret const& query_secret,
+                   std::vector<std::vector<uint64_t>>& positions) {
   if (!VerifyProof(g_exp_r_, query_secret)) {
     assert(false);
     return false;

@@ -11,10 +11,10 @@
 namespace scheme::atomic_swap {
 
 template <typename BobData>
-class Client {
+class Bob {
  public:
-  Client(std::shared_ptr<BobData> b, h256_t const& self_id,
-         h256_t const& peer_id, std::vector<Range> demands);
+  Bob(std::shared_ptr<BobData> b, h256_t const& self_id, h256_t const& peer_id,
+      std::vector<Range> demands);
 
  public:
   void GetRequest(Request& request);
@@ -57,7 +57,7 @@ class Client {
 };
 
 template <typename BobData>
-using ClientPtr = std::shared_ptr<Client<BobData>>;
+using BobPtr = std::shared_ptr<Bob<BobData>>;
 }  // namespace scheme::atomic_swap
 
-#include "scheme_atomic_swap_client.inc"
+#include "scheme_atomic_swap_bob.inc"

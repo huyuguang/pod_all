@@ -11,11 +11,11 @@
 namespace scheme::ot_complaint {
 
 template <typename BobData>
-class Client {
+class Bob {
  public:
   typedef std::shared_ptr<BobData> BobDataPtr;
-  Client(BobDataPtr b, h256_t const& self_id, h256_t const& peer_id,
-         std::vector<Range> demands, std::vector<Range> phantoms);
+  Bob(BobDataPtr b, h256_t const& self_id, h256_t const& peer_id,
+      std::vector<Range> demands, std::vector<Range> phantoms);
 
  public:
   void GetNegoReqeust(NegoBRequest& request);
@@ -84,8 +84,8 @@ class Client {
 };
 
 template <typename BobData>
-using ClientPtr = std::shared_ptr<Client<BobData>>;
+using BobPtr = std::shared_ptr<Bob<BobData>>;
 
 }  // namespace scheme::ot_complaint
 
-#include "scheme_ot_complaint_client.inc"
+#include "scheme_ot_complaint_bob.inc"

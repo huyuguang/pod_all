@@ -88,6 +88,8 @@ BUILD := ./build/self
 BUILDPUB := ./build/public
 BUILDCAPI := ./build/self/capi
 BUILD3RD := ./build/thirdparty
+
+$(shell mkdir -p $(HOME)/bin)
 $(shell mkdir -p $(BUILD))
 $(shell mkdir -p $(BUILDPUB))
 $(shell mkdir -p $(BUILDCAPI))

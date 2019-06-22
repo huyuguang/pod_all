@@ -82,6 +82,7 @@ LIBS := \
 BUILD := ./build/self
 BUILDPUB := ./build/public
 
+$(shell mkdir -p $(HOME)/bin)
 $(shell mkdir -p $(BUILD))
 $(shell mkdir -p $(BUILDPUB))
 

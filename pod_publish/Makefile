@@ -88,6 +88,8 @@ BUILD := ./build/self
 BUILDPUB := ./build/public
 BUILD3RD := ./build/thirdparty
 BUILDCSV := ./build/thirdparty/csv
+
+$(shell mkdir -p $(HOME)/bin)
 $(shell mkdir -p $(BUILD))
 $(shell mkdir -p $(BUILDPUB))
 $(shell mkdir -p $(BUILD3RD))

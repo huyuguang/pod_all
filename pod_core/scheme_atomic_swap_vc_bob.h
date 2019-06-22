@@ -54,6 +54,10 @@ class Bob {
   std::vector<Fr> w_;  // size() = count
   std::vector<Fr> decrypted_m_;
   std::vector<Fr> encrypted_m_;
+
+ private:
+  ZkVkPtr zk_vk_;
+  Fr seed0_mimc3_digest_;
 };
 
 template <typename BobData>

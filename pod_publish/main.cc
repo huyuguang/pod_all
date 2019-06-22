@@ -9,7 +9,7 @@
 #include "scheme_misc.h"
 
 namespace {}  // namespace
-
+// TODO: do not need ecc_pub
 int main(int argc, char** argv) {
   setlocale(LC_ALL, "");
 
@@ -18,31 +18,30 @@ int main(int argc, char** argv) {
 
   Mode task_mode;
   std::string publish_file;
-  std::string output_path;
+  std::string output_dir;
   Type table_type;
   std::vector<uint64_t> vrf_colnum_index;
   std::vector<bool> unique_key;
   uint64_t column_num;
-  std::string ecc_pub_file;
+  std::string data_dir;
   uint32_t omp_thread_num;
 
   try {
     po::options_description options("command line options");
     options.add_options()("help,h", "Use -h or --help to list all arguments")(
-        "-e ecc_pub_file -m table -f file -o output_path -t table_type -k keys",
+        "-d data_dir -m table -f file -o output_dir -t table_type -k keys",
         "publish table file")(
-        "-e ecc_pub_file -m plain -f file -o output_path -c column_num",
+        "-d data_dir -m plain -f file -o output_dir -c column_num",
         "publish plain file")(
-        "ecc_pub_file,e",
-        po::value<std::string>(&ecc_pub_file)->default_value(""),
-        "Provide the ecc pub file")(
+        "data_dir,d", po::value<std::string>(&data_dir)->default_value("."),
+        "Provide the configure file dir")(
         "mode,m", po::value<Mode>(&task_mode)->default_value(Mode::kPlain),
         "Provide pod mode (plain, table)")(
         "publish_file,f",
         po::value<std::string>(&publish_file)->default_value(""),
         "Provide the file which want to publish")(
-        "output_path,o",
-        po::value<std::string>(&output_path)->default_value(""),
+        "output_dir,o",
+        po::value<std::string>(&output_dir)->default_value(""),
         "Provide the publish path")(
         "table_type,t", po::value<Type>(&table_type)->default_value(Type::kCsv),
         "Provide the publish file type in table mode (csv)")(
@@ -72,14 +71,8 @@ int main(int argc, char** argv) {
       return -1;
     }
 
-    if (ecc_pub_file.empty() || !fs::is_regular(ecc_pub_file)) {
-      std::cout << "Open ecc_pub_file " << ecc_pub_file << " failed\n";
-      std::cout << options << std::endl;
-      return -1;
-    }
-
-    if (output_path.empty()) {
-      std::cout << "Want output_path(-o)\n";
+    if (output_dir.empty()) {
+      std::cout << "Want output_dir(-o)\n";
       std::cout << options << std::endl;
       return -1;
     }
@@ -96,9 +89,9 @@ int main(int argc, char** argv) {
       return -1;
     }
 
-    if (!fs::is_directory(output_path) &&
-        !fs::create_directories(output_path)) {
-      std::cout << "Create " << output_path << " failed\n";
+    if (!fs::is_directory(output_dir) &&
+        !fs::create_directories(output_dir)) {
+      std::cout << "Create " << output_dir << " failed\n";
       std::cout << options << std::endl;
       return -1;
     }
@@ -136,20 +129,21 @@ int main(int argc, char** argv) {
 
   InitEcc();
 
-  if (!LoadEccPub(ecc_pub_file)) {
-    std::cerr << "Open ecc pub file " << ecc_pub_file << " failed" << std::endl;
+  std::string ecc_pub_file = data_dir + "/" + "ecc_pub.bin";
+  if (!OpenOrCreateEccPub(ecc_pub_file)) {
+    std::cerr << "Open or create ecc pub file " << ecc_pub_file << " failed\n";
     return -1;
   }
 
   bool ret;
   switch (task_mode) {
     case Mode::kPlain: {
-      ret = PublishPlain(std::move(publish_file), std::move(output_path),
+      ret = PublishPlain(std::move(publish_file), std::move(output_dir),
                          column_num);
       break;
     }
     case Mode::kTable: {
-      ret = PublishTable(std::move(publish_file), std::move(output_path),
+      ret = PublishTable(std::move(publish_file), std::move(output_dir),
                          std::move(table_type), std::move(vrf_colnum_index),
                          std::move(unique_key));
       break;

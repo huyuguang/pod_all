@@ -57,3 +57,5 @@ void validate(boost::any& v, std::vector<std::string> const& values,
   v = r;
 }
 }  // namespace boost::program_options
+
+// https://stackoverflow.com/questions/994353/static-variable-inside-template-function

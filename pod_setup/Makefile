@@ -4,9 +4,11 @@
 
 CXX11_HOME = /usr
 
+HOME = ../linux
 THIRD_PARTY_HOME = ../thirdparty
 MCL_HOME = ../thirdparty/mcl/include
 PUB_HOME = ../public
+SNARK_HOME = /mnt/e/code/crypto/mylibsnark/install
 
 CXXFLAGS := \
  -g3 \
@@ -25,6 +27,16 @@ CXXFLAGS := \
  -I $(THIRD_PARTY_HOME) \
  -I $(PUB_HOME) \
  -I. \
+ -isystem $(SNARK_HOME)/include \
+
+SNARK_FLAGS = \
+ -DBINARY_OUTPUT \
+ -DBN_SUPPORT_SNARK=1 \
+ -DCURVE_BN128 \
+ -DMONTGOMERY_OUTPUT \
+ -DMULTICORE=1 \
+ -DUSE_ASM \
+ -DNO_PROCPS \
 
 MCL_FLAGS := \
  -DMCL_DONT_USE_OPENSSL
@@ -47,9 +59,8 @@ DEBUG_FLAGS := \
 
 LDFLAGS += \
  -fmerge-all-constants \
- -L${CXX11_HOME}/lib64
-
- 
+ -L${CXX11_HOME}/lib64 \
+ -L$(SNARK_HOME)/lib 
 
 LIBS := \
  -lpthread \
@@ -61,7 +72,12 @@ LIBS := \
  -lboost_filesystem \
  -lboost_system \
  -lboost_iostreams \
- -lboost_program_options
+ -lboost_program_options \
+ -lsnark \
+ -lsnark_adsnark \
+ -lff \
+ -lzm \
+ -lprocps
 
 BUILD := ./build/self
 BUILDPUB := ./build/public
@@ -75,6 +91,7 @@ SRC := $(foreach d, $(DIR), $(wildcard $(d)/*.cc))
 
 SRC += ../public/ecc.cc
 SRC += ../public/fp.cc
+SRC += ../public/mimc.cc
 
 RELEASE_OBJ := $(patsubst %.cc, %.o, $(SRC))
 
@@ -85,18 +102,18 @@ CXX := export LD_LIBRARY_PATH=${CXX11_HOME}/lib; ${CXX11_HOME}/bin/g++
 all: pod_setupd pod_setup
 
 %.o : %.cc
-	$(CXX) -c $^ $(CXXFLAGS) $(RELEASE_FLAGS) $(MCL_FLAGS) -o $(BUILD)/$@
+	$(CXX) -c $^ $(CXXFLAGS) $(RELEASE_FLAGS) $(MCL_FLAGS) $(SNARK_FLAGS) -o $(BUILD)/$@
 
 
 %.d.o : %.cc
-	$(CXX) -c $^ $(CXXFLAGS) $(DEBUG_FLAGS) $(MCL_FLAGS) -o $(BUILD)/$@
+	$(CXX) -c $^ $(CXXFLAGS) $(DEBUG_FLAGS) $(MCL_FLAGS) $(SNARK_FLAGS) -o $(BUILD)/$@
 
 
 pod_setupd : $(DEBUG_OBJ)
-	$(CXX) $(addprefix $(BUILD)/, $^) -o $@.exe $(LDFLAGS) $(LIBS)
+	$(CXX) $(addprefix $(BUILD)/, $^) -o $(HOME)/bin/$@.exe $(LDFLAGS) $(LIBS)
 
 pod_setup : $(RELEASE_OBJ)
-	$(CXX) $(addprefix $(BUILD)/, $^) -o $@.exe $(LDFLAGS) $(LIBS)
+	$(CXX) $(addprefix $(BUILD)/, $^) -o $(HOME)/bin/$@.exe $(LDFLAGS) $(LIBS)
 
 clean:
 	find . -regex "\(.*\.o\|.*\.exe\)" | xargs rm

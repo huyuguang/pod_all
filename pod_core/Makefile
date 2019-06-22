@@ -4,10 +4,12 @@
 
 CXX11_HOME = /usr
 
+HOME = ../linux
 THIRD_PARTY_HOME = ../thirdparty
 MCL_HOME = ../thirdparty/mcl/include
 YAS_HOME = ../thirdparty/yas/include
 PUB_HOME = ../public
+SNARK_HOME = /mnt/e/code/crypto/mylibsnark/install
 
 CXXFLAGS := \
  -g3 \
@@ -19,8 +21,6 @@ CXXFLAGS := \
  -gdwarf-2 \
  -gstrict-dwarf \
  -Wno-parentheses \
- -Wno-unused-private-field \
- -Wno-unused-lambda-capture \
  -Wdeprecated-declarations \
  -fmerge-all-constants  \
  -I $(CXX11_HOME)/include \
@@ -30,6 +30,16 @@ CXXFLAGS := \
  -I $(PUB_HOME) \
  -I. \
  -isystem $(CXX11_HOME)/include/boost \
+ -isystem $(SNARK_HOME)/include \
+
+SNARK_FLAGS = \
+ -DBINARY_OUTPUT \
+ -DBN_SUPPORT_SNARK=1 \
+ -DCURVE_BN128 \
+ -DMONTGOMERY_OUTPUT \
+ -DMULTICORE=1 \
+ -DUSE_ASM \
+ -DNO_PROCPS \
 
 MCL_FLAGS := \
  -DMCL_DONT_USE_OPENSSL
@@ -54,7 +64,8 @@ DEBUG_FLAGS := \
 
 LDFLAGS += \
  -fmerge-all-constants \
- -L${CXX11_HOME}/lib64
+ -L${CXX11_HOME}/lib64 \
+ -L$(SNARK_HOME)/lib
 
 LIBS := \
  -lpthread \
@@ -66,7 +77,12 @@ LIBS := \
  -lboost_filesystem \
  -lboost_system \
  -lboost_iostreams \
- -lboost_program_options
+ -lboost_program_options \
+ -lsnark \
+ -lsnark_adsnark \
+ -lff \
+ -lzm \
+ -lprocps
 
 BUILD := ./build/self
 BUILDPUB := ./build/public
@@ -87,22 +103,22 @@ DEBUG_OBJ := $(patsubst %.cc, %.d.o, $(SRC))
 
 CXX := export LD_LIBRARY_PATH=${CXX11_HOME}/lib; ${CXX11_HOME}/bin/g++
 
-all: pod_cored_l pod_core_l
+all: pod_cored pod_core
 
 %.o : %.cc
-	$(CXX) -c $^ $(CXXFLAGS) $(RELEASE_FLAGS) $(MCL_FLAGS) $(BOOST_FLAGS) -o $(BUILD)/$@
+	$(CXX) -c $^ $(CXXFLAGS) $(RELEASE_FLAGS) $(MCL_FLAGS) $(SNARK_FLAGS) $(BOOST_FLAGS) -o $(BUILD)/$@
 
 
 %.d.o : %.cc
-	$(CXX) -c $^ $(CXXFLAGS) $(DEBUG_FLAGS) $(MCL_FLAGS) $(BOOST_FLAGS) -o $(BUILD)/$@
+	$(CXX) -c $^ $(CXXFLAGS) $(DEBUG_FLAGS) $(MCL_FLAGS) $(SNARK_FLAGS) $(BOOST_FLAGS) -o $(BUILD)/$@
 
 
 
-pod_cored_l : $(DEBUG_OBJ)
-	$(CXX) $(addprefix $(BUILD)/, $^) -o $@.exe $(LDFLAGS) $(LIBS)
+pod_cored : $(DEBUG_OBJ)
+	$(CXX) $(addprefix $(BUILD)/, $^) -o $(HOME)/bin/$@.exe $(LDFLAGS) $(LIBS)
 
-pod_core_l : $(RELEASE_OBJ)
-	$(CXX) $(addprefix $(BUILD)/, $^) -o $@.exe $(LDFLAGS) $(LIBS)
+pod_core : $(RELEASE_OBJ)
+	$(CXX) $(addprefix $(BUILD)/, $^) -o $(HOME)/bin/$@.exe $(LDFLAGS) $(LIBS)
 
 clean:
 	find . -regex "\(.*\.o\|.*\.exe\)" | xargs rm

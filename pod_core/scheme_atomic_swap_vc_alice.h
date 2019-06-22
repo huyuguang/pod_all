@@ -5,6 +5,7 @@
 #include <vector>
 
 #include "ecc.h"
+#include "scheme_atomic_swap_vc_misc.h"
 #include "scheme_atomic_swap_vc_protocol.h"
 
 namespace scheme::atomic_swap_vc {
@@ -45,10 +46,18 @@ class Alice {
   std::vector<Mapping> mappings_;
 
  private:
-  h256_t seed0_;
+  Fr seed0_;
   std::vector<Fr> v_;  // size() is (count + 1) * s_
   std::vector<Fr> w_;  // size() is count
   Fr sigma_vw_;
+
+ private:
+  Fr seed0_mimc3_digest_;
+  Fr seed0_rand_;
+
+ private:
+  ZkPkPtr zk_pk_;
+  ZkVkPtr zk_vk_;
 
  private:
   bool evil_ = false;

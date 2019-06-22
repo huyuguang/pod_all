@@ -1,3 +1,4 @@
+#include "chain.h"
 #include "misc.h"
 #include "scheme_misc.h"
 #include "tick.h"
@@ -43,7 +44,7 @@ bool Alice<AliceData>::OnRequest(Request request, Response& response) {
 
   BuildMapping();
 
-  H2(seed0_, demands_count_ * s_, v_);
+  ChainKeccak256(seed0_, demands_count_ * s_, v_);
 
   if (evil_) {
     // NOTE: use rand() for test
@@ -61,7 +62,7 @@ bool Alice<AliceData>::OnRequest(Request request, Response& response) {
                                CalcRangesDigest(demands_), k_mkl_root_}};
   seed2_ = CalcSeed2(seed2_h);
 
-  H2(seed2_, demands_count_, w_);
+  ChainKeccak256(seed2_, demands_count_, w_);
 
   // compute mij' = vij + wi * mij
   auto const& m = a_->m();

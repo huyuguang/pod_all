@@ -22,6 +22,7 @@ enum Action {
   kComplaintPod,
   kOtComplaintPod,
   kAtomicSwapPod,
+  kAtomicSwapPodVc,
 };
 
 void LoadMij(uint8_t const* data_start, uint8_t const* data_end, uint64_t i,
@@ -50,8 +51,6 @@ std::vector<h256_t> BuildSigmaMklTree(std::vector<G1> const& sigmas);
 bool GetBulletinMode(std::string const& file, Mode& mode);
 
 bool IsElementUnique(std::vector<Fr> const v);
-
-void H2(h256_t const& seed, uint64_t count, std::vector<Fr>& v);
 
 h256_t CalcRootOfK(std::vector<G1> const& k);
 

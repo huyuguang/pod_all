@@ -247,17 +247,6 @@ bool IsElementUnique(std::vector<Fr> const v) {
   return std::adjacent_find(pv.begin(), pv.end(), compare) == pv.end();
 }
 
-void H2(h256_t const& seed, uint64_t count, std::vector<Fr>& v) {
-  Tick _tick_(__FUNCTION__);
-
-  v.resize(count);
-
-#pragma omp parallel for
-  for (int64_t i = 0; i < (int64_t)count; ++i) {
-    v[i] = Chain(seed, i);
-  }
-}
-
 namespace {
 h256_t KToH256(G1 const& g) {
   assert(g.isNormalized());
@@ -503,6 +492,8 @@ std::istream& operator>>(std::istream& in, scheme::Action& t) {
     t = scheme::Action::kOtComplaintPod;
   } else if (token == "atomic_swap_pod") {
     t = scheme::Action::kAtomicSwapPod;
+  } else if (token == "atomic_swap_pod_vc") {
+    t = scheme::Action::kAtomicSwapPodVc;
   } else {
     in.setstate(std::ios_base::failbit);
   }
@@ -524,6 +515,8 @@ std::ostream& operator<<(std::ostream& os, scheme::Action const& t) {
     os << "ot_complaint_pod";
   } else if (t == scheme::Action::kAtomicSwapPod) {
     os << "atomic_swap_pod";
+  } else if (t == scheme::Action::kAtomicSwapPodVc) {
+    os << "atomic_swap_pod_vc";
   } else {
     os.setstate(std::ios_base::failbit);
   }

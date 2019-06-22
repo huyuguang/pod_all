@@ -9,11 +9,14 @@
 #include "ecc_pub.h"
 #include "public.h"
 #include "scheme_atomic_swap_test.h"
+#include "scheme_atomic_swap_vc_test.h"
 #include "scheme_complaint_test.h"
 #include "scheme_misc.h"
 #include "scheme_ot_complaint_test.h"
 #include "scheme_ot_vrfq_test.h"
 #include "scheme_vrfq_test.h"
+#include "zkp.h"
+#include "zkp_key.h"
 
 namespace {
 void DumpEccPub() {
@@ -41,9 +44,9 @@ int main(int argc, char** argv) {
   using scheme::Mode;
   Mode mode;
   Action action;
-  std::string publish_path;
-  std::string output_path;
-  std::string ecc_pub_file;
+  std::string publish_dir;
+  std::string output_dir;
+  std::string data_dir;
   std::string query_key;
   std::vector<std::string> query_values;
   std::vector<std::string> phantom_values;
@@ -52,20 +55,20 @@ int main(int argc, char** argv) {
   std::vector<Range> phantom_ranges;
   bool use_capi = false;
   bool test_evil = false;
-  bool dump_ecc_pub = false;
+  bool dump_ecc_pub = false;  
 
   try {
     po::options_description options("command line options");
     options.add_options()("help,h", "Use -h or --help to list all arguments")(
-        "ecc_pub_file,e", po::value<std::string>(&ecc_pub_file),
-        "Provide the ecc pub file")("mode,m", po::value<Mode>(&mode),
+        "data_dir,d", po::value<std::string>(&data_dir)->default_value("."),
+        "Provide the configure file dir")("mode,m", po::value<Mode>(&mode),
                                     "Provide pod mode (plain, table)")(
         "action,a", po::value<Action>(&action),
         "Provide action (range_pod, ot_range_pod, vrf_query, ot_vrf_query...)")(
-        "publish_path,p", po::value<std::string>(&publish_path),
-        "Provide the publish path")("output_path,o",
-                                    po::value<std::string>(&output_path),
-                                    "Provide the output path")(
+        "publish_dir,p", po::value<std::string>(&publish_dir),
+        "Provide the publish dir")("output_dir,o",
+                                    po::value<std::string>(&output_dir),
+                                    "Provide the output dir")(
         "demand_ranges",
         po::value<std::vector<Range>>(&demand_ranges)->multitoken(),
         "Provide the demand ranges")(
@@ -123,15 +126,14 @@ int main(int argc, char** argv) {
 
   std::cout << "omp_get_max_threads: " << omp_get_max_threads() << "\n";
 
-  if (ecc_pub_file.empty() || !fs::is_regular(ecc_pub_file)) {
-    std::cerr << "Open ecc_pub_file " << ecc_pub_file << " failed" << std::endl;
-    return -1;
-  }
-
   InitEcc();
 
-  if (!LoadEccPub(ecc_pub_file)) {
-    std::cerr << "Open ecc pub file " << ecc_pub_file << " failed" << std::endl;
+  InitZkp();
+
+  std::string ecc_pub_file = data_dir + "/" + "ecc_pub.bin";
+
+  if (!OpenOrCreateEccPub(ecc_pub_file)) {
+    std::cerr << "Open or create ecc pub file " << ecc_pub_file << " failed\n";
     return -1;
   }
 
@@ -140,24 +142,31 @@ int main(int argc, char** argv) {
     return 0;
   }
 
-  if (output_path.empty()) {
-    std::cerr << "Want output_path(-o)" << std::endl;
+  if (output_dir.empty()) {
+    std::cerr << "Want output_dir(-o)" << std::endl;
     return -1;
   }
 
-  if (publish_path.empty() || !fs::is_directory(publish_path)) {
-    std::cerr << "Open publish_path " << publish_path << " failed" << std::endl;
+  if (publish_dir.empty() || !fs::is_directory(publish_dir)) {
+    std::cerr << "Open publish_dir " << publish_dir << " failed\n";
     return -1;
   }
 
-  if (!fs::is_directory(output_path) && !fs::create_directories(output_path)) {
-    std::cerr << "Create " << output_path << " failed" << std::endl;
+  if (!fs::is_directory(output_dir) && !fs::create_directories(output_dir)) {
+    std::cerr << "Create " << output_dir << " failed\n";
     return -1;
   }
 
-  // clean the output_path
+  std::string zkp_key_dir = data_dir + "/" + "zksnark_key";
+  if (zkp_key_dir.empty() || !fs::is_directory(zkp_key_dir)) {
+    std::cerr << "Open zkp_key_dir " << zkp_key_dir << " failed\n";
+    return -1;
+  }
+  ZkpKey::instance(zkp_key_dir);
+
+  // clean the output_dir
   for (auto& entry :
-       boost::make_iterator_range(fs::directory_iterator(output_path), {})) {
+       boost::make_iterator_range(fs::directory_iterator(output_dir), {})) {
     fs::remove_all(entry);
   }
 
@@ -172,13 +181,13 @@ int main(int argc, char** argv) {
   if (action == Action::kVrfQuery) {
     auto func =
         use_capi ? scheme::table::vrfq::capi::Test : scheme::table::vrfq::Test;
-    return func(publish_path, output_path, query_key, query_values) ? 0 : -1;
+    return func(publish_dir, output_dir, query_key, query_values) ? 0 : -1;
   }
 
   if (action == Action::kOtVrfQuery) {
     auto func = use_capi ? scheme::table::ot_vrfq::capi::Test
                          : scheme::table::ot_vrfq::Test;
-    return func(publish_path, output_path, query_key, query_values,
+    return func(publish_dir, output_dir, query_key, query_values,
                 phantom_values)
                ? 0
                : -1;
@@ -193,7 +202,7 @@ int main(int argc, char** argv) {
       func = use_capi ? scheme::table::complaint::capi::Test
                       : scheme::table::complaint::Test;
     }
-    return func(publish_path, output_path, demand_ranges, test_evil) ? 0 : -1;
+    return func(publish_dir, output_dir, demand_ranges, test_evil) ? 0 : -1;
   }
 
   if (action == Action::kOtComplaintPod) {
@@ -205,7 +214,7 @@ int main(int argc, char** argv) {
       func = use_capi ? scheme::table::ot_complaint::capi::Test
                       : scheme::table::ot_complaint::Test;
     }
-    return func(publish_path, output_path, demand_ranges, phantom_ranges,
+    return func(publish_dir, output_dir, demand_ranges, phantom_ranges,
                 test_evil)
                ? 0
                : -1;
@@ -220,7 +229,19 @@ int main(int argc, char** argv) {
       func = use_capi ? scheme::table::atomic_swap::capi::Test
                       : scheme::table::atomic_swap::Test;
     }
-    return func(publish_path, output_path, demand_ranges, test_evil) ? 0 : -1;
+    return func(publish_dir, output_dir, demand_ranges, test_evil) ? 0 : -1;
+  }
+
+  if (action == Action::kAtomicSwapPodVc) {
+    decltype(scheme::table::atomic_swap_vc::Test)* func;
+    if (mode == Mode::kPlain) {
+      func = /*use_capi ? scheme::plain::atomic_swap_vc::capi::Test
+                      : */scheme::plain::atomic_swap_vc::Test;
+    } else {
+      func = /*use_capi ? scheme::table::atomic_swap_vc::capi::Test
+                      : */scheme::table::atomic_swap_vc::Test;
+    }
+    return func(publish_dir, output_dir, demand_ranges, test_evil) ? 0 : -1;
   }
 
   std::cerr << "Not implement yet.\n";

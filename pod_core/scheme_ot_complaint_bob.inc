@@ -107,7 +107,7 @@ bool Bob<BobData>::OnResponse(Response response, Receipt& receipt) {
   seed2_ = CalcSeed2(seed2_h);
   // std::cout << "bob seed: " << misc::HexToStr(seed2_) << "\n";
 
-  H2(seed2_, phantoms_count_, w_);
+  ChainKeccak256(seed2_, phantoms_count_, w_);
 
   encrypted_m_.resize(demands_count_ * s_);
 
@@ -183,7 +183,7 @@ bool Bob<BobData>::OnSecret(Secret const& secret) {
 
   // compute v
   std::vector<Fr> v;
-  H2(secret.seed0, phantoms_count_ * s_, v);
+  ChainKeccak256(secret.seed0, phantoms_count_ * s_, v);
 
   if (!CheckK(v)) {
     assert(claim_i_ >= 0 && claim_j_ >= 0);

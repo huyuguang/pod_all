@@ -1,6 +1,10 @@
+#include "chain.h"
+#include "mimc.h"
 #include "misc.h"
+#include "scheme_atomic_swap_vc_misc.h"
 #include "scheme_misc.h"
 #include "tick.h"
+#include "zkp_key.h"
 
 namespace scheme::atomic_swap_vc {
 
@@ -12,7 +16,18 @@ Alice<AliceData>::Alice(std::shared_ptr<AliceData> a, h256_t const& self_id,
       peer_id_(peer_id),
       n_(a_->bulletin().n),
       s_(a_->bulletin().s) {
-  seed0_ = misc::RandH256();
+  zk_pk_ = ZkpKey::instance().GetZkPk("atomic_swap_vc");
+  if (!zk_pk_) {
+    assert(false);
+    throw std::invalid_argument("missing atomic_swap_vc.pk");
+  }
+
+  // ignore if (!zk_vk_)
+  zk_vk_ = ZkpKey::instance().GetZkVk("atomic_swap_vc");
+
+  seed0_ = FrRand();
+  seed0_rand_ = FrRand();
+  seed0_mimc3_digest_ = Mimc3(seed0_, seed0_rand_);
 }
 
 template <typename AliceData>
@@ -43,7 +58,8 @@ bool Alice<AliceData>::OnRequest(Request request, Response& response) {
 
   BuildMapping();
 
-  H2(seed0_, (demands_count_ + 1) * s_, v_);
+  auto pad_count_of_col = PadCountOfCol(demands_count_);
+  ChainMimcInv(seed0_, (demands_count_ + pad_count_of_col) * s_, v_);
 
   if (evil_) {
     // NOTE: use rand() for test
@@ -59,6 +75,8 @@ bool Alice<AliceData>::OnRequest(Request request, Response& response) {
                                CalcRangesDigest(demands_),
                                CalcRootOfK(response.k)}};
   seed2_ = CalcSeed2(seed2_h);
+
+  ChainKeccak256(seed2_, demands_count_, w_);
 
   // compute mij' = vij + wi * mij
   auto const& m = a_->m();
@@ -78,8 +96,13 @@ bool Alice<AliceData>::OnRequest(Request request, Response& response) {
 
   size_t offset = demands_count_ * s_;
   response.vw.resize(s_);
+
   for (size_t j = 0; j < s_; ++j) {
-    response.vw[j] = v_[offset + j];
+    response.vw[j] = FrZero();
+    for (size_t i = 0; i < pad_count_of_col; ++i) {
+      response.vw[j] += v_[offset + i * s_ + j];
+    }
+
     for (size_t i = 0; i < demands_count_; ++i) {
       response.vw[j] += v_[i * s_ + j] * w_[i];
     }
@@ -90,25 +113,38 @@ bool Alice<AliceData>::OnRequest(Request request, Response& response) {
     sigma_vw_ += i;
   }
 
+  std::vector<ZkItem> zk_items;
+  BuildZkItems(zk_items, demands_count_, s_, w_);
+
+  std::vector<Fr> zk_ip_vw;
+  BuildZkIpVw(zk_ip_vw, v_, zk_items);
+
+#ifdef _DEBUG
+  {
+    auto a = std::accumulate(zk_ip_vw.begin(), zk_ip_vw.end(), FrZero());
+    auto const& vw = response.vw;
+    auto b = std::accumulate(vw.begin(), vw.end(), FrZero());
+    assert(a == b);
+  }
+#endif
+
+  response.seed0_mimc3_digest = seed0_mimc3_digest_;
+  response.zk_ip_vw = zk_ip_vw;
+
+  BuildZkProofs(response.zk_proofs, *zk_pk_, zk_items, zk_ip_vw, seed0_,
+                seed0_rand_, seed0_mimc3_digest_, zk_vk_);
+
   return true;
 }
 
 template <typename AliceData>
 bool Alice<AliceData>::OnReceipt(Receipt const& receipt, Secret& secret) {
-  if (receipt.seed2 != seed2_) {
-    assert(false);
-    return false;
-  }
-  if (receipt.sigma_vw != sigma_vw_) {
-    assert(false);
-    return false;
-  }
-  if (receipt.count != demands_count_) {
+  if (receipt.seed0_mimc3_digest != seed0_mimc3_digest_) {
     assert(false);
     return false;
   }
   secret.seed0 = seed0_;
+  secret.seed0_rand = seed0_rand_;
   return true;
 }
-
 }  // namespace scheme::atomic_swap_vc

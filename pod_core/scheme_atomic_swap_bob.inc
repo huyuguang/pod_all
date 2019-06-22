@@ -70,7 +70,7 @@ bool Bob<BobData>::OnResponse(Response response, Receipt& receipt) {
                                CalcRangesDigest(demands_), CalcRootOfK(k_)}};
   seed2_ = CalcSeed2(seed2_h);
 
-  H2(seed2_, demands_count_, w_);
+  ChainKeccak256(seed2_, demands_count_, w_);
 
   encrypted_m_ = std::move(response.m);
 
@@ -170,7 +170,7 @@ bool Bob<BobData>::OnSecret(Secret const& secret) {
 
   // compute v
   std::vector<Fr> v;
-  H2(secret.seed0, (demands_count_ + 1) * s_, v);
+  ChainKeccak256(secret.seed0, (demands_count_ + 1) * s_, v);
 
   if (!VerifyProof(s_, demands_count_, sigma_vw_, v, w_)) {
     // assert(false);

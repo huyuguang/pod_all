@@ -45,3 +45,5 @@ ipch/
 bin/
 
 build/
+
+win/lib

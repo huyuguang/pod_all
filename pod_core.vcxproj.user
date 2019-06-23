@@ -3,11 +3,11 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LocalDebuggerWorkingDirectory>$(OutDir)</LocalDebuggerWorkingDirectory>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
-    <LocalDebuggerCommandArguments>-m plain -a atomic_swap_pod_vc -p plain_data -o plain_output --demand_ranges 1-2</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>-m plain -a atomic_swap_pod_vc -p plain_data -o plain_output --demand_ranges 1-2 -c</LocalDebuggerCommandArguments>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LocalDebuggerWorkingDirectory>$(OutDir)</LocalDebuggerWorkingDirectory>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
-    <LocalDebuggerCommandArguments>-m plain -a atomic_swap_pod_vc -p plain_data -o plain_output --demand_ranges 1-2</LocalDebuggerCommandArguments>
+    <LocalDebuggerCommandArguments>-m plain -a atomic_swap_pod_vc -p plain_data -o plain_output --demand_ranges 1-2 -c</LocalDebuggerCommandArguments>
   </PropertyGroup>
 </Project>

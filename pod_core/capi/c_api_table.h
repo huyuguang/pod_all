@@ -255,3 +255,43 @@ EXPORT bool E_TableVrfqBobOnSecret(handle_t c_bob, char const* secret_file,
 
 EXPORT bool E_TableVrfqBobFree(handle_t c_bob);
 }  // extern "C" vrfq
+
+// atomic_swap_vc
+extern "C" {
+EXPORT handle_t E_TableAtomicSwapVcAliceNew(handle_t c_alice_data,
+                                            uint8_t const* c_self_id,
+                                            uint8_t const* c_peer_id);
+
+EXPORT bool E_TableAtomicSwapVcAliceOnRequest(handle_t c_alice,
+                                              char const* request_file,
+                                              char const* response_file);
+
+EXPORT bool E_TableAtomicSwapVcAliceOnReceipt(handle_t c_alice,
+                                              char const* receipt_file,
+                                              char const* secret_file);
+
+EXPORT bool E_TableAtomicSwapVcAliceSetEvil(handle_t c_alice);
+
+EXPORT bool E_TableAtomicSwapVcAliceFree(handle_t c_alice);
+
+EXPORT handle_t E_TableAtomicSwapVcBobNew(handle_t c_bob_data,
+                                          uint8_t const* c_self_id,
+                                          uint8_t const* c_peer_id,
+                                          range_t const* c_demand,
+                                          uint64_t c_demand_count);
+
+EXPORT bool E_TableAtomicSwapVcBobGetRequest(handle_t c_bob,
+                                             char const* request_file);
+
+EXPORT bool E_TableAtomicSwapVcBobOnResponse(handle_t c_bob,
+                                             char const* response_file,
+                                             char const* receipt_file);
+
+EXPORT bool E_TableAtomicSwapVcBobOnSecret(handle_t c_bob,
+                                           char const* secret_file);
+
+EXPORT bool E_TableAtomicSwapVcBobSaveDecrypted(handle_t c_bob,
+                                                char const* file);
+
+EXPORT bool E_TableAtomicSwapVcBobFree(handle_t c_bob);
+}  // extern "C" atomic_swap_vc

@@ -164,3 +164,43 @@ EXPORT bool E_PlainOtComplaintBobSaveDecrypted(handle_t c_bob,
 
 EXPORT bool E_PlainOtComplaintBobFree(handle_t c_bob);
 }  // extern "C" ot_complaint
+
+// atomic_swap_vc
+extern "C" {
+EXPORT handle_t E_PlainAtomicSwapVcAliceNew(handle_t c_alice_data,
+                                            uint8_t const* c_self_id,
+                                            uint8_t const* c_peer_id);
+
+EXPORT bool E_PlainAtomicSwapVcAliceOnRequest(handle_t c_alice,
+                                              char const* request_file,
+                                              char const* response_file);
+
+EXPORT bool E_PlainAtomicSwapVcAliceOnReceipt(handle_t c_alice,
+                                              char const* receipt_file,
+                                              char const* secret_file);
+
+EXPORT bool E_PlainAtomicSwapVcAliceSetEvil(handle_t c_alice);
+
+EXPORT bool E_PlainAtomicSwapVcAliceFree(handle_t c_alice);
+
+EXPORT handle_t E_PlainAtomicSwapVcBobNew(handle_t c_bob_data,
+                                          uint8_t const* c_self_id,
+                                          uint8_t const* c_peer_id,
+                                          range_t const* c_demand,
+                                          uint64_t c_demand_count);
+
+EXPORT bool E_PlainAtomicSwapVcBobGetRequest(handle_t c_bob,
+                                             char const* request_file);
+
+EXPORT bool E_PlainAtomicSwapVcBobOnResponse(handle_t c_bob,
+                                             char const* response_file,
+                                             char const* receipt_file);
+
+EXPORT bool E_PlainAtomicSwapVcBobOnSecret(handle_t c_bob,
+                                           char const* secret_file);
+
+EXPORT bool E_PlainAtomicSwapVcBobSaveDecrypted(handle_t c_bob,
+                                                char const* file);
+
+EXPORT bool E_PlainAtomicSwapVcBobFree(handle_t c_bob);
+}  // extern "C" atomic_swap_vc

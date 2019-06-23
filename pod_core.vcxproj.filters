@@ -71,6 +71,12 @@
     <Filter Include="local\atomic_swap_vc">
       <UniqueIdentifier>{1bf890f4-9efc-4173-8bde-e1d69741b9f3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="capi\plain_atomic_swap_vc">
+      <UniqueIdentifier>{ee7b0a2c-b4db-4913-9f77-1c2ab1d889c7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="capi\table_atomic_swap_vc">
+      <UniqueIdentifier>{37c89f26-abf6-448a-b196-588bb16f6b40}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pod_core\main.cc">
@@ -207,6 +213,12 @@
     </ClCompile>
     <ClCompile Include="public\zkp.cc">
       <Filter>public</Filter>
+    </ClCompile>
+    <ClCompile Include="pod_core\capi\scheme_table_atomic_swap_vc_test_capi.cc">
+      <Filter>capi\table_atomic_swap_vc</Filter>
+    </ClCompile>
+    <ClCompile Include="pod_core\capi\scheme_plain_atomic_swap_vc_test_capi.cc">
+      <Filter>capi\plain_atomic_swap_vc</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -635,6 +647,12 @@
     </ClInclude>
     <ClInclude Include="pod_core\zkp_key.h">
       <Filter>local</Filter>
+    </ClInclude>
+    <ClInclude Include="pod_core\capi\scheme_table_atomic_swap_vc_test_capi.h">
+      <Filter>capi\table_atomic_swap_vc</Filter>
+    </ClInclude>
+    <ClInclude Include="pod_core\capi\scheme_plain_atomic_swap_vc_test_capi.h">
+      <Filter>capi\plain_atomic_swap_vc</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

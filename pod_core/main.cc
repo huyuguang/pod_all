@@ -1,7 +1,9 @@
 #include "capi/scheme_plain_atomic_swap_test_capi.h"
+#include "capi/scheme_plain_atomic_swap_vc_test_capi.h"
 #include "capi/scheme_plain_complaint_test_capi.h"
 #include "capi/scheme_plain_ot_complaint_test_capi.h"
 #include "capi/scheme_table_atomic_swap_test_capi.h"
+#include "capi/scheme_table_atomic_swap_vc_test_capi.h"
 #include "capi/scheme_table_complaint_test_capi.h"
 #include "capi/scheme_table_ot_complaint_test_capi.h"
 #include "capi/scheme_table_ot_vrfq_test_capi.h"
@@ -37,6 +39,33 @@ void DumpEccPub() {
 }
 }  // namespace
 
+bool InitAll(std::string const& data_dir) {
+  InitEcc();
+
+  InitZkp();
+
+  auto ecc_pub_file = data_dir + "/" + "ecc_pub.bin";
+
+  if (!OpenOrCreateEccPub(ecc_pub_file)) {
+    std::cerr << "Open or create ecc pub file " << ecc_pub_file << " failed\n";
+    return false;
+  }
+
+  std::string zkp_key_dir = data_dir + "/" + "zksnark_key";
+  if (zkp_key_dir.empty() || !fs::is_directory(zkp_key_dir)) {
+    std::cerr << "Open zkp_key_dir " << zkp_key_dir << " failed\n";
+    return false;
+  }
+
+  ZkpKey::instance(zkp_key_dir);
+
+  if (ZkpKey::instance().IsEmpty()) {
+    std::cerr << "Warning: zk key file not exist.\n";
+  }
+
+  return true;
+}
+
 int main(int argc, char** argv) {
   setlocale(LC_ALL, "");
 
@@ -55,20 +84,20 @@ int main(int argc, char** argv) {
   std::vector<Range> phantom_ranges;
   bool use_capi = false;
   bool test_evil = false;
-  bool dump_ecc_pub = false;  
+  bool dump_ecc_pub = false;
 
   try {
     po::options_description options("command line options");
     options.add_options()("help,h", "Use -h or --help to list all arguments")(
         "data_dir,d", po::value<std::string>(&data_dir)->default_value("."),
         "Provide the configure file dir")("mode,m", po::value<Mode>(&mode),
-                                    "Provide pod mode (plain, table)")(
+                                          "Provide pod mode (plain, table)")(
         "action,a", po::value<Action>(&action),
         "Provide action (range_pod, ot_range_pod, vrf_query, ot_vrf_query...)")(
         "publish_dir,p", po::value<std::string>(&publish_dir),
         "Provide the publish dir")("output_dir,o",
-                                    po::value<std::string>(&output_dir),
-                                    "Provide the output dir")(
+                                   po::value<std::string>(&output_dir),
+                                   "Provide the output dir")(
         "demand_ranges",
         po::value<std::vector<Range>>(&demand_ranges)->multitoken(),
         "Provide the demand ranges")(
@@ -126,14 +155,8 @@ int main(int argc, char** argv) {
 
   std::cout << "omp_get_max_threads: " << omp_get_max_threads() << "\n";
 
-  InitEcc();
-
-  InitZkp();
-
-  std::string ecc_pub_file = data_dir + "/" + "ecc_pub.bin";
-
-  if (!OpenOrCreateEccPub(ecc_pub_file)) {
-    std::cerr << "Open or create ecc pub file " << ecc_pub_file << " failed\n";
+  if (!InitAll(data_dir)) {
+    std::cerr << "Init failed\n";
     return -1;
   }
 
@@ -156,13 +179,6 @@ int main(int argc, char** argv) {
     std::cerr << "Create " << output_dir << " failed\n";
     return -1;
   }
-
-  std::string zkp_key_dir = data_dir + "/" + "zksnark_key";
-  if (zkp_key_dir.empty() || !fs::is_directory(zkp_key_dir)) {
-    std::cerr << "Open zkp_key_dir " << zkp_key_dir << " failed\n";
-    return -1;
-  }
-  ZkpKey::instance(zkp_key_dir);
 
   // clean the output_dir
   for (auto& entry :
@@ -235,11 +251,11 @@ int main(int argc, char** argv) {
   if (action == Action::kAtomicSwapPodVc) {
     decltype(scheme::table::atomic_swap_vc::Test)* func;
     if (mode == Mode::kPlain) {
-      func = /*use_capi ? scheme::plain::atomic_swap_vc::capi::Test
-                      : */scheme::plain::atomic_swap_vc::Test;
+      func = use_capi ? scheme::plain::atomic_swap_vc::capi::Test
+                      : scheme::plain::atomic_swap_vc::Test;
     } else {
-      func = /*use_capi ? scheme::table::atomic_swap_vc::capi::Test
-                      : */scheme::table::atomic_swap_vc::Test;
+      func = use_capi ? scheme::table::atomic_swap_vc::capi::Test
+                      : scheme::table::atomic_swap_vc::Test;
     }
     return func(publish_dir, output_dir, demand_ranges, test_evil) ? 0 : -1;
   }

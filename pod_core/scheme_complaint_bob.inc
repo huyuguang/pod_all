@@ -273,7 +273,7 @@ void Bob<BobData>::DecryptM(std::vector<Fr> const& v) {
 
 #pragma omp parallel for
   for (int64_t i = 0; i < (int64_t)mappings_.size(); ++i) {
-    Fr inv_w = FrInv(w_[i]);
+    Fr inv_w = FrInv(w_[i]);// TODO: use batch inv 
     auto is = i * s_;
     for (uint64_t j = 0; j < s_; ++j) {
       auto ij = is + j;

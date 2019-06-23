@@ -1,14 +1,38 @@
 #include "zkp.h"
+#include <boost/archive/binary_iarchive.hpp>
+#include <boost/archive/binary_oarchive.hpp>
 #include <fstream>
 #include <iostream>
-
 #include <libff/common/profiling.hpp>
+#include <sstream>
+#include <vector>
 
 namespace {
 void DisableLibffLog() {
   libff::inhibit_profiling_info = true;
   libff::inhibit_profiling_counters = true;
 }
+
+struct imembuf : public std::streambuf {
+  imembuf(char const* array, size_t len) {
+    char* p(const_cast<char*>(array));
+    this->setg(p, p, p + len);
+  }
+};
+
+struct imemstream : virtual imembuf, std::istream {
+  imemstream(char* array, size_t len)
+      : imembuf(array, len), std::istream(static_cast<std::streambuf*>(this)) {}
+};
+
+struct omembuf : public std::streambuf {
+  omembuf(char* array, size_t len) { this->setp(array, array + len); }
+};
+
+struct omemstream : virtual omembuf, std::ostream {
+  omemstream(char* array, size_t len)
+      : omembuf(array, len), std::ostream(static_cast<std::streambuf*>(this)) {}
+};
 }  // namespace
 
 void InitZkp() {
@@ -61,4 +85,16 @@ ZkVkPtr LoadZkVk(std::string const& file) {
     std::cerr << "Exception: " << ex.what() << "\n";
     return ZkVkPtr();
   }
+}
+
+void ZkProofToBin(ZkProof const& proof,
+                  std::array<uint8_t, kZkProofSerializeSize>& bin) {
+  omemstream out((char*)bin.data(), bin.size());
+  out << proof;
+}
+
+void ZkProofFromBin(ZkProof& proof,
+                    std::array<uint8_t, kZkProofSerializeSize> const& bin) {
+  imemstream in((char*)bin.data(), bin.size());
+  in >> proof;
 }

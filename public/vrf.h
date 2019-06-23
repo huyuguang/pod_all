@@ -75,7 +75,7 @@ void Prove(Sk<N> const& sk, uint8_t const* x, Psk<N>& psk) {
     a[i] = a[i - 1] * (sk[i] + x[i]);
   }
   for (auto& i : a) {
-    i = FrInv(i);
+    i = FrInv(i); // TODO: use batch inv 
   }
   for (size_t i = 0; i < N; ++i) {
     psk[i] = ecc_pub.PowerG1(a[i]);
@@ -123,7 +123,7 @@ void ProveWithR(Sk<N> const& sk, uint8_t const* x, Fr const& r,
     a[i] = a[i - 1] * (sk[i] + x[i]);
   }
   for (auto& i : a) {
-    i = FrInv(i);
+    i = FrInv(i); // TODO: use batch inv 
   }
   for (size_t i = 0; i < N; ++i) {
     psk_exp_r[i] = ecc_pub.PowerG1(a[i] * r);

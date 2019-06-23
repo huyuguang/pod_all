@@ -11,6 +11,5 @@
 #endif
 
 extern "C" {
-EXPORT void E_InitEcc();
-EXPORT bool E_LoadEccPub(char const* ecc_pub_file);
+EXPORT bool E_InitAll(char const* data_dir);
 }

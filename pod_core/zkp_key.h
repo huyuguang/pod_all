@@ -12,17 +12,19 @@ class ZkpKey : boost::noncopyable {
     return _instance_;
   }
 
-  ZkPkPtr GetZkPk(std::string const& name) {
+  ZkPkPtr GetZkPk(std::string const& name) const {
     auto it = pk_.find(name);
     if (it != pk_.end()) return it->second;
     return ZkPkPtr();
   }
 
-  ZkVkPtr GetZkVk(std::string const& name) {
+  ZkVkPtr GetZkVk(std::string const& name) const {
     auto it = vk_.find(name);
     if (it != vk_.end()) return it->second;
     return ZkVkPtr();
   }
+
+  bool IsEmpty() const { return pk_.empty() && vk_.empty(); }
 
  private:
   ZkpKey(std::string const& path) : path_(path) {

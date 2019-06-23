@@ -1,0 +1,4 @@
+[submodule "linux/libsnark"]
+	path = depends/gtest
+	url = git://github.com/huyuguang/libsnark.git
+

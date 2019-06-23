@@ -48,3 +48,4 @@ build/
 
 win/lib
 win/include
+depends/install

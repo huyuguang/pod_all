@@ -8,7 +8,7 @@ HOME = ../linux
 THIRD_PARTY_HOME = ../thirdparty
 MCL_HOME = ../thirdparty/mcl/include
 PUB_HOME = ../public
-SNARK_HOME = /mnt/e/code/crypto/mylibsnark/install
+SNARK_HOME = ../depends/install
 
 CXXFLAGS := \
  -g3 \

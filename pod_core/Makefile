@@ -9,7 +9,7 @@ THIRD_PARTY_HOME = ../thirdparty
 MCL_HOME = ../thirdparty/mcl/include
 YAS_HOME = ../thirdparty/yas/include
 PUB_HOME = ../public
-SNARK_HOME = /mnt/e/code/crypto/mylibsnark/install
+SNARK_HOME = ../depends/install
 
 CXXFLAGS := \
  -g3 \

@@ -244,13 +244,15 @@ template <typename BobData>
 void Bob<BobData>::DecryptM(std::vector<Fr> const& v) {
   Tick _tick_(__FUNCTION__);
 
+  std::vector<Fr> inv_w = w_;
+  FrInv(inv_w.data(), inv_w.size());
+
 #pragma omp parallel for
   for (int64_t i = 0; i < (int64_t)mappings_.size(); ++i) {
-    Fr inv_w = FrInv(w_[i]);// TODO: use batch inv 
     auto is = i * s_;
     for (uint64_t j = 0; j < s_; ++j) {
       auto ij = is + j;
-      encrypted_m_[ij] = (encrypted_m_[ij] - v[ij]) * inv_w;
+      encrypted_m_[ij] = (encrypted_m_[ij] - v[ij]) * inv_w[i];
     }
   }
 

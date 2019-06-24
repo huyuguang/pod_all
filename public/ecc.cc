@@ -81,6 +81,30 @@ Fr FrInv(Fr const& r) {
   return r_inv;
 }
 
+void FrInv(Fr* begin, uint64_t count) {
+  assert(count > 0);
+
+  std::vector<Fr> prod(count);
+
+  Fr acc(1);
+
+  for (size_t i = 0; i < count; ++i) {
+    assert(!begin[i].isZero());
+    prod[i] = acc;
+    acc *= begin[i];
+  }
+
+  Fr acc_inverse = FrInv(acc);
+
+  for (int64_t i = (int64_t)count - 1; i >= 0; --i) {
+    Fr old_el = begin[i];
+    begin[i] = acc_inverse * prod[i];
+    acc_inverse *= old_el;
+  }
+}
+
+void FrInv(std::vector<Fr>& vec) { FrInv(vec.data(), vec.size()); }
+
 G1 G1Rand() {
   G1 out;
   bool b;
@@ -543,3 +567,4 @@ Fr MapToFr(uint64_t b) {
   auto b_big = boost::endian::native_to_big(b);
   return MapToFr((uint8_t const*)&b_big, sizeof(b_big));
 }
+

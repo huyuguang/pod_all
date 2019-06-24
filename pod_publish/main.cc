@@ -8,8 +8,6 @@
 #include "publish.h"
 #include "scheme_misc.h"
 
-namespace {}  // namespace
-// TODO: do not need ecc_pub
 int main(int argc, char** argv) {
   setlocale(LC_ALL, "");
 

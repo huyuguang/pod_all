@@ -50,6 +50,10 @@ void FrRand(std::vector<Fr*>& f);
 
 Fr FrInv(Fr const& r);
 
+void FrInv(Fr* begin, uint64_t count);
+
+void FrInv(std::vector<Fr>& vec);
+
 G1 G1Rand();
 
 void G1Rand(G1* r, size_t n);

@@ -111,7 +111,9 @@ bool Bob<BobData>::OnResponse(Response response, Receipt& receipt) {
 
   encrypted_m_.resize(demands_count_ * s_);
 
+#ifdef MULTICORE
 #pragma omp parallel for
+#endif
   for (int64_t i = 0; i < (int64_t)ot_ui_.size(); ++i) {
     Fp12 e;
     G1 ui_exp_a = ot_ui_[i] * ot_rand_a_;
@@ -150,7 +152,10 @@ bool Bob<BobData>::CheckEncryptedM() {
 
   // uint64_t phantom_offset = phantom_.start - demand_.start;
   int not_equal = 0;
+
+#ifdef MULTICORE
 #pragma omp parallel for
+#endif
   for (int64_t i = 0; i < (int64_t)mappings_.size(); ++i) {
     if (not_equal) continue;
     auto const& mapping = mappings_[i];
@@ -165,7 +170,9 @@ bool Bob<BobData>::CheckEncryptedM() {
       right += ecc_pub.PowerU1(j, m);
     }
     if (left != right) {
+#ifdef MULTICORE
 #pragma omp atomic
+#endif
       ++not_equal;
     }
   }
@@ -206,7 +213,13 @@ bool Bob<BobData>::GenerateClaim(Claim& claim) {
 
 template <typename BobData>
 bool Bob<BobData>::CheckK(std::vector<Fr> const& v) {
-  if (v.size() > (1024 * 1024) && omp_get_max_threads() < 3) {
+#ifdef MULTICORE
+  auto omp_threads = omp_get_max_threads();
+#else
+  auto omp_threads = 1;
+#endif
+
+  if (v.size() > (1024 * 1024) && omp_threads < 3) {
     return CheckKMultiExp(v);
   } else {
     return CheckKDirect(v);
@@ -330,8 +343,9 @@ uint64_t Bob<BobData>::FindMismatchI(uint64_t mismatch_j,
 template <typename BobData>
 void Bob<BobData>::DecryptM(std::vector<Fr> const& v) {
   Tick _tick_(__FUNCTION__);
-
+#ifdef MULTICORE
 #pragma omp parallel for
+#endif
   for (int64_t i = 0; i < (int64_t)mappings_.size(); ++i) {
     auto const& mapping = mappings_[i];
     Fr inv_w = FrInv(w_[mapping.phantom_offset]);

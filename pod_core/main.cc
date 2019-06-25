@@ -79,12 +79,14 @@ int main(int argc, char** argv) {
   std::string query_key;
   std::vector<std::string> query_values;
   std::vector<std::string> phantom_values;
-  uint32_t omp_thread_num = 0;
   std::vector<Range> demand_ranges;
   std::vector<Range> phantom_ranges;
   bool use_capi = false;
   bool test_evil = false;
   bool dump_ecc_pub = false;
+#ifdef MULTICORE
+  uint32_t omp_thread_num = 0;
+#endif
 
   try {
     po::options_description options("command line options");
@@ -113,10 +115,14 @@ int main(int argc, char** argv) {
         "phantom_key,n",
         po::value<std::vector<std::string>>(&phantom_values)->multitoken(),
         "Provide the query key phantoms(table mode, for example -n "
-        "phantoms_a phantoms_b phantoms_c)")(
+        "phantoms_a phantoms_b phantoms_c)")
+#ifdef MULTICORE          
+        (
         "omp_thread_num", po::value<uint32_t>(&omp_thread_num),
         "Provide the number of the openmp thread, 1: disable "
-        "openmp, 0: default.")("use_c_api,c", "")("test_evil", "")(
+        "openmp, 0: default.")
+#endif          
+        ("use_c_api,c", "")("test_evil", "")(
         "dump_ecc_pub", "");
 
     boost::program_options::variables_map vmap;
@@ -148,12 +154,13 @@ int main(int argc, char** argv) {
     return -1;
   }
 
+#ifdef MULTICORE
   if (omp_thread_num) {
     std::cout << "omp_set_num_threads: " << omp_thread_num << "\n";
     omp_set_num_threads(omp_thread_num);
   }
-
   std::cout << "omp_get_max_threads: " << omp_get_max_threads() << "\n";
+#endif
 
   if (!InitAll(data_dir)) {
     std::cerr << "Init failed\n";

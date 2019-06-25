@@ -116,7 +116,9 @@ std::vector<G1> CalcSigma(std::vector<Fr> const& m, uint64_t n, uint64_t s) {
 
   auto const& u1 = ecc_pub.u1();
   std::vector<G1> sigmas(n);
+#ifdef MULTICORE
 #pragma omp parallel for
+#endif
   for (int64_t i = 0; i < (int64_t)n; ++i) {
     G1& sigma = sigmas[i];
     auto is = i * s;
@@ -306,7 +308,9 @@ void BuildK(std::vector<Fr> const& v, std::vector<G1>& k, uint64_t s) {
   uint64_t n = v.size() / s;
   k.resize(v.size());
 
+#ifdef MULTICORE
 #pragma omp parallel for
+#endif
   for (int64_t i = 0; i < (int64_t)n; ++i) {
     for (int64_t j = 0; j < (int64_t)s; ++j) {
       auto offset = i * s + j;

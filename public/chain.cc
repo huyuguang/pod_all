@@ -45,7 +45,9 @@ void ChainKeccak256(h256_t const& seed, uint64_t count, std::vector<Fr>& v) {
   Tick _tick_(__FUNCTION__);
   v.resize(count);
 
+#ifdef MULTICORE
 #pragma omp parallel for
+#endif
   for (int64_t i = 0; i < (int64_t)count; ++i) {
     v[i] = ChainKeccak256(seed, i);
   }
@@ -59,7 +61,9 @@ void ChainMimcInv(Fr const& seed, uint64_t count, std::vector<Fr>& v) {
   Tick _tick_(__FUNCTION__);
   v.resize(count);
 
+#ifdef MULTICORE
 #pragma omp parallel for
+#endif
   for (uint64_t i = 0; i < count; ++i) {
     v[i] = ChainMimcInv(seed, i);
   }

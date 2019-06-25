@@ -89,7 +89,9 @@ bool Alice<AliceData>::OnRequest(Request request, Response& response) {
   ot_rand_c_ = FrRand();
   response.ot_ui.resize(ot_vi_.size());
 
+#ifdef MULTICORE
 #pragma omp parallel for
+#endif
   for (int64_t j = 0; j < (int64_t)response.ot_ui.size(); ++j) {
     response.ot_ui[j] = ot_vi_[j] * ot_rand_c_;
   }
@@ -107,7 +109,9 @@ bool Alice<AliceData>::OnRequest(Request request, Response& response) {
   auto const& m = a_->m();
   response.m.resize(phantoms_count_ * s_);
 
+#ifdef MULTICORE
 #pragma omp parallel for
+#endif
   for (int64_t i = 0; i < (int64_t)mappings_.size(); ++i) {
     auto const& map = mappings_[i];
     auto fr_i = MapToFr(map.global_index);

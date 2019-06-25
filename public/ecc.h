@@ -1,6 +1,8 @@
 #pragma once
 
+#ifdef MULTICORE
 #include <omp.h>
+#endif
 #include <algorithm>
 #include <array>
 #include <chrono>

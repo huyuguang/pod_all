@@ -22,7 +22,9 @@ int main(int argc, char** argv) {
   std::vector<bool> unique_key;
   uint64_t column_num;
   std::string data_dir;
+#ifdef MULTICORE
   uint32_t omp_thread_num;
+#endif
 
   try {
     po::options_description options("command line options");
@@ -52,11 +54,13 @@ int main(int argc, char** argv) {
         "positions in table mode (for example: -k 0 1 3)")(
         "unique_key,u", po::value<std::vector<bool>>(&unique_key)->multitoken(),
         "Provide the flag if publish must unique the key"
-        " in table mode (for example: -u 1 0 1)")(
-        "omp_thread_num",
-        po::value<uint32_t>(&omp_thread_num)->default_value(0),
+        " in table mode (for example: -u 1 0 1)")
+#ifdef MULTICORE
+        ("omp_thread_num", po::value<uint32_t>(&omp_thread_num)->default_value(0),
         "Provide the number of the openmp thread, 1: disable openmp, 0: "
-        "default.");
+        "default.")
+#endif
+      ;
 
     boost::program_options::variables_map vmap;
 
@@ -120,10 +124,12 @@ int main(int argc, char** argv) {
     return -1;
   }
 
+#ifdef MULTICORE
   if (omp_thread_num) {
     std::cout << "set openmp threadnum: " << omp_thread_num << "\n";
     omp_set_num_threads(omp_thread_num);
   }
+#endif
 
   InitEcc();
 

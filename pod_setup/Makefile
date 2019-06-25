@@ -77,7 +77,6 @@ LIBS := \
  -lsnark_adsnark \
  -lff \
  -lzm \
- -lprocps
 
 BUILD := ./build/self
 BUILDPUB := ./build/public

@@ -50,12 +50,16 @@ Fr FrRand() {
 void FrRand(Fr* r, size_t n) {
   std::vector<uint8_t> h(n * 32);
 
+#ifdef MULTICORE
 #pragma omp parallel for
+#endif
   for (size_t i = 0; i < 4; ++i) {
     rng.GenerateBlock(h.data() + 8 * i * n, 8 * n);
   }
 
+#ifdef MULTICORE
 #pragma omp parallel for
+#endif
   for (size_t i = 0; i < n; ++i) {
     r[i].setArrayMask(h.data() + i * 32, 32);
   }
@@ -64,12 +68,16 @@ void FrRand(Fr* r, size_t n) {
 void FrRand(std::vector<Fr*>& f) {
   auto n = f.size();
   std::vector<uint8_t> h(n * 32);
+#ifdef MULTICORE
 #pragma omp parallel for
+#endif
   for (size_t i = 0; i < 4; ++i) {
     rng.GenerateBlock(h.data() + 8 * i * n, 8 * n);
   }
 
+#ifdef MULTICORE
 #pragma omp parallel for
+#endif
   for (size_t i = 0; i < f.size(); ++i) {
     f[i]->setArrayMask(h.data() + i * 32, 32);
   }

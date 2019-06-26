@@ -42,8 +42,6 @@ std::vector<ZkFr> ConvertToZkFr(std::vector<Fr> const& mcl_frs) {
 }  // namespace
 
 bool GenerateAtomicSwapKeyPair(std::string const& output_path, uint64_t count) {
-  libsnark::default_r1cs_gg_ppzksnark_pp::init_public_params();
-
   // Create protoboard
   libsnark::protoboard<ZkFr> pb;
 

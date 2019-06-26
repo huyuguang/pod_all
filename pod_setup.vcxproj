@@ -107,12 +107,14 @@
     <ClCompile Include="public\ecc.cc" />
     <ClCompile Include="public\fp.cc" />
     <ClCompile Include="public\mimc.cc" />
+    <ClCompile Include="public\zkp.cc" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="public\atomic_swap_gadget.h" />
     <ClInclude Include="public\mimc.h" />
     <ClInclude Include="public\mimc3_gadget.h" />
     <ClInclude Include="public\mimcinv_gadget.h" />
+    <ClInclude Include="public\zkp.h" />
     <ClInclude Include="thirdparty\mcl\include\cybozu\array.hpp" />
     <ClInclude Include="thirdparty\mcl\include\cybozu\atoi.hpp" />
     <ClInclude Include="thirdparty\mcl\include\cybozu\benchmark.hpp" />

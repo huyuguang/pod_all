@@ -43,6 +43,9 @@
     <ClCompile Include="public\mimc.cc">
       <Filter>public</Filter>
     </ClCompile>
+    <ClCompile Include="public\zkp.cc">
+      <Filter>public</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="thirdparty\mcl\include\mcl\aggregate_sig.hpp">
@@ -220,6 +223,9 @@
       <Filter>public</Filter>
     </ClInclude>
     <ClInclude Include="public\mimc.h">
+      <Filter>public</Filter>
+    </ClInclude>
+    <ClInclude Include="public\zkp.h">
       <Filter>public</Filter>
     </ClInclude>
   </ItemGroup>

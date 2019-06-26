@@ -31,7 +31,7 @@ enum {
   kZkProofSerializeSize = 2 * (32 + 2) + 1 * (64 + 2),
 };
 
-void InitZkp();
+void InitZkp(bool disable_log);
 
 ZkFr ConvertToZkFr(Fr const& mcl_fr);
 

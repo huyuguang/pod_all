@@ -35,9 +35,11 @@ struct omemstream : virtual omembuf, std::ostream {
 };
 }  // namespace
 
-void InitZkp() {
+void InitZkp(bool disable_log) {
   libsnark::default_r1cs_gg_ppzksnark_pp::init_public_params();
-  DisableLibffLog();
+  if (disable_log) {
+    DisableLibffLog();
+  }  
 }
 
 ZkFr ConvertToZkFr(Fr const& mcl_fr) {

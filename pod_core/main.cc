@@ -42,7 +42,7 @@ void DumpEccPub() {
 bool InitAll(std::string const& data_dir) {
   InitEcc();
 
-  InitZkp();
+  InitZkp(true);
 
   auto ecc_pub_file = data_dir + "/" + "ecc_pub.bin";
 

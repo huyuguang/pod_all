@@ -1,5 +1,6 @@
 #include "ecc.h"
 #include "public.h"
+#include "zkp.h"
 
 bool GenerateAtomicSwapKeyPair(std::string const& output_path, uint64_t count);
 
@@ -7,6 +8,7 @@ int main(int argc, char** argv) {
   setlocale(LC_ALL, "");
   std::string output_path;
   uint64_t count;
+  bool verbose;
 
   try {
     po::options_description options("command line options");
@@ -15,7 +17,9 @@ int main(int argc, char** argv) {
         po::value<std::string>(&output_path)->default_value("zksnark_key"),
         "Provide the output path")(
         "count,c", po::value<uint64_t>(&count)->default_value(1024),
-        "Provide the count");
+        "Provide the count")(
+        "verbose,v", po::value<bool>(&verbose)->default_value(false),
+        "Enable libff log");
 
     boost::program_options::variables_map vmap;
 
@@ -48,6 +52,7 @@ int main(int argc, char** argv) {
   }
 
   InitEcc();
+  InitZkp(verbose);
 
   GenerateAtomicSwapKeyPair(output_path, count);
 

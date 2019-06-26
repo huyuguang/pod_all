@@ -14,7 +14,7 @@ CXXFLAGS := \
  -g3 \
  -fPIC \
  -fopenmp \
- -std=c++14 \
+ -std=c++17 \
  -Wall \
  -Wextra \
  -gdwarf-2 \
@@ -60,7 +60,7 @@ DEBUG_FLAGS := \
 LDFLAGS += \
  -fmerge-all-constants \
  -L${CXX11_HOME}/lib64 \
- -L$(SNARK_HOME)/lib 
+ -L$(SNARK_HOME)/lib \
 
 LIBS := \
  -lpthread \
@@ -92,6 +92,7 @@ SRC := $(foreach d, $(DIR), $(wildcard $(d)/*.cc))
 SRC += ../public/ecc.cc
 SRC += ../public/fp.cc
 SRC += ../public/mimc.cc
+SRC += ../public/zkp.cc
 
 RELEASE_OBJ := $(patsubst %.cc, %.o, $(SRC))
 

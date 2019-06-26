@@ -74,7 +74,6 @@ LIBS := \
  -lboost_iostreams \
  -lboost_program_options \
  -lsnark \
- -lsnark_adsnark \
  -lff \
  -lzm \
 

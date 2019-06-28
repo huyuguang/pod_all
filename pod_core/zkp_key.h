@@ -4,6 +4,7 @@
 #include <mutex>
 #include <unordered_map>
 #include "zkp.h"
+#include "tick.h"
 
 class ZkpKey : boost::noncopyable {
  public:
@@ -28,6 +29,7 @@ class ZkpKey : boost::noncopyable {
 
  private:
   ZkpKey(std::string const& path) : path_(path) {
+    Tick tick(__FUNCTION__);
     auto range = boost::make_iterator_range(fs::directory_iterator(path_), {});
     for (auto& entry : range) {
       auto basename = fs::basename(entry);

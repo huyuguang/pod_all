@@ -124,7 +124,7 @@ EXPORT bool E_PlainComplaintAliceOnRequest(handle_t c_alice,
   try {
     Request request;
     yas::file_istream is(request_file);
-    yas::binary_iarchive<yas::file_istream, YasBinF()> ia(is);
+    yas::json_iarchive<yas::file_istream> ia(is);
     ia.serialize(request);
 
     Response response;
@@ -223,7 +223,7 @@ EXPORT bool E_PlainComplaintBobGetRequest(handle_t c_bob,
     Request request;
     bob->GetRequest(request);
     yas::file_ostream os(request_file);
-    yas::binary_oarchive<yas::file_ostream, YasBinF()> oa(os);
+    yas::json_oarchive<yas::file_ostream> oa(os);
     oa.serialize(request);
   } catch (std::exception&) {
     return false;
@@ -355,7 +355,7 @@ EXPORT bool E_PlainAtomicSwapAliceOnRequest(handle_t c_alice,
   try {
     Request request;
     yas::file_istream is(request_file);
-    yas::binary_iarchive<yas::file_istream, YasBinF()> ia(is);
+    yas::json_iarchive<yas::file_istream> ia(is);
     ia.serialize(request);
 
     Response response;
@@ -454,7 +454,7 @@ EXPORT bool E_PlainAtomicSwapBobGetRequest(handle_t c_bob,
     Request request;
     bob->GetRequest(request);
     yas::file_ostream os(request_file);
-    yas::binary_oarchive<yas::file_ostream, YasBinF()> oa(os);
+    yas::json_oarchive<yas::file_ostream> oa(os);
     oa.serialize(request);
   } catch (std::exception&) {
     return false;
@@ -634,7 +634,7 @@ EXPORT bool E_PlainOtComplaintAliceOnRequest(handle_t c_alice,
   try {
     Request request;
     yas::file_istream is(request_file);
-    yas::binary_iarchive<yas::file_istream, YasBinF()> ia(is);
+    yas::json_iarchive<yas::file_istream> ia(is);
     ia.serialize(request);
 
     Response response;
@@ -806,7 +806,7 @@ EXPORT bool E_PlainOtComplaintBobGetRequest(handle_t c_bob,
     Request request;
     bob->GetRequest(request);
     yas::file_ostream os(request_file);
-    yas::binary_oarchive<yas::file_ostream, YasBinF()> oa(os);
+    yas::json_oarchive<yas::file_ostream> oa(os);
     oa.serialize(request);
   } catch (std::exception&) {
     return false;
@@ -939,7 +939,7 @@ EXPORT bool E_PlainAtomicSwapVcAliceOnRequest(handle_t c_alice,
   try {
     Request request;
     yas::file_istream is(request_file);
-    yas::binary_iarchive<yas::file_istream, YasBinF()> ia(is);
+    yas::json_iarchive<yas::file_istream> ia(is);
     ia.serialize(request);
 
     Response response;
@@ -1038,7 +1038,7 @@ EXPORT bool E_PlainAtomicSwapVcBobGetRequest(handle_t c_bob,
     Request request;
     bob->GetRequest(request);
     yas::file_ostream os(request_file);
-    yas::binary_oarchive<yas::file_ostream, YasBinF()> oa(os);
+    yas::json_oarchive<yas::file_ostream> oa(os);
     oa.serialize(request);
   } catch (std::exception&) {
     return false;

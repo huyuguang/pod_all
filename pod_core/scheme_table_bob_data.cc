@@ -13,7 +13,7 @@ BobData::BobData(std::string const& bulletin_file,
                  std::string const& public_path)
     : public_path_(public_path) {
   if (!LoadBulletin(bulletin_file, bulletin_))
-    throw std::runtime_error("invalid bulletin file");
+    throw std::runtime_error("Bob: invalid bulletin file");
   LoadData();
 }
 
@@ -41,7 +41,7 @@ bool BobData::NeedVerify() {
 // throw
 void BobData::LoadData() {
   if (!bulletin_.n || !bulletin_.s)
-    throw std::runtime_error("invalid bulletin");
+    throw std::runtime_error("Bob: invalid bulletin");
 
   std::string verify_file = public_path_ + "/.verify";
   std::string sigma_file = public_path_ + "/sigma";

@@ -126,8 +126,13 @@ void BuildZkProofs(std::vector<ZkProof>& zk_proofs, ZkPk const& pk,
                     seed_mimc3_digest);
 
   zk_proofs.resize(zk_items.size());
+  std::cout << "BuildZkProofs: zk_items.size() " << zk_items.size()
+            << "\n";
+
 #ifdef MULTICORE
+#ifndef _DEBUG
 #pragma omp parallel for
+#endif
 #endif
   for (size_t i = 0; i < zk_items.size(); ++i) {
     GenerateZkProof(zk_proofs[i], pk, zkp_items[i], check_vk);

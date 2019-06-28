@@ -34,15 +34,28 @@ inline constexpr size_t YasBinF() {
 // save
 template <typename Ar>
 void serialize(Ar &ar, Range const &t) {
-  ar &t.start;
-  ar &t.count;
+  if (ar.type() == yas::binary) {
+    ar &t.start;
+    ar &t.count;
+  } else {
+    assert(ar.type() == yas::json);
+    std::string str = Range::to_string(t);
+    ar &str;
+  }
 }
 
 // load
 template <typename Ar>
 void serialize(Ar &ar, Range &t) {
-  ar &t.start;
-  ar &t.count;
+  if (ar.type() == yas::binary) {
+    ar &t.start;
+    ar &t.count;
+  } else {
+    assert(ar.type() == yas::json);
+    std::string str;
+    ar &str;
+    t = Range::from_string(str); // throw
+  }
 }
 
 // save

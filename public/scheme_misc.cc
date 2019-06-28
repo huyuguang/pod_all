@@ -531,16 +531,7 @@ std::istream& operator>>(std::istream& in, Range& t) {
   try {
     std::string token;
     in >> token;
-    auto pos = token.find_first_of('-');
-    if (pos != std::string::npos) {
-      std::string s1 = token.substr(0, pos);
-      std::string s2 = token.substr(pos + 1);
-      t.start = boost::lexical_cast<uint64_t>(s1);
-      t.count = boost::lexical_cast<uint64_t>(s2);
-    } else {
-      t.start = boost::lexical_cast<uint64_t>(token);
-      t.count = 1;
-    }
+    t = Range::from_string(token); // throw
   } catch (std::exception&) {
     in.setstate(std::ios_base::failbit);
   }
@@ -548,7 +539,8 @@ std::istream& operator>>(std::istream& in, Range& t) {
 }
 
 std::ostream& operator<<(std::ostream& os, Range const& t) {
-  os << t.start << "-" << t.count;
+  std::string s = Range::to_string(t);
+  os << s;
   return os;
 }
 

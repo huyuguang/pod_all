@@ -6,10 +6,10 @@ CXX11_HOME = /usr
 
 HOME = ../linux
 THIRD_PARTY_HOME = ../thirdparty
-MCL_HOME = ../thirdparty/mcl/include
 YAS_HOME = ../thirdparty/yas/include
 PUB_HOME = ../public
 SNARK_HOME = ../depends/install
+MCL_HOME = $(SNARK_HOME)/include/depends/mcl/include
 
 CXXFLAGS := \
  -g3 \
@@ -35,7 +35,7 @@ CXXFLAGS := \
 SNARK_FLAGS = \
  -DBINARY_OUTPUT \
  -DBN_SUPPORT_SNARK=1 \
- -DCURVE_BN128 \
+ -DCURVE_MCL_BN128 \
  -DMONTGOMERY_OUTPUT \
  -DMULTICORE=1 \
  -DUSE_ASM \
@@ -80,7 +80,7 @@ LIBS := \
  -lboost_program_options \
  -lsnark \
  -lff \
- -lzm \
+ -lmcl \
 
 BUILD := ./build/self
 BUILDPUB := ./build/public

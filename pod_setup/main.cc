@@ -51,6 +51,7 @@ int main(int argc, char** argv) {
     return -1;
   }
 
+  std::cout << "Init ecc and zk\n";
   InitEcc();
   InitZkp(verbose);
 

@@ -17,11 +17,11 @@
 #include <atomic>
 #include <chrono>
 #include <condition_variable>
-#if defined(_MSC_VER)
-#include <execution>
-#else
-#include <parallel/algorithm>
-#endif
+//#if defined(_MSC_VER)
+//#include <execution>
+//#else
+//#include <parallel/algorithm>
+//#endif
 #include <functional>
 #include <map>
 #include <memory>

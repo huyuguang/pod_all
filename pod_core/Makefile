@@ -2,7 +2,23 @@
 #sudo apt-get install libcrypto++-dev
 #sudo apt-get install libboost-all-dev
 
-CXX11_HOME = /usr
+ifeq ($(OS),Windows_NT)
+	OS_TYPE := Windows
+else
+	UNAME := $(shell uname -s)
+	ifeq ($(UNAME),Linux)
+		OS_TYPE := Linux
+	else ifeq ($(UNAME),Darwin)
+		OS_TYPE := Darwin
+	else
+		OS_TYPE := Unknown
+	endif
+endif
+
+CXX ?= $(shell which g++)
+ifdef CXX11_HOME
+  CXX := LD_LIBRARY_PATH=${CXX11_HOME}/lib $(CXX11_HOME)/bin/g++
+endif
 
 HOME = ../linux
 THIRD_PARTY_HOME = ../thirdparty
@@ -10,6 +26,21 @@ YAS_HOME = ../thirdparty/yas/include
 PUB_HOME = ../public
 SNARK_HOME = ../depends/install
 MCL_HOME = $(SNARK_HOME)/include/depends/mcl/include
+
+INC_FLAGS :=  \
+ -I /usr/local/include \
+ -I /usr/include \
+ -I $(MCL_HOME) \
+ -I $(PUB_HOME) \
+ -I $(YAS_HOME) \
+ -I $(THIRD_PARTY_HOME) \
+ -isystem $(SNARK_HOME)/include \
+ -I. \
+ -I.. \
+
+ifdef CXX11_HOME
+  INC_FLAGS += -I $(CXX11_HOME)/include
+endif
 
 CXXFLAGS := \
  -g3 \
@@ -23,14 +54,7 @@ CXXFLAGS := \
  -Wno-parentheses \
  -Wdeprecated-declarations \
  -fmerge-all-constants  \
- -I $(CXX11_HOME)/include \
- -I $(MCL_HOME) \
- -I $(YAS_HOME) \
- -I $(THIRD_PARTY_HOME) \
- -I $(PUB_HOME) \
- -I. \
- -isystem $(CXX11_HOME)/include/boost \
- -isystem $(SNARK_HOME)/include \
+ $(INC_FLAGS) \
 
 SNARK_FLAGS = \
  -DBINARY_OUTPUT \
@@ -64,7 +88,6 @@ DEBUG_FLAGS := \
 
 LDFLAGS += \
  -fmerge-all-constants \
- -L${CXX11_HOME}/lib64 \
  -L$(SNARK_HOME)/lib
 
 LIBS := \
@@ -81,6 +104,18 @@ LIBS := \
  -lsnark \
  -lff \
  -lmcl \
+
+ifeq ($(OS_TYPE),Darwin)
+  TMPVAR := $(CXXFLAGS)
+  CXXFLAGS := $(filter-out -fopenmp, $(TMPVAR))
+
+  TMPVAR := $(SNARK_FLAGS)
+  SNARK_FLAGS := $(filter-out -DMULTICORE=1, $(TMPVAR))
+
+  TMPVAR := $(LIBS)
+  TMPVAR := $(filter-out -lgomp, $(TMPVAR))
+  LIBS := $(filter-out -lrt, $(TMPVAR))
+endif
 
 BUILD := ./build/self
 BUILDPUB := ./build/public
@@ -101,9 +136,10 @@ RELEASE_OBJ := $(patsubst %.cc, %.o, $(SRC))
 
 DEBUG_OBJ := $(patsubst %.cc, %.d.o, $(SRC))
 
-CXX := export LD_LIBRARY_PATH=${CXX11_HOME}/lib; ${CXX11_HOME}/bin/g++
+RELEASE_BIN := pod_core
+DEBUG_BIN := pod_cored
 
-all: pod_cored pod_core
+all: $(RELEASE_BIN) $(DEBUG_BIN)
 
 %.o : %.cc
 	$(CXX) -c $^ $(CXXFLAGS) $(RELEASE_FLAGS) $(MCL_FLAGS) $(SNARK_FLAGS) $(BOOST_FLAGS) -o $(BUILD)/$@
@@ -114,13 +150,15 @@ all: pod_cored pod_core
 
 
 
-pod_cored : $(DEBUG_OBJ)
-	$(CXX) $(addprefix $(BUILD)/, $^) -o $(HOME)/bin/$@.exe $(LDFLAGS) $(LIBS)
+$(DEBUG_BIN) : $(DEBUG_OBJ)
+	$(CXX) $(addprefix $(BUILD)/, $^) -o $(HOME)/bin/$@ $(LDFLAGS) $(LIBS)
 
-pod_core : $(RELEASE_OBJ)
-	$(CXX) $(addprefix $(BUILD)/, $^) -o $(HOME)/bin/$@.exe $(LDFLAGS) $(LIBS)
+$(RELEASE_BIN) : $(RELEASE_OBJ)
+	$(CXX) $(addprefix $(BUILD)/, $^) -o $(HOME)/bin/$@ $(LDFLAGS) $(LIBS)
 
 clean:
-	find . -regex "\(.*\.o\|.*\.exe\)" | xargs rm
+	find . -name "*.o" -delete
+	rm -rf $(HOME)/bin/$(RELEASE_BIN) $(HOME)/bin/$(DEBUG_BIN)
+	rm -rf build
 
 .PHONY :

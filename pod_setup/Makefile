@@ -1,6 +1,7 @@
 #sudo apt-get install libomp-dev
 #sudo apt-get install libcrypto++-dev
 #sudo apt-get install libboost-all-dev
+#sudo apt-get install libiomp5 (if clang in linux, use -lomp replace -lgomp)
 
 ifeq ($(OS),Windows_NT)
 	OS_TYPE := Windows
@@ -101,6 +102,9 @@ ifeq ($(OS_TYPE),Darwin)
 
   TMPVAR := $(SNARK_FLAGS)
   SNARK_FLAGS := $(filter-out -DMULTICORE=1, $(TMPVAR))
+
+  TMPVAR := $(SNARK_FLAGS)
+  SNARK_FLAGS := $(filter-out -DUSE_ASM, $(TMPVAR))
 
   TMPVAR := $(LIBS)
   TMPVAR := $(filter-out -lgomp, $(TMPVAR))

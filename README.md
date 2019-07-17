@@ -1,5 +1,8 @@
 # pod_all
 
+Core code for https://github.com/sec-bit/zkPoD-lib  
+
+### 获取代码
 1，拉libsnark代码  
 git submodule init && git submodule update
 

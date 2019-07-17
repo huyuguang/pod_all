@@ -3,7 +3,7 @@
   <ImportGroup Label="PropertySheets" />
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup>
-    <IncludePath>C:\vcpkg\installed\x64-windows-static\include;$(SolutionDir)/../depends/install/include;$(SolutionDir)\..\depends\install\include\depends\mcl\include;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
+    <IncludePath>C:\vcpkg\installed\x64-windows-static\include;$(SolutionDir)/../depends/libsnark/msvc/include;$(SolutionDir)\..\depends\libsnark/msvc/include/depends/mcl/include;$(VC_IncludePath);$(WindowsSDK_IncludePath)</IncludePath>
     <LibraryPath>C:\vcpkg\installed\x64-windows-static\debug\lib;$(VC_LibraryPath_x64);$(WindowsSDK_LibraryPath_x64);$(NETFXKitsDir)Lib\um\x64</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup>

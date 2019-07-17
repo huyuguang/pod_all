@@ -3,9 +3,10 @@
 CXX11_HOME = /usr
 
 THIRD_PARTY_HOME = ../thirdparty
-MCL_HOME = ../thirdparty/mcl/include
 YAS_HOME = ../thirdparty/yas/include
 PUB_HOME = ../public
+SNARK_HOME = ../depends/install
+MCL_HOME = $(SNARK_HOME)/include/depends/mcl/include
 
 CXXFLAGS := \
  -g3 \
@@ -19,6 +20,8 @@ CXXFLAGS := \
  -Wno-parentheses \
  -Wdeprecated-declarations \
  -fmerge-all-constants  \
+ -march=native \
+ -mtune=native \
  -I $(CXX11_HOME)/include \
  -I $(MCL_HOME) \
  -I $(YAS_HOME) \
@@ -31,7 +34,6 @@ MCL_FLAGS := \
 
 RELEASE_FLAGS := \
  -O3 \
- -DDTREE_ICASE \
  -DNDEBUG \
  -DLINUX \
  -DMULTICORE \
@@ -42,16 +44,20 @@ DEBUG_FLAGS := \
  -DLINUX \
  
 LDFLAGS += \
- -static-libstdc++ -static-libgcc \
  -fmerge-all-constants \
- -L${CXX11_HOME}/lib64
+ -L$(SNARK_HOME)/lib
 
 LIBS := \
  -lpthread \
  -lrt \
  -lgmpxx \
  -lgmp \
- -lcryptopp 
+ -lcryptopp \
+ -lboost_filesystem \
+ -lboost_system \
+ -lboost_iostreams \
+ -lboost_program_options \
+ -lmcl \
 
 DIR := . 
 

@@ -1,6 +1,11 @@
 #pragma once
 
 #include <stdint.h>
+
+#ifndef __cplusplus
+#include <stdbool.h>
+#endif
+
 #include "c_api_types.h"
 
 #ifdef _WIN32
@@ -9,7 +14,9 @@
 #define EXPORT __attribute__((visibility("default")))
 #endif
 
+#ifdef __cplusplus
 extern "C" {
+#endif
 EXPORT handle_t E_PlainAliceDataNew(char const* publish_path);
 EXPORT handle_t E_PlainBobDataNew(char const* bulletin_file,
                                   char const* public_path);
@@ -20,10 +27,14 @@ EXPORT bool E_PlainBobDataFree(handle_t c_bob_data);
 EXPORT bool E_PlainAliceBulletin(handle_t c_alice_data,
                                  plain_bulletin_t* bulletin);
 EXPORT bool E_PlainBobBulletin(handle_t c_bob_data, plain_bulletin_t* bulletin);
+#ifdef __cplusplus
 }
+#endif
 
 // complaint
+#ifdef __cplusplus
 extern "C" {
+#endif
 EXPORT handle_t E_PlainComplaintAliceNew(handle_t c_alice_data,
                                          uint8_t const* c_self_id,
                                          uint8_t const* c_peer_id);
@@ -62,10 +73,14 @@ EXPORT bool E_PlainComplaintBobGenerateClaim(handle_t c_bob,
 EXPORT bool E_PlainComplaintBobSaveDecrypted(handle_t c_bob, char const* file);
 
 EXPORT bool E_PlainComplaintBobFree(handle_t c_bob);
+#ifdef __cplusplus
 }  // extern "C" complaint
+#endif
 
 // atomic_swap
+#ifdef __cplusplus
 extern "C" {
+#endif
 EXPORT handle_t E_PlainAtomicSwapAliceNew(handle_t c_alice_data,
                                           uint8_t const* c_self_id,
                                           uint8_t const* c_peer_id);
@@ -101,10 +116,14 @@ EXPORT bool E_PlainAtomicSwapBobOnSecret(handle_t c_bob,
 EXPORT bool E_PlainAtomicSwapBobSaveDecrypted(handle_t c_bob, char const* file);
 
 EXPORT bool E_PlainAtomicSwapBobFree(handle_t c_bob);
+#ifdef __cplusplus
 }  // extern "C" atomic_swap
+#endif
 
 // ot_complaint
+#ifdef __cplusplus
 extern "C" {
+#endif
 EXPORT handle_t E_PlainOtComplaintAliceNew(handle_t c_alice_data,
                                            uint8_t const* c_self_id,
                                            uint8_t const* c_peer_id);
@@ -163,10 +182,14 @@ EXPORT bool E_PlainOtComplaintBobSaveDecrypted(handle_t c_bob,
                                                char const* file);
 
 EXPORT bool E_PlainOtComplaintBobFree(handle_t c_bob);
+#ifdef __cplusplus
 }  // extern "C" ot_complaint
+#endif
 
 // atomic_swap_vc
+#ifdef __cplusplus
 extern "C" {
+#endif
 EXPORT handle_t E_PlainAtomicSwapVcAliceNew(handle_t c_alice_data,
                                             uint8_t const* c_self_id,
                                             uint8_t const* c_peer_id);
@@ -203,4 +226,6 @@ EXPORT bool E_PlainAtomicSwapVcBobSaveDecrypted(handle_t c_bob,
                                                 char const* file);
 
 EXPORT bool E_PlainAtomicSwapVcBobFree(handle_t c_bob);
+#ifdef __cplusplus
 }  // extern "C" atomic_swap_vc
+#endif

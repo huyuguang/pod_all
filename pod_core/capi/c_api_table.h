@@ -9,7 +9,9 @@
 #define EXPORT __attribute__((visibility("default")))
 #endif
 
+#ifdef __cplusplus
 extern "C" {
+#endif
 EXPORT handle_t E_TableAliceDataNew(char const* publish_path);
 EXPORT handle_t E_TableBobDataNew(char const* bulletin_file,
                                   char const* public_path);
@@ -23,10 +25,14 @@ EXPORT bool E_TableBobBulletin(handle_t c_bob_data, table_bulletin_t* bulletin);
 
 EXPORT bool E_TableBIsKeyUnique(handle_t c_bob_data, char const* query_key,
                                 bool* unique);
+#ifdef __cplusplus
 }
+#endif
 
 // complaint
+#ifdef __cplusplus
 extern "C" {
+#endif
 EXPORT handle_t E_TableComplaintAliceNew(handle_t c_alice_data,
                                          uint8_t const* c_self_id,
                                          uint8_t const* c_peer_id);
@@ -65,10 +71,14 @@ EXPORT bool E_TableComplaintBobGenerateClaim(handle_t c_bob,
 EXPORT bool E_TableComplaintBobSaveDecrypted(handle_t c_bob, char const* file);
 
 EXPORT bool E_TableComplaintBobFree(handle_t c_bob);
+#ifdef __cplusplus
 }  // extern "C" complaint
+#endif
 
 // atomic_swap
+#ifdef __cplusplus
 extern "C" {
+#endif
 EXPORT handle_t E_TableAtomicSwapAliceNew(handle_t c_alice_data,
                                           uint8_t const* c_self_id,
                                           uint8_t const* c_peer_id);
@@ -104,10 +114,14 @@ EXPORT bool E_TableAtomicSwapBobOnSecret(handle_t c_bob,
 EXPORT bool E_TableAtomicSwapBobSaveDecrypted(handle_t c_bob, char const* file);
 
 EXPORT bool E_TableAtomicSwapBobFree(handle_t c_bob);
+#ifdef __cplusplus
 }  // extern "C" atomic_swap
+#endif
 
 // ot_complaint
+#ifdef __cplusplus
 extern "C" {
+#endif
 EXPORT handle_t E_TableOtComplaintAliceNew(handle_t c_alice_data,
                                            uint8_t const* c_self_id,
                                            uint8_t const* c_peer_id);
@@ -166,10 +180,14 @@ EXPORT bool E_TableOtComplaintBobSaveDecrypted(handle_t c_bob,
                                                char const* file);
 
 EXPORT bool E_TableOtComplaintBobFree(handle_t c_bob);
+#ifdef __cplusplus
 }  // extern "C" ot_complaint
+#endif
 
 // ot_vrfq
+#ifdef __cplusplus
 extern "C" {
+#endif
 EXPORT handle_t E_TableOtVrfqAliceNew(handle_t c_alice_data,
                                       uint8_t const* c_self_id,
                                       uint8_t const* c_peer_id);
@@ -221,10 +239,14 @@ EXPORT bool E_TableOtVrfqBobOnSecret(handle_t c_bob, char const* secret_file,
                                      char const* positions_file);
 
 EXPORT bool E_TableOtVrfqBobFree(handle_t c_bob);
+#ifdef __cplusplus
 }  // extern "C" ot_vrfq
+#endif
 
 // vrfq
+#ifdef __cplusplus
 extern "C" {
+#endif
 EXPORT handle_t E_TableVrfqAliceNew(handle_t c_alice_data,
                                     uint8_t const* c_self_id,
                                     uint8_t const* c_peer_id);
@@ -254,10 +276,14 @@ EXPORT bool E_TableVrfqBobOnSecret(handle_t c_bob, char const* secret_file,
                                    char const* positions_file);
 
 EXPORT bool E_TableVrfqBobFree(handle_t c_bob);
+#ifdef __cplusplus
 }  // extern "C" vrfq
+#endif
 
 // atomic_swap_vc
+#ifdef __cplusplus
 extern "C" {
+#endif
 EXPORT handle_t E_TableAtomicSwapVcAliceNew(handle_t c_alice_data,
                                             uint8_t const* c_self_id,
                                             uint8_t const* c_peer_id);
@@ -294,4 +320,6 @@ EXPORT bool E_TableAtomicSwapVcBobSaveDecrypted(handle_t c_bob,
                                                 char const* file);
 
 EXPORT bool E_TableAtomicSwapVcBobFree(handle_t c_bob);
+#ifdef __cplusplus
 }  // extern "C" atomic_swap_vc
+#endif

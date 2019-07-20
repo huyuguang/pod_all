@@ -56,27 +56,29 @@ void serialize(Ar &ar, NegoBResponse &t) {
 // save to bin
 template <typename Ar>
 void serialize(Ar &ar, Request const &t) {
-  ar &YAS_OBJECT_NVP("Request", ("s", t.seed2_seed), ("p", t.phantoms),
+  ar &YAS_OBJECT_NVP("Request", ("b", t.bob_nonce), ("p", t.phantoms),
                      ("ot_vi", t.ot_vi), ("ot_v", t.ot_v));
 }
 
 // load from bin
 template <typename Ar>
 void serialize(Ar &ar, Request &t) {
-  ar &YAS_OBJECT_NVP("Request", ("s", t.seed2_seed), ("p", t.phantoms),
+  ar &YAS_OBJECT_NVP("Request", ("b", t.bob_nonce), ("p", t.phantoms),
                      ("ot_vi", t.ot_vi), ("ot_v", t.ot_v));
 }
 
 // save to bin
 template <typename Ar>
 void serialize(Ar &ar, Response const &t) {
-  ar &YAS_OBJECT_NVP("Response", ("k", t.k), ("o", t.ot_ui), ("m", t.m));
+  ar &YAS_OBJECT_NVP("Response", ("a", t.alice_nonce), ("k", t.k),
+                     ("o", t.ot_ui), ("m", t.m));
 }
 
 // load from bin
 template <typename Ar>
 void serialize(Ar &ar, Response &t) {
-  ar &YAS_OBJECT_NVP("Response", ("k", t.k), ("o", t.ot_ui), ("m", t.m));
+  ar &YAS_OBJECT_NVP("Response", ("a", t.alice_nonce), ("k", t.k),
+                     ("o", t.ot_ui), ("m", t.m));
 }
 
 // save to json

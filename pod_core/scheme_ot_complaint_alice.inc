@@ -16,6 +16,7 @@ Alice<AliceData>::Alice(std::shared_ptr<AliceData> a, h256_t const& self_id,
   seed0_ = misc::RandH256();
   ot_self_pk_ = G2Rand();
   ot_alpha_ = FrRand();
+  alice_nonce_ = misc::RandH256();
 }
 
 template <typename AliceData>
@@ -56,7 +57,7 @@ bool Alice<AliceData>::OnRequest(Request request, Response& response) {
   phantoms_ = request.phantoms;       // sizeof() = L
   ot_vi_ = std::move(request.ot_vi);  // sizeof() = K
   ot_v_ = std::move(request.ot_v);
-  seed2_seed_ = request.seed2_seed;
+  bob_nonce_ = request.bob_nonce;
 
   if (!CheckPhantoms(n_, phantoms_)) {
     assert(false);
@@ -82,6 +83,8 @@ bool Alice<AliceData>::OnRequest(Request request, Response& response) {
     std::cout << "evil: " << evil_i << "," << evil_j << "\n";
   }
 
+  response.alice_nonce = alice_nonce_;
+
   BuildK(v_, response.k, s_);
 
   k_mkl_root_ = CalcRootOfK(response.k);
@@ -96,7 +99,7 @@ bool Alice<AliceData>::OnRequest(Request request, Response& response) {
     response.ot_ui[j] = ot_vi_[j] * ot_rand_c_;
   }
 
-  std::vector<h256_t> seed2_h{{peer_id_, self_id_, seed2_seed_,
+  std::vector<h256_t> seed2_h{{peer_id_, self_id_, alice_nonce_, bob_nonce_,
                                CalcRangesDigest(phantoms_),
                                CalcG1DataDigest(ot_vi_), G1ToBin(ot_v_),
                                CalcG1DataDigest(response.ot_ui), k_mkl_root_}};

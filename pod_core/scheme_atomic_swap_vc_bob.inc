@@ -31,7 +31,7 @@ Bob<BobData>::Bob(std::shared_ptr<BobData> b, h256_t const& self_id,
 
   BuildMapping();
 
-  seed2_seed_ = misc::RandH256();
+  bob_nonce_ = misc::RandH256();
 }
 
 template <typename BobData>
@@ -50,7 +50,7 @@ void Bob<BobData>::BuildMapping() {
 
 template <typename BobData>
 void Bob<BobData>::GetRequest(Request& request) {
-  request.seed2_seed = seed2_seed_;
+  request.bob_nonce = bob_nonce_;
   request.demands = demands_;
 }
 
@@ -76,7 +76,9 @@ bool Bob<BobData>::OnResponse(Response response, Receipt& receipt) {
 
   vw_ = std::move(response.vw);
 
-  std::vector<h256_t> seed2_h{{self_id_, peer_id_, seed2_seed_,
+  alice_nonce_ = response.alice_nonce;
+
+  std::vector<h256_t> seed2_h{{self_id_, peer_id_, alice_nonce_, bob_nonce_,
                                CalcRangesDigest(demands_), CalcRootOfK(k_)}};
   seed2_ = CalcSeed2(seed2_h);
 

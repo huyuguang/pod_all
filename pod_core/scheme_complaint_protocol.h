@@ -6,11 +6,12 @@
 
 namespace scheme::complaint {
 struct Request {
-  h256_t seed2_seed;
+  h256_t bob_nonce;
   std::vector<Range> demands;
 };
 
 struct Response {
+  h256_t alice_nonce;
   std::vector<G1> k;
   std::vector<Fr> m;
 };

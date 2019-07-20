@@ -24,13 +24,14 @@ struct NegoBResponse {
 };
 
 struct Request {
-  h256_t seed2_seed;
+  h256_t bob_nonce;
   std::vector<Range> phantoms;  // sizeof() = L
   std::vector<G1> ot_vi;        // sizeof() = K
   G1 ot_v;
 };
 
 struct Response {
+  h256_t alice_nonce;
   std::vector<G1> k;      // sizeof() = L
   std::vector<G1> ot_ui;  // sizeof() = K
   std::vector<Fr> m;      // sizeof() = L

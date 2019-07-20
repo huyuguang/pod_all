@@ -56,7 +56,8 @@ class Bob {
   Request request_;
   std::vector<G1> k_;      // sizeof() = L
   std::vector<G1> ot_ui_;  // sizeof() = K
-  h256_t seed2_seed_;
+  h256_t alice_nonce_;
+  h256_t bob_nonce_;
 
  private:
   struct Mapping {

@@ -31,7 +31,8 @@ class Alice {
 
  private:
   std::vector<Range> demands_;
-  h256_t seed2_seed_;
+  h256_t alice_nonce_;
+  h256_t bob_nonce_;
   h256_t seed2_;
 
  private:

@@ -8,25 +8,25 @@ namespace scheme::complaint {
 // save to bin
 template <typename Ar>
 void serialize(Ar &ar, Request const &t) {
-  ar &YAS_OBJECT_NVP("Request", ("s", t.seed2_seed), ("d", t.demands));
+  ar &YAS_OBJECT_NVP("Request", ("b", t.bob_nonce), ("d", t.demands));
 }
 
 // load from bin
 template <typename Ar>
 void serialize(Ar &ar, Request &t) {
-  ar &YAS_OBJECT_NVP("Request", ("s", t.seed2_seed), ("d", t.demands));
+  ar &YAS_OBJECT_NVP("Request", ("b", t.bob_nonce), ("d", t.demands));
 }
 
 // save to bin
 template <typename Ar>
 void serialize(Ar &ar, Response const &t) {
-  ar &YAS_OBJECT_NVP("Response", ("k", t.k), ("m", t.m));
+  ar &YAS_OBJECT_NVP("Response", ("a", t.alice_nonce), ("k", t.k), ("m", t.m));
 }
 
 // load from bin
 template <typename Ar>
 void serialize(Ar &ar, Response &t) {
-  ar &YAS_OBJECT_NVP("Response", ("k", t.k), ("m", t.m));
+  ar &YAS_OBJECT_NVP("Response", ("a", t.alice_nonce), ("k", t.k), ("m", t.m));
 }
 
 // save to json

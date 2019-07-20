@@ -22,7 +22,7 @@ Bob<BobData>::Bob(std::shared_ptr<BobData> b, h256_t const& self_id,
   for (auto const& i : phantoms_) phantoms_count_ += i.count;
   BuildMapping();
 
-  seed2_seed_ = misc::RandH256();
+  bob_nonce_ = misc::RandH256();
 
   ot_self_pk_ = G1Rand();
   ot_beta_ = FrRand();
@@ -66,7 +66,7 @@ bool Bob<BobData>::OnNegoResponse(NegoBResponse const& response) {
 
 template <typename BobData>
 void Bob<BobData>::GetRequest(Request& request) {
-  request.seed2_seed = seed2_seed_;
+  request.bob_nonce = bob_nonce_;
   request.phantoms = phantoms_;
 
   request.ot_vi.reserve(demands_count_);
@@ -96,14 +96,15 @@ bool Bob<BobData>::OnResponse(Response response, Receipt& receipt) {
     return false;
   }
 
+  alice_nonce_ = response.alice_nonce;
   k_ = std::move(response.k);
   ot_ui_ = std::move(response.ot_ui);
   k_mkl_root_ = CalcRootOfK(k_);
-
+  
   std::vector<h256_t> seed2_h{
-      {self_id_, peer_id_, seed2_seed_, CalcRangesDigest(phantoms_),
-       CalcG1DataDigest(request_.ot_vi), G1ToBin(request_.ot_v),
-       CalcG1DataDigest(ot_ui_), k_mkl_root_}};
+      {self_id_, peer_id_, alice_nonce_, bob_nonce_,
+       CalcRangesDigest(phantoms_), CalcG1DataDigest(request_.ot_vi),
+       G1ToBin(request_.ot_v), CalcG1DataDigest(ot_ui_), k_mkl_root_}};
   seed2_ = CalcSeed2(seed2_h);
   // std::cout << "bob seed: " << misc::HexToStr(seed2_) << "\n";
 

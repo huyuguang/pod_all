@@ -43,7 +43,8 @@ class Bob {
   uint64_t const s_;
   std::vector<Range> const demands_;
   uint64_t demands_count_ = 0;
-  h256_t seed2_seed_;
+  h256_t alice_nonce_;
+  h256_t bob_nonce_;
 
  private:
   std::vector<G1> k_;

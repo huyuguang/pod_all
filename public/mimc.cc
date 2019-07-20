@@ -1,5 +1,9 @@
 #include "mimc.h"
 
+// P = Fr::getModulo(), that is the order of the  G1, equal
+// 21888242871839275222246405745257275088548364400416034343698204186575808495617
+// gcd(P-1, 5) = 1, gcd(P-1, 7) = 1, gcd(P-1, 3)=0
+
 std::vector<Fr> MimcConst(std::string const& prefix, size_t count) {
   std::vector<Fr> ret(count);
   for (size_t i = 0; i < count; ++i) {

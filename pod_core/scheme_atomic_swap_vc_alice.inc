@@ -28,6 +28,7 @@ Alice<AliceData>::Alice(std::shared_ptr<AliceData> a, h256_t const& self_id,
   seed0_ = FrRand();
   seed0_rand_ = FrRand();
   seed0_mimc3_digest_ = Mimc3(seed0_, seed0_rand_);
+  alice_nonce_ = misc::RandH256();
 }
 
 template <typename AliceData>
@@ -54,7 +55,7 @@ bool Alice<AliceData>::OnRequest(Request request, Response& response) {
   for (auto const& i : request.demands) demands_count_ += i.count;
 
   demands_ = std::move(request.demands);
-  seed2_seed_ = request.seed2_seed;
+  bob_nonce_ = request.bob_nonce;
 
   BuildMapping();
 
@@ -69,9 +70,11 @@ bool Alice<AliceData>::OnRequest(Request request, Response& response) {
     std::cout << "evil: " << evil_i << "," << evil_j << "\n";
   }
 
+  response.alice_nonce = alice_nonce_;
+
   BuildK(v_, response.k, s_);
 
-  std::vector<h256_t> seed2_h{{peer_id_, self_id_, seed2_seed_,
+  std::vector<h256_t> seed2_h{{peer_id_, self_id_, alice_nonce_, bob_nonce_,
                                CalcRangesDigest(demands_),
                                CalcRootOfK(response.k)}};
   seed2_ = CalcSeed2(seed2_h);

@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "ecc.h"
+#include "mimc.h"
 #include "scheme_atomic_swap_vc_zkp.h"
 
 namespace scheme::atomic_swap_vc {

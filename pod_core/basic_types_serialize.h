@@ -175,7 +175,7 @@ namespace libsnark {
 template <typename Ar>
 void serialize(Ar &ar, ZkProof const &t) {
   assert(ar.type() == yas::binary);
-  std::array<uint8_t, kZkProofSerializeSize> bin;
+  std::vector<uint8_t> bin;
   ZkProofToBin(t, bin);
   ar &bin;
 }
@@ -184,7 +184,7 @@ void serialize(Ar &ar, ZkProof const &t) {
 template <typename Ar>
 void serialize(Ar &ar, ZkProof &t) {
   assert(ar.type() == yas::binary);
-  std::array<uint8_t, kZkProofSerializeSize> bin;
+  std::vector<uint8_t> bin;
   ar &bin;
   ZkProofFromBin(t, bin);
 }

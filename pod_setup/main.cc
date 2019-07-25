@@ -1,6 +1,7 @@
 #include "ecc.h"
 #include "public.h"
 #include "zkp.h"
+#include "mimc.h"
 
 bool GenerateAtomicSwapKeyPair(std::string const& output_path, uint64_t count);
 
@@ -16,7 +17,7 @@ int main(int argc, char** argv) {
         "output_path,o",
         po::value<std::string>(&output_path)->default_value("zksnark_key"),
         "Provide the output path")(
-        "count,c", po::value<uint64_t>(&count)->default_value(1024),
+        "count,c", po::value<uint64_t>(&count)->default_value(ZkpMimcCount()),
         "Provide the count")(
         "verbose,v", po::value<bool>(&verbose)->default_value(false),
         "Enable libff log");

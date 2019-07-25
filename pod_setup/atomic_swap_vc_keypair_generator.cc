@@ -83,38 +83,47 @@ bool GenerateAtomicSwapKeyPair(std::string const& output_path, uint64_t count) {
       keypair = libsnark::r1cs_gg_ppzksnark_generator<
           libsnark::default_r1cs_gg_ppzksnark_pp>(constraint_system);
 
+  std::ios_base::openmode out_mode = std::ios_base::out | std::ios_base::binary;
+  std::ios_base::openmode in_mode = std::ios_base::in | std::ios_base::binary;
+  std::string pk_file = output_path + "/atomic_swap_vc.pk";
+  std::string vk_file = output_path + "/atomic_swap_vc.vk";
+
   try {
+    libsnark::r1cs_gg_ppzksnark_keypair<libsnark::default_r1cs_gg_ppzksnark_pp>
+        keypair_check;
+
     std::ofstream ofs_vk_data;
-    ofs_vk_data.open(output_path + "/atomic_swap_vc.vk",
-                     std::ofstream::out | std::ofstream::binary);
+    ofs_vk_data.open(vk_file, out_mode);
     ofs_vk_data << keypair.vk;
     ofs_vk_data.close();
 
     std::ofstream ofs_pk_data;
-    ofs_pk_data.open(output_path + "/atomic_swap_vc.pk",
-                     std::ofstream::out | std::ofstream::binary);
+    ofs_pk_data.open(pk_file, out_mode);
     ofs_pk_data << keypair.pk;
     ofs_pk_data.close();
 
-    libsnark::r1cs_gg_ppzksnark_keypair<libsnark::default_r1cs_gg_ppzksnark_pp>
-        keypair_check;
-
     std::ifstream ifs_vk_data;
-    ifs_vk_data.open(output_path + "/atomic_swap_vc.vk",
-                     std::ifstream::in | std::ifstream::binary);
+    ifs_vk_data.open(vk_file, in_mode);
     ifs_vk_data >> keypair_check.vk;
 
+    if (!(keypair.vk == keypair_check.vk)) {
+      assert(false);
+      throw std::runtime_error("oops: vk");
+    }
+
     std::ifstream ifs_pk_data;
-    ifs_pk_data.open(output_path + "/atomic_swap_vc.pk",
-                     std::ifstream::in | std::ifstream::binary);
+    ifs_pk_data.open(pk_file, in_mode);
     ifs_pk_data >> keypair_check.pk;
 
-    if (!(keypair.pk == keypair_check.pk) ||
-        !(keypair.vk == keypair_check.vk)) {
+    if (!(keypair.pk == keypair_check.pk)) {
       assert(false);
-      throw std::runtime_error("oops");
+      throw std::runtime_error("oops: pk");
     }
-    std::cout << "Generate success\n";
+
+    std::cout << "Generate success:\n";
+    std::cout << "pk_file: " << pk_file << "\n";
+    std::cout << "vk_file: " << vk_file << "\n";
+
     return true;
   } catch (std::exception& ex) {
     std::cerr << "Execption: " << ex.what() << "\n";

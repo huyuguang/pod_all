@@ -5,6 +5,7 @@
 #include <numeric>
 #include "scheme_atomic_swap_vc_zkp.h"
 #include "tick.h"
+#include "scheme_atomic_swap_vc_serialize.h"
 
 namespace scheme::atomic_swap_vc {
 
@@ -27,7 +28,8 @@ void ConvertToZkpItems(std::vector<ZkpItem>& zkp_items,
 
 void ConvertToZkvItems(std::vector<ZkvItem>& zkv_items,
                        std::vector<ZkItem> const& zk_items,
-                       std::vector<Fr> const& zk_ip_vw, Fr seed_mimc3_digest) {
+                       std::vector<Fr> const& zk_ip_vw,
+                       Fr const& seed_mimc3_digest) {
   assert(zk_items.size() == zk_ip_vw.size());
   zkv_items.resize(zk_items.size());
   for (size_t i = 0; i < zk_items.size(); ++i) {
@@ -38,6 +40,22 @@ void ConvertToZkvItems(std::vector<ZkvItem>& zkv_items,
   }
 }
 }  // namespace
+
+
+void SaveProofToFile(std::string const& file, ZkProof const& proof,
+                ZkItem const& zk_item, Fr seed_mimc3_digest, Fr ip_vw) {
+  try {
+    yas::file_ostream os(file.c_str());
+    yas::binary_oarchive<yas::file_ostream, YasBinF()> oa(os);
+    oa.serialize(proof);
+    oa.serialize(zk_item.public_offset);
+    oa.serialize(zk_item.public_w);
+    oa.serialize(seed_mimc3_digest);
+    oa.serialize(ip_vw);
+  } catch (std::exception&) {
+    // ignore
+  }  
+}
 
 void BuildZkItems(std::vector<ZkItem>& zk_items, uint64_t n, uint64_t s,
                   std::vector<Fr> const& w) {
@@ -156,6 +174,19 @@ bool VerifyZkProofs(std::vector<ZkProof> const& zk_proofs, ZkVk const& vk,
   for (size_t i = 0; i < zk_items.size(); ++i) {
     if (!VerifyZkProof(zk_proofs[i], vk, zkv_items[i])) return false;
   }
+
+#ifdef TEST_GENERATE_PROOF_FILE
+  boost::system::error_code err;
+  if (fs::is_directory("./temp", err) ||
+      fs::create_directories("./temp", err)) {
+    for (size_t i = 0; i < zk_items.size(); ++i) {
+      SaveProofToFile(std::string("./temp/zk_proof_") + std::to_string(i),
+                      zk_proofs[i], zk_items[i], seed_mimc3_digest,
+                      zk_ip_vw[i]);
+    }
+  }
+#endif
+
   return true;
 }
 }  // namespace scheme::atomic_swap_vc

@@ -17,6 +17,8 @@ void InitEcc() {
   std::cout << "init mcl in main\n";
   mcl::bn::CurveParam cp = mcl::BN_SNARK1;
   mcl::bn256::initPairing(cp);
+  // Fr::setETHserialization(true);
+  // Fp::setETHserialization(true);
   // Fr::setIoMode(mcl::IoMode::IoSerialize);
   // G1::setIoMode(mcl::IoMode::IoSerialize);
   // G2::setIoMode(mcl::IoMode::IoSerialize);

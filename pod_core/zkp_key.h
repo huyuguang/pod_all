@@ -3,8 +3,9 @@
 #include <boost/noncopyable.hpp>
 #include <mutex>
 #include <unordered_map>
-#include "zkp.h"
+#include "public.h"
 #include "tick.h"
+#include "zkp.h"
 
 class ZkpKey : boost::noncopyable {
  public:

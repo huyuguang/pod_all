@@ -18,6 +18,7 @@ struct imembuf : public std::streambuf {
     char* p(const_cast<char*>(array));
     this->setg(p, p, p + len);
   }
+  size_t get_count() { return gptr() - eback(); }
 };
 
 struct imemstream : virtual imembuf, std::istream {
@@ -27,6 +28,7 @@ struct imemstream : virtual imembuf, std::istream {
 
 struct omembuf : public std::streambuf {
   omembuf(char* array, size_t len) { this->setp(array, array + len); }
+  size_t get_count() { return pptr() - pbase(); }
 };
 
 struct omemstream : virtual omembuf, std::ostream {
@@ -89,14 +91,15 @@ ZkVkPtr LoadZkVk(std::string const& file) {
   }
 }
 
-void ZkProofToBin(ZkProof const& proof,
-                  std::array<uint8_t, kZkProofSerializeSize>& bin) {
+void ZkProofToBin(ZkProof const& proof, std::vector<uint8_t>& bin) {
+  bin.resize(1024);
   omemstream out((char*)bin.data(), bin.size());
   out << proof;
+  bin.resize(out.get_count());
 }
 
-void ZkProofFromBin(ZkProof& proof,
-                    std::array<uint8_t, kZkProofSerializeSize> const& bin) {
+void ZkProofFromBin(ZkProof& proof, std::vector<uint8_t> const& bin) {
   imemstream in((char*)bin.data(), bin.size());
   in >> proof;
+  assert(in.get_count() == bin.size());
 }

@@ -10,6 +10,10 @@ enum {
   kMimcInvRound = 64,
 };
 
+inline uint64_t constexpr ZkpMimcCount() {
+  return 1024;
+}
+
 std::vector<Fr> const& Mimc3Const();
 
 std::vector<Fr> const& MimcInvConst();

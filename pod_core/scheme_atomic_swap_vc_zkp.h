@@ -4,10 +4,6 @@
 
 namespace scheme::atomic_swap_vc {
 
-inline uint64_t constexpr ZkpMimcCount() {
-  return 1024;
-}
-
 struct ZkpItem {
   std::vector<ZkFr> o;
   std::vector<ZkFr> w;

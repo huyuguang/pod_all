@@ -26,11 +26,6 @@ typedef libsnark::r1cs_gg_ppzksnark_verification_key<
     ZkVk;
 typedef std::shared_ptr<ZkVk> ZkVkPtr;
 
-enum {
-  // check the ZkProof operator<<()
-  kZkProofSerializeSize = 2 * (32 + 2) + 1 * (64 + 2),
-};
-
 void InitZkp(bool disable_log);
 
 ZkFr ConvertToZkFr(Fr const& mcl_fr);
@@ -43,8 +38,6 @@ ZkPkPtr LoadZkPk(std::string const& file);
 
 ZkVkPtr LoadZkVk(std::string const& file);
 
-void ZkProofToBin(ZkProof const& proof,
-                  std::array<uint8_t, kZkProofSerializeSize>& bin);
+void ZkProofToBin(ZkProof const& proof, std::vector<uint8_t>& bin);
 
-void ZkProofFromBin(ZkProof& proof,
-                    std::array<uint8_t, kZkProofSerializeSize> const& bin);
+void ZkProofFromBin(ZkProof& proof, std::vector<uint8_t> const& bin);

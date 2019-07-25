@@ -8,8 +8,9 @@
   </PropertyGroup>
   <ItemDefinitionGroup>
     <ClCompile>
-      <AdditionalIncludeDirectories>$(SolutionDir)/../depends/install/include</AdditionalIncludeDirectories>
-      <PreprocessorDefinitions>MULTICORE;MCL_NO_AUTOLINK;MCL_DONT_USE_OPENSSL;BOOST_SPIRIT_THREADSAFE;BOOST_CONFIG_SUPPRESS_OUTDATED_MESSAGE;BINARY_OUTPUT;CURVE_MCL_BN128;MONTGOMERY_OUTPUT;NO_PROCPS;USE_ASM;WIN32_LEAN_AND_MEAN;NOMINMAX;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>
+      </AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>NO_PT_COMPRESSION;MULTICORE=1;MCL_NO_AUTOLINK;MCL_DONT_USE_OPENSSL;BOOST_SPIRIT_THREADSAFE;BOOST_CONFIG_SUPPRESS_OUTDATED_MESSAGE;CURVE_MCL_BN128;NO_PROCPS;USE_ASM;WIN32_LEAN_AND_MEAN;NOMINMAX;_MBCS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <AdditionalLibraryDirectories>$(SolutionDir)/../depends/libsnark/msvc/lib/x64/release</AdditionalLibraryDirectories>

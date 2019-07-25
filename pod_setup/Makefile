@@ -55,11 +55,19 @@ CXXFLAGS := \
  -fmerge-all-constants  \
  $(INC_FLAGS) \
 
+#SNARK_FLAGS = \
+# -DBINARY_OUTPUT \
+# -DBN_SUPPORT_SNARK=1 \
+# -DCURVE_MCL_BN128 \
+# -DMONTGOMERY_OUTPUT \
+# -DMULTICORE=1 \
+# -DUSE_ASM \
+# -DNO_PROCPS \
+
 SNARK_FLAGS = \
- -DBINARY_OUTPUT \
  -DBN_SUPPORT_SNARK=1 \
+ -DNO_PT_COMPRESSION=1 \
  -DCURVE_MCL_BN128 \
- -DMONTGOMERY_OUTPUT \
  -DMULTICORE=1 \
  -DUSE_ASM \
  -DNO_PROCPS \
@@ -95,6 +103,9 @@ LIBS := \
  -lsnark \
  -lff \
  -lmcl \
+
+# if CURVE_BN128
+# LIBS += -lzm
 
 ifeq ($(OS_TYPE),Darwin)
   TMPVAR := $(CXXFLAGS)

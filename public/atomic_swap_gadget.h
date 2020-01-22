@@ -19,7 +19,7 @@ class AtomicSwapVcGadget : public libsnark::gadget<FieldT> {
   libsnark::pb_linear_combination_array<FieldT> seed_o_;
   std::shared_ptr<libsnark::inner_product_gadget<FieldT>> ip_gadget_;
   std::shared_ptr<Mimc3Gadget<FieldT>> mimc3_gadget_;
-  std::vector<std::shared_ptr<MimcInvGadget<FieldT>>> mimcinv_gadgets_;
+  std::vector<std::shared_ptr<Mimc5Gadget<FieldT>>> mimcinv_gadgets_;
 
   AtomicSwapVcGadget(libsnark::protoboard<FieldT>& pb,
                      const std::vector<FieldT>& mimc3_constants,
@@ -56,7 +56,7 @@ class AtomicSwapVcGadget : public libsnark::gadget<FieldT> {
       seed_o_[i].assign(pb, lc_seed_o);
 
       mimcinv_gadgets_[i].reset(
-          new MimcInvGadget<FieldT>(pb, mimcinv_constants, seed_o_[i], v_[i],
+          new Mimc5Gadget<FieldT>(pb, mimcinv_constants, seed_o_[i], v_[i],
                                     FMT(this->annotation_prefix, " mimcinv")));
     }
   }

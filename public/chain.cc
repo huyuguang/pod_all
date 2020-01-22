@@ -54,7 +54,7 @@ void ChainKeccak256(h256_t const& seed, uint64_t count, std::vector<Fr>& v) {
 }
 
 Fr ChainMimcInv(Fr const& seed, uint64_t index) {
-  return MimcInv(seed + index);
+  return Mimc5(seed + index);
 }
 
 void ChainMimcInv(Fr const& seed, uint64_t count, std::vector<Fr>& v) {

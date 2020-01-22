@@ -25,8 +25,8 @@ std::vector<Fr> const& Mimc3Const() {
   return kConst;
 }
 
-std::vector<Fr> const& MimcInvConst() {
-  static std::vector<Fr> kConst(MimcConst("mimc_inv_const", kMimcInvRound));
+std::vector<Fr> const& Mimc5Const() {
+  static std::vector<Fr> kConst(MimcConst("mimc_inv_const", kMimc5Round));
   return kConst;
 }
 
@@ -60,25 +60,35 @@ Fr Mimc3Circuit(Fr const& left, Fr const& right) {
   return y.back();
 }
 
-Fr MimcInv(Fr const& s) {
-  auto const& kConst = MimcInvConst();
-  std::vector<Fr> x(kConst.size());
-  auto box = [](Fr const& v) { return v.inverse(); };
-  x[0] = box(s + kConst[0]);
-  x[1] = s + box(x[0] + kConst[1]);
-  for (size_t i = 2; i < kConst.size(); ++i) {
-    x[i] = x[i - 2] + box(x[i - 1] + kConst[i]);
+Fr Mimc5(Fr const& s) {
+  //auto const& kConst = Mimc5Const();
+  //std::vector<Fr> x(kConst.size());
+  //auto box = [](Fr const& v) { return v.inverse(); };
+  //x[0] = box(s + kConst[0]);
+  //x[1] = s + box(x[0] + kConst[1]);
+  //for (size_t i = 2; i < kConst.size(); ++i) {
+  //  x[i] = x[i - 2] + box(x[i - 1] + kConst[i]);
+  //}
+  //return x.back();
+  auto const& kConst = Mimc5Const();
+  auto box = [](Fr const& v) {
+    auto vv = v * v;
+    return vv * vv * v;
+  };
+  Fr enc = 0;
+  for (size_t i = 0; i < kConst.size(); ++i) {
+    enc = box(enc + s + kConst[i]);
   }
-  return x.back();
+  return enc + s;
 }
-
-Fr MimcInvCircuit(Fr const& s) {
-  auto const& kConst = MimcInvConst();
-  std::vector<Fr> x(kConst.size());
-  x[0] = FrInv(s + kConst[0]);
-  x[1] = s + FrInv(x[0] + kConst[1]);
-  for (size_t i = 2; i < kConst.size(); ++i) {
-    x[i] = x[i - 2] + FrInv(x[i - 1] + kConst[i]);
-  }
-  return x.back();
-}
+//
+//Fr MimcInvCircuit(Fr const& s) {
+//  auto const& kConst = Mimc5Const();
+//  std::vector<Fr> x(kConst.size());
+//  x[0] = FrInv(s + kConst[0]);
+//  x[1] = s + FrInv(x[0] + kConst[1]);
+//  for (size_t i = 2; i < kConst.size(); ++i) {
+//    x[i] = x[i - 2] + FrInv(x[i - 1] + kConst[i]);
+//  }
+//  return x.back();
+//}

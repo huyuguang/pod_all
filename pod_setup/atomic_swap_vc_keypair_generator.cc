@@ -69,7 +69,7 @@ bool GenerateAtomicSwapKeyPair(std::string const& output_path, uint64_t count) {
 
   // Add R1CS constraints to protoboard
   auto mimc3_const = ConvertToZkFr(Mimc3Const());
-  auto mimcinv_const = ConvertToZkFr(MimcInvConst());
+  auto mimcinv_const = ConvertToZkFr(Mimc5Const());
   AtomicSwapVcGadget<ZkFr> g(pb, mimc3_const, mimcinv_const, seed, seed_rand,
                              digest, result, o, w);
   g.generate_r1cs_constraints();

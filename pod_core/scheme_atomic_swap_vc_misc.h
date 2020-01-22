@@ -15,7 +15,7 @@ inline uint64_t PadCountOfCol(uint64_t n) {
 }
 
 struct ZkItem {
-  std::vector<uint64_t> public_offset;  // MimcInv(seed0+offset)
+  std::vector<uint64_t> public_offset;  // Mimc5(seed0+offset)
   std::vector<Fr> public_w;
   std::vector<uint64_t> col;
   uint64_t row;

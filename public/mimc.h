@@ -7,7 +7,7 @@
 
 enum {
   kMimc3Round = 64,
-  kMimcInvRound = 64,
+  kMimc5Round = 110,
 };
 
 inline uint64_t constexpr ZkpMimcCount() {
@@ -16,12 +16,10 @@ inline uint64_t constexpr ZkpMimcCount() {
 
 std::vector<Fr> const& Mimc3Const();
 
-std::vector<Fr> const& MimcInvConst();
+std::vector<Fr> const& Mimc5Const();
 
 Fr Mimc3(Fr const& left, Fr const& right);
 
 Fr Mimc3Circuit(Fr const& left, Fr const& right);
 
-Fr MimcInv(Fr const& s);
-
-Fr MimcInvCircuit(Fr const& s);
+Fr Mimc5(Fr const& s);

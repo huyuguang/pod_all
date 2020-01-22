@@ -10,14 +10,16 @@
 #include <libsnark/zk_proof_systems/ppzksnark/r1cs_ppzksnark/r1cs_ppzksnark.hpp>
 
 template <typename FieldT>
-class MimcInvGadget : public libsnark::gadget<FieldT> {
+class Mimc5Gadget : public libsnark::gadget<FieldT> {
  public:
   const std::vector<FieldT>& constants_;
   const libsnark::pb_linear_combination<FieldT> seed_;
   const libsnark::pb_variable<FieldT> digest_;
-  libsnark::pb_variable_array<FieldT> rounds_x_;
+  libsnark::pb_variable_array<FieldT> rounds_x2_;
+  libsnark::pb_variable_array<FieldT> rounds_x4_;
+  libsnark::pb_variable_array<FieldT> rounds_x5_;
 
-  MimcInvGadget(libsnark::protoboard<FieldT>& pb,
+  Mimc5Gadget(libsnark::protoboard<FieldT>& pb,
                 const std::vector<FieldT>& constants,
                 const libsnark::pb_linear_combination<FieldT> seed,
                 const libsnark::pb_variable<FieldT> digest,
@@ -26,53 +28,65 @@ class MimcInvGadget : public libsnark::gadget<FieldT> {
         constants_(constants),
         seed_(seed),
         digest_(digest) {
-    rounds_x_.allocate(pb, constants_.size(),
-                       FMT(annotation_prefix, " rounds_x"));
+    rounds_x2_.allocate(pb, constants_.size(),
+                        FMT(annotation_prefix, " rounds_x2"));
+    rounds_x4_.allocate(pb, constants_.size(),
+                        FMT(annotation_prefix, " rounds_x4"));
+    rounds_x5_.allocate(pb, constants_.size(),
+                        FMT(annotation_prefix, " rounds_x5"));
   }
 
   libsnark::pb_variable<FieldT> result() {
-    return rounds_x_[constants_.size() - 1];
+    return rounds_x5_[constants_.size() - 1];
   }
 
   void generate_r1cs_constraints() {
-    // x[0] = FrInv(s + kConst[0]);
-    this->pb.add_r1cs_constraint(libsnark::r1cs_constraint<FieldT>(
-        rounds_x_[0], seed_ + constants_[0], FieldT(1)));
+    libsnark::pb_variable<FieldT> data;
+    for (size_t i = 0; i < constants_.size(); ++i) {
+      auto x1 = i == 0 ? (seed_ + constants_[i]) : (data + seed_ + constants_[i]);
+      this->pb.add_r1cs_constraint(
+          libsnark::r1cs_constraint<FieldT>(x1, x1, rounds_x2_[i]), "x1*x1");
+      this->pb.add_r1cs_constraint(
+          libsnark::r1cs_constraint<FieldT>(rounds_x2_[i], rounds_x2_[i],
+                                        rounds_x4_[i]),
+          "x2*x2");
 
-    // x[1] = s + FrInv(x[0] + kConst[1]);
-    this->pb.add_r1cs_constraint(libsnark::r1cs_constraint<FieldT>(
-        rounds_x_[1] - seed_, rounds_x_[0] + constants_[1], FieldT(1)));
-
-    for (size_t i = 2; i < constants_.size(); ++i) {
-      // x[i] = x[i - 2] + FrInv(x[i - 1] + kConst[i]);
-      this->pb.add_r1cs_constraint(libsnark::r1cs_constraint<FieldT>(
-          rounds_x_[i] - rounds_x_[i - 2], rounds_x_[i - 1] + constants_[i],
-          FieldT(1)));
+      if (i < constants_.size() - 1) {
+        this->pb.add_r1cs_constraint(
+            libsnark::r1cs_constraint<FieldT>(rounds_x4_[i], x1, rounds_x5_[i]),
+            "x4*x1");
+        data = rounds_x5_[i];
+      } else {
+        this->pb.add_r1cs_constraint(
+            libsnark::r1cs_constraint<FieldT>(rounds_x4_[i], x1,
+                                          rounds_x5_[i] - seed_),
+            "x5");
+      }
     }
 
     // digest_ == x.back()
     this->pb.add_r1cs_constraint(libsnark::r1cs_constraint<FieldT>(
-        1, rounds_x_[constants_.size() - 1] - digest_, 0));
+        1, rounds_x5_[constants_.size() - 1] - digest_, 0));
   }
 
   void generate_r1cs_witness() {
     seed_.evaluate(this->pb);
     FieldT seed = this->pb.lc_val(seed_);
-    FieldT temp;
-
-    // x[0] = FrInv(s + kConst[0]);
-    temp = seed + constants_[0];
-    this->pb.val(rounds_x_[0]) = temp.inverse();
-
-    // x[1] = s + FrInv(x[0] + kConst[1]);
-    temp = this->pb.val(rounds_x_[0]) + constants_[1];
-    this->pb.val(rounds_x_[1]) = seed + temp.inverse();
-
-    for (size_t i = 2; i < constants_.size(); ++i) {
-      // x[i] = x[i - 2] + FrInv(x[i - 1] + kConst[i]);
-      temp = this->pb.val(rounds_x_[i - 1]) + constants_[i];
-      this->pb.val(rounds_x_[i]) =
-          this->pb.val(rounds_x_[i - 2]) + temp.inverse();
+    FieldT data = 0;
+    for (size_t i = 0; i < constants_.size(); ++i) {
+      auto x1 = data + seed + constants_[i];
+      auto x2 = x1 * x1;
+      auto x4 = x2 * x2;
+      auto x5 = x4 * x1;
+      this->pb.val(rounds_x2_[i]) = x2;
+      this->pb.val(rounds_x4_[i]) = x4;
+      if (i < constants_.size() - 1) {
+        this->pb.val(rounds_x5_[i]) = x5;
+        // std::cout << x5 << "\n";
+        data = x5;
+      } else {
+        this->pb.val(rounds_x5_[i]) = x5 + seed;
+      }
     }
   }
 };
